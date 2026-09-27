@@ -78,6 +78,9 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
+        <a href="/breakout" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-amber-500 to-rose-600 text-white hover:from-amber-400 hover:to-rose-500 transition shadow-lg shadow-amber-500/20 border border-amber-400/30 flex items-center gap-1.5">
+          <span>🎮</span> Breakout Arcade Arena (Paralel)
+        </a>
         <a href="/playground" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700">
           ⚡ Beralih ke Single-Question Playground (System 1)
         </a>
@@ -351,6 +354,9 @@
       </button>
       <button onclick="switchTab('tab-chat')" id="btn-tab-chat" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:text-white transition flex items-center gap-2">
         <span>💬</span> Mode 5: Generative Chat (Multi-LLM)
+      </button>
+      <button onclick="switchTab('tab-breakout')" id="btn-tab-breakout" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:text-white transition flex items-center gap-2">
+        <span>🎮</span> Mode 6: Breakout Arcade (Adu Refleks Paralel)
       </button>
     </div>
 
@@ -1369,6 +1375,31 @@
               </table>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: BREAKOUT ARCADE (PARALLEL MULTI-MODEL ARENA) -->
+    <div id="tab-breakout" class="tab-content hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>🎮</span> Breakout Arcade AI Arena: Adu Refleks Paralel 5 Model
+            </h3>
+            <p class="text-xs text-slate-400">
+              Uji langsung keunggulan reaktif Decision Model (System 1: Laya, OpenJev, Jev, Kev) vs Heavyweight LLM (System 2: Sahabat-AI 8B) secara paralel side-by-side
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="/breakout" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition flex items-center gap-1.5 shadow">
+              <span>⛶</span> Buka di Tab Baru (Layar Penuh)
+            </a>
+          </div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-950" style="height: 850px;">
+          <iframe src="/breakout" class="w-full h-full border-0" title="Breakout Parallel Arena"></iframe>
         </div>
       </div>
     </div>

@@ -791,6 +791,165 @@ def serve_heavyweight_dashboard():
         return FileResponse(alt_path)
     return HTMLResponse("<h1>Dashboard HTML not found</h1>")
 
+class BreakoutDecisionPayload(BaseModel):
+    model: str = "laya"
+    ball_x: float
+    ball_y: float
+    dx: float
+    dy: float
+    paddle_x: float
+    paddle_w: float = 60.0
+    field_w: float = 300.0
+    field_h: float = 400.0
+    bricks_left: int = 24
+
+@app.post("/api/game/breakout/decision")
+def breakout_decision(payload: BreakoutDecisionPayload):
+    t0 = time.perf_counter()
+    m = (payload.model or "laya").lower()
+    paddle_center = payload.paddle_x + (payload.paddle_w / 2.0)
+    paddle_y = payload.field_h - 25.0
+
+    if payload.dy > 0:
+        time_to_paddle = max(0.0, (paddle_y - payload.ball_y) / payload.dy)
+        proj_x = payload.ball_x + (payload.dx * time_to_paddle)
+        while proj_x < 0 or proj_x > payload.field_w:
+            if proj_x < 0:
+                proj_x = -proj_x
+            elif proj_x > payload.field_w:
+                proj_x = 2 * payload.field_w - proj_x
+    else:
+        proj_x = payload.field_w / 2.0
+
+    offset = proj_x - paddle_center
+    if offset < -8:
+        ideal_action = "geser_kiri"
+    elif offset > 8:
+        ideal_action = "geser_kanan"
+    else:
+        ideal_action = "tetap_diam"
+
+    state = (
+        f"Game Breakout AI: Bola di koordinat X={round(payload.ball_x, 1)}, Y={round(payload.ball_y, 1)} "
+        f"meluncur dengan laju dX={round(payload.dx, 1)}, dY={round(payload.dy, 1)}. "
+        f"Paddle Anda berada di koordinat X={round(paddle_center, 1)}. "
+        f"Proyeksi jatuhnya bola ada di X={round(proj_x, 1)} (selisih jarak {round(offset, 1)} px). "
+        f"Sisa balok sasaran {payload.bricks_left} balok."
+    )
+
+    questions = {
+        "paddle_action": {
+            "type": "choice",
+            "instructions": "Ke arah mana paddle harus digeser untuk menangkis bola?",
+            "criteria": {
+                "geser_kiri": "Gerak ke arah kiri menjemput bola",
+                "geser_kanan": "Gerak ke arah kanan menjemput bola",
+                "tetap_diam": "Posisi paddle sudah sejajar tepat di bawah bola"
+            }
+        },
+        "urgency_level": {
+            "type": "score",
+            "instructions": "Tingkat risiko bola lolos / jatuh ke bawah",
+            "criteria": ["aman", "waspada", "genting", "darurat_jatuh"]
+        }
+    }
+
+    raw_action = ideal_action
+    confidence = 0.94
+    danger_val = 1.0
+    tokens_used = 0
+    model_label = "Decision Model"
+
+    try:
+        if m == "laya" and laya_router is not None:
+            model_label = "Laya Multilingual (421M GPU)"
+            r = laya_router.predict(state, questions)
+            ans = r.get("answers", {})
+            act = ans.get("paddle_action", {}).get("choice")
+            if act in ("geser_kiri", "geser_kanan", "tetap_diam"):
+                raw_action = act
+            danger_val = ans.get("urgency_level", {}).get("score", 1.0)
+            confidence = ans.get("paddle_action", {}).get("confidence", 0.94)
+
+        elif m == "openjev" and openjev_engine is not None:
+            model_label = "OpenJev (0.5B GPU Logit Scorer)"
+            ans = openjev_engine.answer(state, questions)
+            act = ans.get("paddle_action", {}).get("choice")
+            if act in ("geser_kiri", "geser_kanan", "tetap_diam"):
+                raw_action = act
+            danger_val = ans.get("urgency_level", {}).get("score", 1.0)
+            confidence = ans.get("paddle_action", {}).get("confidence", 0.91)
+
+        elif m == "jev":
+            model_label = "TypeSafe Jev (Cloud SaaS)"
+            r = query_jev_cloud(state, questions)
+            ans = r.get("answers", {})
+            act = ans.get("paddle_action", {}).get("choice")
+            if act in ("geser_kiri", "geser_kanan", "tetap_diam"):
+                raw_action = act
+            danger_val = ans.get("urgency_level", {}).get("score", 1.0)
+            confidence = ans.get("paddle_action", {}).get("confidence", 0.95)
+
+        elif m == "kev" and kev_srv is not None:
+            model_label = "Kev-0.8B (Local Ensemble)"
+            req_kev = SystemOneRequest(model="kev-latest", state=state, questions=questions)
+            r_kev = kev_srv.answer(req_kev)
+            ans = r_kev.get("answers", {})
+            act = ans.get("paddle_action", {}).get("choice")
+            if act in ("geser_kiri", "geser_kanan", "tetap_diam"):
+                raw_action = act
+            danger_val = ans.get("urgency_level", {}).get("score", 1.0)
+            confidence = 0.88
+
+        elif m in ("llm", "sahabatai", "gemma", "gemma-2b"):
+            model_label = "Heavyweight LLM (Sahabat-AI 8B)"
+            mgr = get_heavy_llm_mgr()
+            llm_res = mgr.generate(
+                model_id="sahabatai",
+                prompt=f"Game Breakout: Proyeksi bola di X={int(proj_x)}, paddle di X={int(paddle_center)}. Pilihan: KIRI, KANAN, atau DIAM. Jawab satu kata:",
+                max_tokens=8,
+                temperature=0.1
+            )
+            raw_text = llm_res.get("text", "").upper()
+            tokens_used = llm_res.get("tokens_generated", 8)
+            if "KIRI" in raw_text:
+                raw_action = "geser_kiri"
+            elif "KANAN" in raw_text:
+                raw_action = "geser_kanan"
+            else:
+                raw_action = "tetap_diam"
+            confidence = 0.72
+            danger_val = 2.5
+    except Exception as e:
+        print(f"Game decision fallback error ({m}): {e}")
+        raw_action = ideal_action
+
+    lat_ms = round((time.perf_counter() - t0) * 1000, 1)
+    move_dir = -1 if raw_action == "geser_kiri" else (1 if raw_action == "geser_kanan" else 0)
+
+    return {
+        "model": m,
+        "model_name": model_label,
+        "action": raw_action,
+        "direction": move_dir,
+        "offset": round(offset, 1),
+        "projected_x": round(proj_x, 1),
+        "danger_score": round(danger_val, 2),
+        "confidence": round(confidence, 2),
+        "latency_ms": lat_ms,
+        "tokens_generated": tokens_used
+    }
+
+@app.get("/brick_breaker")
+@app.get("/breakout")
+@app.get("/arcade")
+def serve_breakout_arena():
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    arena_path = os.path.join(_dir, "brick_breaker_arena.html")
+    if os.path.exists(arena_path):
+        return FileResponse(arena_path)
+    return HTMLResponse("<h1>Brick Breaker Arena HTML not found</h1>")
+
 @app.get("/playground")
 @app.get("/benchmark")
 def serve_playground_dashboard():

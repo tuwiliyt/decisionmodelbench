@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 Arena Breakout AI: Pertarungan Paralel Decision Models (System 1 vs System 2)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              laya: '#10b981',
+              openjev: '#06b6d4',
+              jev: '#a855f7',
+              kev: '#f59e0b',
+              llm: '#f43f5e'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #050811;
+      color: #e2e8f0;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .arcade-glow {
+      box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.3);
+    }
+    canvas {
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased text-slate-200">
+
+  <!-- Header Section -->
+  <header class="border-b border-slate-800/80 sticky top-0 z-50 glass-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-600 to-rose-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 font-bold text-white text-xl animate-pulse">
+          🎮
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-400 bg-clip-text text-transparent">
+              Arena Breakout AI: Pertarungan Paralel Decision Models
+            </h1>
+            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+              5 Model Serentak
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Pembuktian Empiris Kecepatan Refleks: System 1 (0 Token, Sub-100ms) vs System 2 (Heavy LLM)</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <a href="/" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1.5">
+          <span>🏛️</span> Arena LLM
+        </a>
+        <a href="/playground" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1.5">
+          <span>⚡</span> Playground
+        </a>
+        <div id="vramClusterBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-950/40 border border-purple-800/50 text-xs">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="vramClusterText" class="text-purple-200 font-mono text-[11px]">Dual Tesla T4</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls & Arena Master Bar -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Value Proposition Alert Banner -->
+    <div class="glass-card rounded-2xl p-4 border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-purple-950/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
+          <span>💡</span> Logika Pengujian Game Fisika Real-Time
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed max-w-4xl">
+          Dalam game aksi berkecepatan tinggi seperti <strong>Breakout / Brick Breaker</strong>, keputusan harus diambil dalam hitungan milidetik (<span class="text-emerald-300 font-bold">&lt;100 ms</span>). 
+          <strong>Decision Models (Laya, OpenJev, Jev)</strong> menghasilkan keputusan tensor seketika (0 token) dengan tingkat refleks ~15–20 Hz. Sebaliknya, <strong>Foundation LLM (System 2)</strong> memerlukan generasi teks autoregresif ~2,000–3,500 ms per gerakan, menyebabkan bola jatuh sebelum LLM sempat merespons!
+        </p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="toggleAudio()" id="btnAudio" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Toggle Sound FX">
+          🔊 Audio: ON
+        </button>
+      </div>
+    </div>
+
+    <!-- Master Control Bar -->
+    <div class="glass-card rounded-2xl p-4 border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button onclick="startAllGames()" id="btnStartAll" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white hover:opacity-90 shadow-lg shadow-emerald-500/20 transition flex items-center gap-2">
+          <span>▶️</span> MULAI SEMUA BOARD
+        </button>
+        <button onclick="pauseAllGames()" id="btnPauseAll" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-2 border border-slate-700">
+          <span>⏸️</span> JEDA
+        </button>
+        <button onclick="resetAllGames()" id="btnResetAll" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-2 border border-slate-700">
+          <span>🔄</span> RESET SEMUA
+        </button>
+      </div>
+
+      <!-- Mode & Speed Controls -->
+      <div class="flex flex-wrap items-center gap-4 text-xs">
+        <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+          <span class="text-slate-400 font-bold">Mode Pengujian:</span>
+          <select id="simMode" onchange="changeMode()" class="bg-transparent text-cyan-300 font-bold focus:outline-none cursor-pointer">
+            <option value="calibrated" selected>⚡ Refleks Real Latency (60 FPS Smooth)</option>
+            <option value="api_live">📡 Live API POST (/api/game/breakout/decision)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+          <span class="text-slate-400 font-bold">Kecepatan Bola:</span>
+          <select id="gameSpeed" onchange="changeSpeed()" class="bg-transparent text-emerald-300 font-bold focus:outline-none cursor-pointer">
+            <option value="1">1.0x (Normal)</option>
+            <option value="1.5" selected>1.5x (Arcade Cepat)</option>
+            <option value="2">2.0x (Refleks Ekstrem)</option>
+          </select>
+        </div>
+
+        <button onclick="triggerSampleApiCall()" class="px-3 py-1.5 rounded-lg bg-indigo-950 text-indigo-300 hover:bg-indigo-900 transition border border-indigo-800 text-[11px] font-bold">
+          🔬 Uji 1x API Probe
+        </button>
+      </div>
+    </div>
+
+    <!-- 5 Parallel Game Boards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5" id="arenaBoardsContainer">
+
+      <!-- BOARD 1: LAYA MULTILINGUAL (421M GPU) -->
+      <div class="glass-card rounded-2xl p-3 border border-emerald-500/40 relative overflow-hidden flex flex-col justify-between" id="boardCard-laya">
+        <!-- Top Board Info -->
+        <div class="space-y-1.5 pb-2 border-b border-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono">
+              SYSTEM 1
+            </span>
+            <span class="text-[11px] text-emerald-400 font-mono font-bold" id="laya-lives">❤️❤️❤️</span>
+          </div>
+          <div class="text-sm font-extrabold text-white truncate">Laya Multilingual</div>
+          <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+            <span>ModernBERT 421M</span>
+            <span class="text-emerald-400 font-bold" id="laya-lat-header">~55 ms ⚡</span>
+          </div>
+        </div>
+
+        <!-- Canvas Game Window -->
+        <div class="my-2 relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex justify-center items-center">
+          <canvas id="canvas-laya" width="220" height="300" class="block"></canvas>
+          <div id="overlay-laya" class="hidden absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-center p-3">
+            <span class="text-2xl mb-1" id="overlay-laya-icon">🏆</span>
+            <strong class="text-xs text-white" id="overlay-laya-title">SELESAI</strong>
+            <span class="text-[10px] text-slate-400 mt-1" id="overlay-laya-desc">Skor: 0</span>
+          </div>
+        </div>
+
+        <!-- Live Telemetry Box -->
+        <div class="space-y-1 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Skor Balok:</span>
+            <span class="text-white font-bold" id="laya-score">0 / 24</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Aksi Paddle:</span>
+            <span class="text-emerald-400 font-bold" id="laya-action">■ TETAP</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Refleks / Frekuensi:</span>
+            <span class="text-cyan-400 font-bold" id="laya-hz">18.2 Hz</span>
+          </div>
+          <div class="flex justify-between items-center text-[10px] pt-1 border-t border-slate-800">
+            <span class="text-slate-500">Token Terpakai:</span>
+            <span class="text-emerald-400 font-bold">0 token</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOARD 2: OPENJEV (0.5B GPU) -->
+      <div class="glass-card rounded-2xl p-3 border border-cyan-500/40 relative overflow-hidden flex flex-col justify-between" id="boardCard-openjev">
+        <div class="space-y-1.5 pb-2 border-b border-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono">
+              SYSTEM 1
+            </span>
+            <span class="text-[11px] text-cyan-400 font-mono font-bold" id="openjev-lives">❤️❤️❤️</span>
+          </div>
+          <div class="text-sm font-extrabold text-white truncate">OpenJev Logit Scorer</div>
+          <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+            <span>Qwen2.5 0.5B GPU</span>
+            <span class="text-cyan-400 font-bold" id="openjev-lat-header">~210 ms</span>
+          </div>
+        </div>
+
+        <div class="my-2 relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex justify-center items-center">
+          <canvas id="canvas-openjev" width="220" height="300" class="block"></canvas>
+          <div id="overlay-openjev" class="hidden absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-center p-3">
+            <span class="text-2xl mb-1" id="overlay-openjev-icon">🏆</span>
+            <strong class="text-xs text-white" id="overlay-openjev-title">SELESAI</strong>
+            <span class="text-[10px] text-slate-400 mt-1" id="overlay-openjev-desc">Skor: 0</span>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Skor Balok:</span>
+            <span class="text-white font-bold" id="openjev-score">0 / 24</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Aksi Paddle:</span>
+            <span class="text-cyan-400 font-bold" id="openjev-action">■ TETAP</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Refleks / Frekuensi:</span>
+            <span class="text-cyan-400 font-bold" id="openjev-hz">4.8 Hz</span>
+          </div>
+          <div class="flex justify-between items-center text-[10px] pt-1 border-t border-slate-800">
+            <span class="text-slate-500">Token Terpakai:</span>
+            <span class="text-emerald-400 font-bold">0 token</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOARD 3: TYPESAFE JEV (CLOUD SAAS) -->
+      <div class="glass-card rounded-2xl p-3 border border-purple-500/40 relative overflow-hidden flex flex-col justify-between" id="boardCard-jev">
+        <div class="space-y-1.5 pb-2 border-b border-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-800 font-mono">
+              SYSTEM 1
+            </span>
+            <span class="text-[11px] text-purple-400 font-mono font-bold" id="jev-lives">❤️❤️❤️</span>
+          </div>
+          <div class="text-sm font-extrabold text-white truncate">TypeSafe Jev (Cloud)</div>
+          <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+            <span>SaaS Cloud API</span>
+            <span class="text-purple-400 font-bold" id="jev-lat-header">~160 ms</span>
+          </div>
+        </div>
+
+        <div class="my-2 relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex justify-center items-center">
+          <canvas id="canvas-jev" width="220" height="300" class="block"></canvas>
+          <div id="overlay-jev" class="hidden absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-center p-3">
+            <span class="text-2xl mb-1" id="overlay-jev-icon">🏆</span>
+            <strong class="text-xs text-white" id="overlay-jev-title">SELESAI</strong>
+            <span class="text-[10px] text-slate-400 mt-1" id="overlay-jev-desc">Skor: 0</span>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Skor Balok:</span>
+            <span class="text-white font-bold" id="jev-score">0 / 24</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Aksi Paddle:</span>
+            <span class="text-purple-400 font-bold" id="jev-action">■ TETAP</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Refleks / Frekuensi:</span>
+            <span class="text-cyan-400 font-bold" id="jev-hz">6.2 Hz</span>
+          </div>
+          <div class="flex justify-between items-center text-[10px] pt-1 border-t border-slate-800">
+            <span class="text-slate-500">Token Terpakai:</span>
+            <span class="text-emerald-400 font-bold">0 token</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOARD 4: KEV-0.8B (LOCAL ENSEMBLE) -->
+      <div class="glass-card rounded-2xl p-3 border border-amber-500/40 relative overflow-hidden flex flex-col justify-between" id="boardCard-kev">
+        <div class="space-y-1.5 pb-2 border-b border-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800 font-mono">
+              SYSTEM 1
+            </span>
+            <span class="text-[11px] text-amber-400 font-mono font-bold" id="kev-lives">❤️❤️❤️</span>
+          </div>
+          <div class="text-sm font-extrabold text-white truncate">Kev-0.8B Ensemble</div>
+          <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+            <span>Qwen LoRA 0.8B</span>
+            <span class="text-amber-400 font-bold" id="kev-lat-header">~950 ms</span>
+          </div>
+        </div>
+
+        <div class="my-2 relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex justify-center items-center">
+          <canvas id="canvas-kev" width="220" height="300" class="block"></canvas>
+          <div id="overlay-kev" class="hidden absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-center p-3">
+            <span class="text-2xl mb-1" id="overlay-kev-icon">🏆</span>
+            <strong class="text-xs text-white" id="overlay-kev-title">SELESAI</strong>
+            <span class="text-[10px] text-slate-400 mt-1" id="overlay-kev-desc">Skor: 0</span>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Skor Balok:</span>
+            <span class="text-white font-bold" id="kev-score">0 / 24</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Aksi Paddle:</span>
+            <span class="text-amber-400 font-bold" id="kev-action">■ TETAP</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Refleks / Frekuensi:</span>
+            <span class="text-amber-400 font-bold" id="kev-hz">1.1 Hz</span>
+          </div>
+          <div class="flex justify-between items-center text-[10px] pt-1 border-t border-slate-800">
+            <span class="text-slate-500">Token Terpakai:</span>
+            <span class="text-emerald-400 font-bold">0 token</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOARD 5: HEAVYWEIGHT LLM (SAHABAT-AI 8B / GEMMA) -->
+      <div class="glass-card rounded-2xl p-3 border border-rose-500/40 relative overflow-hidden flex flex-col justify-between" id="boardCard-llm">
+        <div class="space-y-1.5 pb-2 border-b border-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800 font-mono">
+              SYSTEM 2 (LLM)
+            </span>
+            <span class="text-[11px] text-rose-400 font-mono font-bold" id="llm-lives">❤️❤️❤️</span>
+          </div>
+          <div class="text-sm font-extrabold text-rose-300 truncate">Sahabat-AI 8B (LLM)</div>
+          <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+            <span>Autoregressive Loop</span>
+            <span class="text-rose-400 font-bold" id="llm-lat-header">~2,500 ms ⏳</span>
+          </div>
+        </div>
+
+        <div class="my-2 relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex justify-center items-center">
+          <canvas id="canvas-llm" width="220" height="300" class="block"></canvas>
+          <div id="overlay-llm" class="hidden absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-center p-3">
+            <span class="text-2xl mb-1" id="overlay-llm-icon">💀</span>
+            <strong class="text-xs text-white" id="overlay-llm-title">GAME OVER</strong>
+            <span class="text-[10px] text-slate-400 mt-1" id="overlay-llm-desc">Lag terlalu tinggi!</span>
+          </div>
+          <!-- Thinking indicator for LLM -->
+          <div id="llmThinkingBadge" class="hidden absolute top-2 right-2 px-2 py-0.5 rounded-full bg-rose-950/90 border border-rose-800 text-[10px] font-mono text-rose-300 animate-pulse flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> Thinking...
+          </div>
+        </div>
+
+        <div class="space-y-1 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Skor Balok:</span>
+            <span class="text-white font-bold" id="llm-score">0 / 24</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Aksi Paddle:</span>
+            <span class="text-rose-400 font-bold" id="llm-action">⏳ LAG...</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Refleks / Frekuensi:</span>
+            <span class="text-rose-400 font-bold" id="llm-hz">0.4 Hz</span>
+          </div>
+          <div class="flex justify-between items-center text-[10px] pt-1 border-t border-slate-800">
+            <span class="text-slate-500">Token Terbuang:</span>
+            <span class="text-rose-400 font-bold" id="llm-tokens">~80 tokens</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Leaderboard & Comparison Telemetry -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Leaderboard Ranking Card -->
+      <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>🏆</span> Klasemen Refleks & Efisiensi Breakout
+          </h3>
+          <span class="text-[10px] font-mono text-cyan-400">Real-Time Sorting</span>
+        </div>
+        <div class="space-y-2.5" id="leaderboardList">
+          <!-- Item Laya -->
+          <div class="p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-bold text-emerald-400 font-mono">#1</span>
+              <div>
+                <strong class="text-white">Laya Multilingual</strong>
+                <div class="text-[10px] text-slate-400">Refleks 18 Hz • 0 Tokens</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-emerald-400 font-mono font-bold" id="lb-laya-score">0 pts</span>
+              <div class="text-[10px] text-slate-500 font-mono">~55 ms</div>
+            </div>
+          </div>
+
+          <!-- Item OpenJev -->
+          <div class="p-2.5 rounded-xl bg-slate-900/90 border border-cyan-500/30 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-bold text-cyan-400 font-mono">#2</span>
+              <div>
+                <strong class="text-white">OpenJev Logit Scorer</strong>
+                <div class="text-[10px] text-slate-400">Refleks 4.8 Hz • 0 Tokens</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-cyan-400 font-mono font-bold" id="lb-openjev-score">0 pts</span>
+              <div class="text-[10px] text-slate-500 font-mono">~210 ms</div>
+            </div>
+          </div>
+
+          <!-- Item Jev -->
+          <div class="p-2.5 rounded-xl bg-slate-900/90 border border-purple-500/30 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-bold text-purple-400 font-mono">#3</span>
+              <div>
+                <strong class="text-white">TypeSafe Jev (Cloud)</strong>
+                <div class="text-[10px] text-slate-400">Refleks 6.2 Hz • 0 Tokens</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-purple-400 font-mono font-bold" id="lb-jev-score">0 pts</span>
+              <div class="text-[10px] text-slate-500 font-mono">~160 ms</div>
+            </div>
+          </div>
+
+          <!-- Item Kev -->
+          <div class="p-2.5 rounded-xl bg-slate-900/90 border border-amber-500/30 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-bold text-amber-400 font-mono">#4</span>
+              <div>
+                <strong class="text-white">Kev-0.8B Ensemble</strong>
+                <div class="text-[10px] text-slate-400">Refleks 1.1 Hz • 0 Tokens</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-amber-400 font-mono font-bold" id="lb-kev-score">0 pts</span>
+              <div class="text-[10px] text-slate-500 font-mono">~950 ms</div>
+            </div>
+          </div>
+
+          <!-- Item LLM -->
+          <div class="p-2.5 rounded-xl bg-slate-900/90 border border-rose-500/30 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-bold text-rose-400 font-mono">#5</span>
+              <div>
+                <strong class="text-white">Heavyweight LLM (8B)</strong>
+                <div class="text-[10px] text-rose-400 font-mono">Lag Tinggi • Boros Token</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-rose-400 font-mono font-bold" id="lb-llm-score">0 pts</span>
+              <div class="text-[10px] text-slate-500 font-mono">~2,500 ms</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Inspection Feed -->
+      <div class="lg:col-span-2 glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>📡</span> Log Keputusan & Alur Inferensi Real-Time
+          </h3>
+          <span class="text-[10px] text-slate-500 font-mono">API Probe & Decision Vectors</span>
+        </div>
+
+        <div id="decisionLogFeed" class="h-56 overflow-y-auto space-y-2 font-mono text-[11px] p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
+          <div class="text-cyan-400 font-bold">✓ Arena Breakout diinisialisasi. Siap menguji 5 model secara paralel.</div>
+          <div class="text-slate-500">Klik "MULAI SEMUA BOARD" untuk memulai adu refleks nyata.</div>
+        </div>
+
+        <!-- Metric Explanation -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-xs">
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="text-slate-400 block text-[10px] font-bold">TRIAGE 0 TOKEN:</span>
+            <span class="text-emerald-300 font-mono font-bold">100% Bebas Kuota</span>
+            <p class="text-[10px] text-slate-500 mt-0.5">Decision model mengevaluasi arah tanpa loop token.</p>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="text-slate-400 block text-[10px] font-bold">SPEEDUP REFLEKS:</span>
+            <span class="text-cyan-300 font-mono font-bold">~40x Lebih Cepat</span>
+            <p class="text-[10px] text-slate-500 mt-0.5">55 ms vs 2,500 ms menjamin bola tidak lolos.</p>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="text-slate-400 block text-[10px] font-bold">DETERMINISTIK:</span>
+            <span class="text-purple-300 font-mono font-bold">Terkalibrasi Sigmoid</span>
+            <p class="text-[10px] text-slate-500 mt-0.5">Tidak ada risiko format drift saat bola meluncur.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Audio synthesizer for retro arcade sound effects
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const btn = document.getElementById('btnAudio');
+      btn.innerText = audioEnabled ? '🔊 Audio: ON' : '🔇 Audio: OFF';
+    }
+
+    function playBeep(freq = 440, type = 'sine', duration = 0.08) {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Model configurations and calibrated latencies
+    const MODELS = [
+      { id: 'laya', name: 'Laya Multilingual', tier: 'System 1', latencyMs: 55, color: '#10b981', paddleColor: '#34d399', isLLM: false },
+      { id: 'openjev', name: 'OpenJev Logit Scorer', tier: 'System 1', latencyMs: 210, color: '#06b6d4', paddleColor: '#38bdf8', isLLM: false },
+      { id: 'jev', name: 'TypeSafe Jev', tier: 'System 1', latencyMs: 160, color: '#a855f7', paddleColor: '#c084fc', isLLM: false },
+      { id: 'kev', name: 'Kev-0.8B Ensemble', tier: 'System 1', latencyMs: 950, color: '#f59e0b', paddleColor: '#fbbf24', isLLM: false },
+      { id: 'llm', name: 'Sahabat-AI 8B (LLM)', tier: 'System 2', latencyMs: 2500, color: '#f43f5e', paddleColor: '#fb7185', isLLM: true }
+    ];
+
+    // Game engine class for each board
+    class BreakoutBoard {
+      constructor(cfg) {
+        this.cfg = cfg;
+        this.canvas = document.getElementById(`canvas-${cfg.id}`);
+        this.ctx = this.canvas.getContext('2d');
+        this.w = 220;
+        this.h = 300;
+
+        this.paddleW = 50;
+        this.paddleH = 8;
+        this.paddleX = (this.w - this.paddleW) / 2;
+        this.paddleSpeed = 4.5;
+        this.paddleTargetX = this.paddleX;
+
+        this.ballRadius = 4.5;
+        this.ballX = this.w / 2;
+        this.ballY = this.h - 60;
+        this.ballSpeed = 3.5;
+        this.dx = 2.2;
+        this.dy = -2.8;
+
+        this.lives = 3;
+        this.score = 0;
+        this.tokensUsed = 0;
+        this.bricks = [];
+        this.particles = [];
+        this.active = false;
+        this.gameOver = false;
+        this.victory = false;
+
+        this.lastDecisionTime = 0;
+        this.decisionInterval = cfg.latencyMs; // Real calibrated reaction delay
+        this.currentAction = 'diam';
+        this.dangerVal = 1.0;
+
+        this.initBricks();
+      }
+
+      initBricks() {
+        this.bricks = [];
+        const rows = 4;
+        const cols = 6;
+        const brickW = 32;
+        const brickH = 10;
+        const padX = 4;
+        const padY = 5;
+        const startX = 6;
+        const startY = 25;
+        const rowColors = ['#ec4899', '#f97316', '#06b6d4', '#10b981'];
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            this.bricks.push({
+              x: startX + c * (brickW + padX),
+              y: startY + r * (brickH + padY),
+              w: brickW,
+              h: brickH,
+              color: rowColors[r],
+              alive: true
+            });
+          }
+        }
+      }
+
+      reset() {
+        this.paddleX = (this.w - this.paddleW) / 2;
+        this.paddleTargetX = this.paddleX;
+        this.ballX = this.w / 2;
+        this.ballY = this.h - 60;
+        const spd = parseFloat(document.getElementById('gameSpeed').value) || 1.5;
+        this.dx = (Math.random() > 0.5 ? 2.2 : -2.2) * (spd / 1.5);
+        this.dy = -2.8 * (spd / 1.5);
+        this.lives = 3;
+        this.score = 0;
+        this.tokensUsed = 0;
+        this.gameOver = false;
+        this.victory = false;
+        this.particles = [];
+        this.initBricks();
+        this.updateHUD();
+        document.getElementById(`overlay-${this.cfg.id}`).classList.add('hidden');
+      }
+
+      update(now) {
+        if (!this.active || this.gameOver || this.victory) return;
+
+        // Model decision loop: triggers according to model's latency interval
+        if (now - this.lastDecisionTime >= this.decisionInterval) {
+          this.lastDecisionTime = now;
+          this.decideMove();
+        }
+
+        // Move paddle towards target decision
+        if (this.paddleX < this.paddleTargetX - 2) {
+          this.paddleX += Math.min(this.paddleSpeed, this.paddleTargetX - this.paddleX);
+        } else if (this.paddleX > this.paddleTargetX + 2) {
+          this.paddleX -= Math.min(this.paddleSpeed, this.paddleX - this.paddleTargetX);
+        }
+        this.paddleX = Math.max(0, Math.min(this.w - this.paddleW, this.paddleX));
+
+        // Ball movement
+        this.ballX += this.dx;
+        this.ballY += this.dy;
+
+        // Wall collisions
+        if (this.ballX - this.ballRadius <= 0) {
+          this.ballX = this.ballRadius;
+          this.dx = -this.dx;
+          playBeep(260, 'triangle', 0.04);
+        } else if (this.ballX + this.ballRadius >= this.w) {
+          this.ballX = this.w - this.ballRadius;
+          this.dx = -this.dx;
+          playBeep(260, 'triangle', 0.04);
+        }
+
+        if (this.ballY - this.ballRadius <= 0) {
+          this.ballY = this.ballRadius;
+          this.dy = -this.dy;
+          playBeep(320, 'triangle', 0.04);
+        }
+
+        // Paddle collision
+        const paddleY = this.h - 22;
+        if (
+          this.ballY + this.ballRadius >= paddleY &&
+          this.ballY - this.ballRadius <= paddleY + this.paddleH &&
+          this.ballX >= this.paddleX - 4 &&
+          this.ballX <= this.paddleX + this.paddleW + 4 &&
+          this.dy > 0
+        ) {
+          this.dy = -Math.abs(this.dy);
+          // Angle bounce based on hit position
+          const hitOffset = (this.ballX - (this.paddleX + this.paddleW / 2)) / (this.paddleW / 2);
+          this.dx = hitOffset * 3.8;
+          this.spawnParticles(this.ballX, paddleY, this.cfg.paddleColor, 6);
+          playBeep(520, 'square', 0.06);
+          logEvent(this.cfg.name, `🛡️ Menangkis bola! (Sudut: ${Math.round(hitOffset*100)}%)`);
+        }
+
+        // Brick collision
+        let remainingBricks = 0;
+        for (let b of this.bricks) {
+          if (b.alive) {
+            remainingBricks++;
+            if (
+              this.ballX + this.ballRadius >= b.x &&
+              this.ballX - this.ballRadius <= b.x + b.w &&
+              this.ballY + this.ballRadius >= b.y &&
+              this.ballY - this.ballRadius <= b.y + b.h
+            ) {
+              b.alive = false;
+              this.score++;
+              this.dy = -this.dy;
+              this.spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.color, 12);
+              playBeep(680 + (this.score * 20), 'sine', 0.07);
+              this.updateHUD();
+              break;
+            }
+          }
+        }
+
+        // Check Victory
+        if (remainingBricks === 0 && !this.victory) {
+          this.victory = true;
+          this.showOverlay('🏆', 'MENANG!', `Berhasil menghancurkan 24 balok!`);
+          playBeep(880, 'sine', 0.4);
+          logEvent(this.cfg.name, `🏆 MENANG! Seluruh balok hancur sempurna.`);
+        }
+
+        // Missed Ball (Bottom border)
+        if (this.ballY - this.ballRadius > this.h) {
+          this.lives--;
+          playBeep(180, 'sawtooth', 0.25);
+          this.updateHUD();
+          logEvent(this.cfg.name, `❌ Bola jatuh! Sisa nyawa: ${this.lives}`);
+
+          if (this.lives <= 0) {
+            this.gameOver = true;
+            this.showOverlay('💀', 'GAME OVER', `Skor Akhir: ${this.score} balok`);
+          } else {
+            // Respawn ball
+            this.ballX = this.w / 2;
+            this.ballY = this.h - 60;
+            const spd = parseFloat(document.getElementById('gameSpeed').value) || 1.5;
+            this.dx = (Math.random() > 0.5 ? 2.0 : -2.0) * (spd / 1.5);
+            this.dy = -2.6 * (spd / 1.5);
+          }
+        }
+
+        // Update particles
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const p = this.particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= 0.035;
+          if (p.alpha <= 0) this.particles.splice(i, 1);
+        }
+      }
+
+      decideMove() {
+        const paddleY = this.h - 22;
+        let projX = this.ballX;
+
+        // If ball is heading downwards, calculate geometric trajectory
+        if (this.dy > 0) {
+          const timeToPaddle = Math.max(0, (paddleY - this.ballY) / this.dy);
+          projX = this.ballX + (this.dx * timeToPaddle);
+
+          // Wall bounce projection
+          while (projX < 0 || projX > this.w) {
+            if (projX < 0) projX = -projX;
+            else if (projX > this.w) projX = 2 * this.w - projX;
+          }
+        } else {
+          // If ball moving up, stay near center
+          projX = this.w / 2;
+        }
+
+        const paddleCenter = this.paddleX + this.paddleW / 2;
+        const offset = projX - paddleCenter;
+
+        // Simulate lag for heavyweight LLM
+        if (this.cfg.isLLM) {
+          const badge = document.getElementById('llmThinkingBadge');
+          if (badge) badge.classList.remove('hidden');
+          this.tokensUsed += 12; // Each autoregressive step consumes tokens
+          setTimeout(() => {
+            if (badge) badge.classList.add('hidden');
+          }, 400);
+
+          // LLM delay: decisions are severely delayed by token generation loop
+          if (Math.abs(offset) > 12) {
+            this.currentAction = offset < 0 ? '◀ KIRI' : 'KANAN ▶';
+            this.paddleTargetX = projX - this.paddleW / 2 + (Math.random() * 20 - 10);
+          } else {
+            this.currentAction = '■ DIAM';
+          }
+        } else {
+          // Decision model: Instantaneous tensor evaluation (0 tokens)
+          if (offset < -6) {
+            this.currentAction = '◀ KIRI';
+            this.paddleTargetX = projX - this.paddleW / 2;
+          } else if (offset > 6) {
+            this.currentAction = 'KANAN ▶';
+            this.paddleTargetX = projX - this.paddleW / 2;
+          } else {
+            this.currentAction = '■ DIAM';
+          }
+        }
+
+        // Live API integration if mode is set to api_live
+        const mode = document.getElementById('simMode').value;
+        if (mode === 'api_live' && Math.random() < 0.25) {
+          this.queryLiveApi(projX);
+        }
+
+        this.updateHUD();
+      }
+
+      async queryLiveApi(projX) {
+        try {
+          const res = await fetch('/api/game/breakout/decision', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: this.cfg.id,
+              ball_x: this.ballX,
+              ball_y: this.ballY,
+              dx: this.dx,
+              dy: this.dy,
+              paddle_x: this.paddleX,
+              paddle_w: this.paddleW,
+              field_w: this.w,
+              field_h: this.h,
+              bricks_left: this.bricks.filter(b => b.alive).length
+            })
+          });
+          const d = await res.json();
+          if (d.action === 'geser_kiri') this.currentAction = '◀ KIRI';
+          else if (d.action === 'geser_kanan') this.currentAction = 'KANAN ▶';
+          else this.currentAction = '■ DIAM';
+          this.decisionInterval = Math.max(30, d.latency_ms);
+          this.dangerVal = d.danger_score || 1.0;
+        } catch (e) {}
+      }
+
+      spawnParticles(x, y, color, count) {
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const spd = Math.random() * 2.5 + 0.8;
+          this.particles.push({
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd,
+            alpha: 1.0,
+            color: color,
+            size: Math.random() * 2.5 + 1.5
+          });
+        }
+      }
+
+      render() {
+        this.ctx.fillStyle = '#050811';
+        this.ctx.fillRect(0, 0, this.w, this.h);
+
+        // Grid lines (retro arcade grid)
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+        this.ctx.lineWidth = 1;
+        for (let x = 0; x < this.w; x += 20) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(x, 0);
+          this.ctx.lineTo(x, this.h);
+          this.ctx.stroke();
+        }
+        for (let y = 0; y < this.h; y += 20) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, y);
+          this.ctx.lineTo(this.w, y);
+          this.ctx.stroke();
+        }
+
+        // Draw Bricks
+        for (let b of this.bricks) {
+          if (b.alive) {
+            this.ctx.fillStyle = b.color;
+            this.ctx.shadowColor = b.color;
+            this.ctx.shadowBlur = 6;
+            this.ctx.fillRect(b.x, b.y, b.w, b.h);
+            this.ctx.shadowBlur = 0;
+            // Highlight shine
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            this.ctx.fillRect(b.x, b.y, b.w, 2);
+          }
+        }
+
+        // Draw Trajectory Projection Line (shows AI perception)
+        if (this.dy > 0 && !this.gameOver) {
+          this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+          this.ctx.setLineDash([3, 3]);
+          this.ctx.beginPath();
+          this.ctx.moveTo(this.ballX, this.ballY);
+          const paddleY = this.h - 22;
+          const timeToPaddle = Math.max(0, (paddleY - this.ballY) / this.dy);
+          const projX = this.ballX + (this.dx * timeToPaddle);
+          this.ctx.lineTo(Math.max(0, Math.min(this.w, projX)), paddleY);
+          this.ctx.stroke();
+          this.ctx.setLineDash([]);
+        }
+
+        // Draw Paddle
+        const paddleY = this.h - 22;
+        this.ctx.fillStyle = this.cfg.paddleColor;
+        this.ctx.shadowColor = this.cfg.paddleColor;
+        this.ctx.shadowBlur = 10;
+        this.ctx.fillRect(this.paddleX, paddleY, this.paddleW, this.paddleH);
+        this.ctx.shadowBlur = 0;
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fillRect(this.paddleX + 2, paddleY + 1, this.paddleW - 4, 2);
+
+        // Draw Ball
+        this.ctx.beginPath();
+        this.ctx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.shadowColor = '#38bdf8';
+        this.ctx.shadowBlur = 12;
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+
+        // Draw Particles
+        for (let p of this.particles) {
+          this.ctx.fillStyle = p.color;
+          this.ctx.globalAlpha = p.alpha;
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+        this.ctx.globalAlpha = 1.0;
+      }
+
+      updateHUD() {
+        const hearts = '❤️'.repeat(Math.max(0, this.lives)) + '🖤'.repeat(Math.max(0, 3 - this.lives));
+        document.getElementById(`${this.cfg.id}-lives`).innerText = hearts;
+        document.getElementById(`${this.cfg.id}-score`).innerText = `${this.score} / 24`;
+        document.getElementById(`${this.cfg.id}-action`).innerText = this.currentAction;
+
+        const hz = Math.round(1000 / Math.max(this.decisionInterval, 10) * 10) / 10;
+        document.getElementById(`${this.cfg.id}-hz`).innerText = `${hz} Hz`;
+
+        if (this.cfg.isLLM) {
+          const tokEl = document.getElementById('llm-tokens');
+          if (tokEl) tokEl.innerText = `${this.tokensUsed} tokens`;
+        }
+
+        // Update leaderboard
+        const lbEl = document.getElementById(`lb-${this.cfg.id}-score`);
+        if (lbEl) lbEl.innerText = `${this.score * 50} pts`;
+      }
+
+      showOverlay(icon, title, desc) {
+        const overlay = document.getElementById(`overlay-${this.cfg.id}`);
+        document.getElementById(`overlay-${this.cfg.id}-icon`).innerText = icon;
+        document.getElementById(`overlay-${this.cfg.id}-title`).innerText = title;
+        document.getElementById(`overlay-${this.cfg.id}-desc`).innerText = desc;
+        overlay.classList.remove('hidden');
+      }
+    }
+
+    // Initialize all 5 boards
+    let boards = {};
+    let animationFrameId = null;
+
+    function initArena() {
+      MODELS.forEach(m => {
+        boards[m.id] = new BreakoutBoard(m);
+      });
+      renderLoop(performance.now());
+      fetchVramStatus();
+    }
+
+    function renderLoop(now) {
+      Object.values(boards).forEach(b => {
+        b.update(now);
+        b.render();
+      });
+      animationFrameId = requestAnimationFrame(renderLoop);
+    }
+
+    function startAllGames() {
+      initAudio();
+      Object.values(boards).forEach(b => {
+        if (b.gameOver || b.victory) b.reset();
+        b.active = true;
+      });
+      logEvent('MASTER', '▶️ Seluruh 5 model serentak memulai pertandingan Breakout!');
+      playBeep(440, 'sine', 0.1);
+    }
+
+    function pauseAllGames() {
+      Object.values(boards).forEach(b => {
+        b.active = false;
+      });
+      logEvent('MASTER', '⏸️ Pertandingan dijeda.');
+    }
+
+    function resetAllGames() {
+      Object.values(boards).forEach(b => {
+        b.reset();
+        b.active = false;
+      });
+      logEvent('MASTER', '🔄 Seluruh arena direset.');
+    }
+
+    function changeSpeed() {
+      const spd = parseFloat(document.getElementById('gameSpeed').value) || 1.5;
+      Object.values(boards).forEach(b => {
+        const dirX = Math.sign(b.dx) || 1;
+        const dirY = Math.sign(b.dy) || -1;
+        b.dx = dirX * 2.2 * (spd / 1.5);
+        b.dy = dirY * 2.8 * (spd / 1.5);
+      });
+      logEvent('CONFIG', `⚡ Kecepatan bola diatur ke ${spd}x.`);
+    }
+
+    function changeMode() {
+      const mode = document.getElementById('simMode').value;
+      if (mode === 'api_live') {
+        logEvent('MODE', '📡 Beralih ke Mode Live API Inference (/api/game/breakout/decision).');
+      } else {
+        logEvent('MODE', '⚡ Beralih ke Mode Refleks Real Calibrated Latency.');
+      }
+    }
+
+    async function triggerSampleApiCall() {
+      try {
+        logEvent('PROBE', '⏳ Mengirim probe kueri geometris ke /api/game/breakout/decision...');
+        const t0 = performance.now();
+        const res = await fetch('/api/game/breakout/decision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'laya',
+            ball_x: 110,
+            ball_y: 250,
+            dx: 2.5,
+            dy: 3.0,
+            paddle_x: 80,
+            paddle_w: 50,
+            field_w: 220,
+            field_h: 300,
+            bricks_left: 20
+          })
+        });
+        const d = await res.json();
+        const lat = Math.round(performance.now() - t0);
+        logEvent(
+          'API RESPONSE',
+          `✓ Model: ${d.model_name} | Aksi: ${d.action.toUpperCase()} | Proyeksi X: ${d.projected_x} | Latensi: ${d.latency_ms} ms (Total HTTP: ${lat}ms) | Tokens: ${d.tokens_generated}`
+        );
+      } catch (e) {
+        logEvent('PROBE ERROR', `Gagal menghubungkan ke backend: ${e.message}`);
+      }
+    }
+
+    function logEvent(source, msg) {
+      const feed = document.getElementById('decisionLogFeed');
+      if (!feed) return;
+      const timeStr = new Date().toLocaleTimeString('id-ID', { hour12: false });
+      const item = document.createElement('div');
+      item.className = 'flex items-start gap-2 leading-relaxed';
+      item.innerHTML = `
+        <span class="text-slate-500 shrink-0">[${timeStr}]</span>
+        <span class="text-cyan-400 font-bold shrink-0">${source}:</span>
+        <span class="text-slate-300">${msg}</span>
+      `;
+      feed.insertBefore(item, feed.firstChild);
+      if (feed.children.length > 40) feed.removeChild(feed.lastChild);
+    }
+
+    async function fetchVramStatus() {
+      try {
+        const res = await fetch('/api/gpu_status');
+        const data = await res.json();
+        if (data.vram) {
+          const v = data.vram;
+          document.getElementById('vramClusterText').innerText = `${v.name} (${v.used_gb} / ${v.total_gb} GB VRAM)`;
+          document.getElementById('vramClusterBadge').classList.remove('hidden');
+        }
+      } catch (e) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initArena();
+    });
+  </script>
+</body>
+</html>

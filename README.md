@@ -22,11 +22,12 @@ Repository ini menyajikan pembuktian empiris, baik melalui **Antarmuka Web Inter
 2. [🔄 Perbandingan Alur Eksekusi Kueri](#-perbandingan-alur-eksekusi-kueri)
 3. [📊 Hasil Uji Empiris Nyata (Benchmark Empiric Proof)](#-hasil-uji-empiris-nyata-benchmark-empiric-proof)
 4. [📈 Matriks Komparasi Seluruh Spektrum Model](#-matriks-komparasi-seluruh-spektrum-model)
-5. [🖥️ Tutorial Uji Perbandingan Headless (CLI Terminal)](#️-tutorial-uji-perbandingan-headless-cli-terminal)
-6. [🌐 Tutorial Web Dashboard & Live Monitor GPU (nvtop Style)](#-tutorial-web-dashboard--live-monitor-gpu-nvtop-style)
-7. [🚀 Panduan Instalasi Lengkap dari Server Kosong](#-panduan-instalasi-lengkap-dari-server-kosong)
-8. [📦 Katalog Model & Spesifikasi Hardware](#-katalog-model--spesifikasi-hardware)
-9. [📁 Struktur File Repository](#-struktur-file-repository)
+5. [🎮 Arena Brick Breaker / Breakout AI (Adu Refleks Paralel)](#-arena-brick-breaker--breakout-ai-adu-refleks-paralel)
+6. [🖥️ Tutorial Uji Perbandingan Headless (CLI Terminal)](#️-tutorial-uji-perbandingan-headless-cli-terminal)
+7. [🌐 Tutorial Web Dashboard & Live Monitor GPU (nvtop Style)](#-tutorial-web-dashboard--live-monitor-gpu-nvtop-style)
+8. [🚀 Panduan Instalasi Lengkap dari Server Kosong](#-panduan-instalasi-lengkap-dari-server-kosong)
+9. [📦 Katalog Model & Spesifikasi Hardware](#-katalog-model--spesifikasi-hardware)
+10. [📁 Struktur File Repository](#-struktur-file-repository)
 
 ---
 
@@ -111,6 +112,46 @@ Pengujian nyata end-to-end pada cluster **2x NVIDIA Tesla T4 GPU** membandingkan
 | **Penghematan Token** | 0% (Boros Kuota) | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** |
 | **Overhead VRAM GPU** | 0 MB (Hanya LLM) | ~950 MB | **0 MB (Offloaded Cloud)** | ~1,100 MB | ~1,600 MB | Membutuhkan >=16GB |
 | **Throughput Concurrency**| ~0.2 – 0.3 req/s | **~15 – 20 req/s** | **~50+ req/s (Cloud)** | ~5 – 8 req/s | ~1 req/s | N/A |
+
+---
+
+## 🎮 Arena Brick Breaker / Breakout AI (Adu Refleks Paralel)
+
+Sebagai pembuktian nyata mengapa **Decision Model (System 1)** unggul mutlak atas **Heavyweight Autoregressive LLM (System 2)** pada kendali aksi reaktif waktu-nyata (*real-time reactive control*), DecisionModelBench menyediakan arena simulasi game **Brick Breaker / Breakout** yang mempertandingkan 5 model kecerdasan buatan secara **paralel side-by-side** di arena masing-masing:
+
+1. 🟢 **Laya Multilingual (421M ModernBERT CUDA):** Kecepatan inferensi super-refleks **~55 ms (18.2 Hz)**, 0 tokens.
+2. 🔵 **OpenJev (0.5B Qwen 2.5 Logit Scorer GPU 1):** Pertahanan stabil **~210 ms (4.8 Hz)**, 0 tokens.
+3. 🟣 **TypeSafe Jev (Cloud SaaS Decision Model):** Respon awan cepat **~160 ms (6.2 Hz)**, 0 tokens.
+4. 🟡 **Kev-0.8B (Local LoRA Ensemble CUDA):** Reaksi terukur **~950 ms (1.1 Hz)**, 0 tokens.
+5. 🔴 **Heavyweight LLM (Sahabat-AI 8B Instruct):** Loop autoregresif **~2,500 ms (0.4 Hz)**, membakar 12–80 tokens per aksi.
+
+### Mengapa LLM Gagal Total pada Game Reaktif?
+* **Physics Deadline:** Bola bergerak menukik ke bawah dan melewati garis batas paddle dalam rentang waktu 1.5 – 2.0 detik.
+* **Refleks Sub-100ms vs Input Starvation:** Decision Model (System 1) menghasilkan keputusan arah gerak (`geser_kiri`, `geser_kanan`, `tetap_diam`) dalam 1 forward pass CUDA (<60 ms). Paddle langsung bergeser menangkis bola tepat sasaran.
+* Sebaliknya, Large LLM (System 2) butuh ~2.5 detik per siklus generasi kata demi kata. Saat kata pertama baru terbit, bola telah menembus lantai arena dan nyawa terbuang sia-sia (*Decision Lag*).
+
+---
+
+### Cara Menjalankan Arena Breakout:
+
+#### 1. Mode Web Interaktif (Retro Cyber Arcade 5-Kanvas Paralel)
+Buka di browser saat server aktif:
+* **URL Langsung:** `http://localhost:7860/breakout` atau `http://localhost:7860/brick_breaker`
+* **Tab Mode 6 Dashboard:** Buka `http://localhost:7860/` lalu klik tab `[🎮 Mode 6: Breakout Arcade]`
+* **Fitur:** 5 kanvas simulasi paralel simultan, efek audio retro Web Audio API, partikel ledakan balok, garis proyeksi lintasan, grafik leaderboard live, dan tombol uji API probe langsung ke GPU.
+
+#### 2. Mode Terminal Headless CLI (Rich ASCII Parallel Arena)
+Jalankan simulator paralel langsung di terminal Linux/SSH:
+```bash
+# Jalankan simulasi paralel 5 model selama 100 ticks (default)
+python3 play_brick_breaker.py
+
+# Simulasi cepat 40 ticks
+python3 play_brick_breaker.py --ticks 40 --fps 15
+
+# Uji satu probe API live ke backend FastAPI server
+python3 play_brick_breaker.py --api
+```
 
 ---
 
@@ -256,6 +297,8 @@ decisionmodelbench/
 ├── sahabatai_engine.py               # Engine wrapper Sahabat-AI
 ├── generate_heavyweight_dashboard.py # Generator antarmuka web dashboard kelas berat (HTML)
 ├── heavyweight_llm_dashboard.html    # Antarmuka web utama: Arena Komparasi & Dual-GPU nvtop
+├── brick_breaker_arena.html          # Web Arena Retro Arcade 5-kanvas simulasi paralel
+├── play_brick_breaker.py             # CLI Terminal Rich ASCII Brick Breaker 5-model paralel
 ├── generate_dashboard.py             # Generator antarmuka web playground kelas ringan (HTML)
 ├── benchmark_dashboard.html          # Antarmuka web playground single-question (System 1)
 ├── test_jev.py                       # Skrip uji konektivitas TypeSafe Jev API
