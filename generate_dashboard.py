@@ -409,8 +409,8 @@ html_content = f"""<!DOCTYPE html>
 
   <!-- Footer -->
   <footer class="border-t border-slate-800/80 py-8 text-center text-xs text-slate-500">
-    <p>Project AI Decision Models (System One) • Workspace: /content/drive/MyDrive/AIPROJECT/DecisionModel</p>
-    <p class="mt-1">Diverifikasi secara lokal menggunakan PyTorch & NVIDIA Tesla T4 GPU</p>
+    <p>DecisionModelBench • Unified Non-Autoregressive AI Decision Models Benchmark</p>
+    <p class="mt-1">Diverifikasi secara lokal menggunakan PyTorch & Akselerator GPU</p>
   </footer>
 
   <!-- Script Logic -->
