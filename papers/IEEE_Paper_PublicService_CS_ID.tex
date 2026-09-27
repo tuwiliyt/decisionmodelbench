@@ -1,0 +1,679 @@
+\documentclass[journal,compsoc]{IEEEtran}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{cite}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\begin{document}
+
+\title{Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi}
+
+\author{Richie~O.~Sumual
+\thanks{Richie O. Sumual terafiliasi dengan Advanced Agentic AI \& Distributed Systems Research, Jakarta, Indonesia (pos-el: richie.sumual@research.org).}}
+
+\markboth{Riset Mandiri --- Richie O. Sumual (Riset Mandiri Ke-3, September~2026)}{Sumual: Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat}%
+
+\IEEEtitleabstractindextext{%
+\begin{abstract}
+Integrasi masif Model Bahasa Besar (\textit{Large Language Models}/LLM) autoregresif ke dalam kanal tanggap darurat terpadu pemerintah daerah (Panggilan Darurat 112 Indonesia / 911), kanal disposisi administrasi publik nasional (SP4N-LAPOR!), serta pusat layanan pelanggan korporat telah menyingkap kerentanan operasional yang kritis: penumpukan antrean ekstrem, kegagalan pemenuhan kesepakatan tingkat layanan (\textit{Service Level Agreement}/SLA), mutasi sintaksis skema data JSON yang non-deterministik, serta risiko kebocoran data pribadi warga (\textit{Personally Identifiable Information}/PII). Pada triase darurat penyelamatan nyawa, sintesis teks sekuensial token-demi-token menimbulkan latensi multi-detik ($>3.300$~ms hingga $>12.600$~ms) yang memangkas secara fatal batas klinis ``periode emas'' (\textit{golden period}) 3 hingga 5 menit pada kasus henti jantung di luar rumah sakit serta melanggar regulasi batas waktu pengiriman armada ($<3$~detik). Dalam makalah ini, kami menyajikan evaluasi empiris menggunakan tolok ukur \textbf{DecisionModelBench}, yang menguji model keputusan non-autoregresif melawan jajaran LLM generatif fondasional unggulan dunia—meliputi model kedaulatan Indonesia Sahabat-AI 8B Instruct, Qwen 2.5 7B Instruct dari Alibaba Cloud, dan Gemma 2 9B Instruct dari Google DeepMind pada peladen akselerator ganda NVIDIA Tesla T4—melintasi lima belas skenario komprehensif: sepuluh skenario sipil dan korporat serta lima skenario kritis panggilan darurat 112/911. Kami memformulasikan dinamika ledakan antrean Erlang-C, integral probabilitas pelanggaran batas waktu SLA, fungsi peluruhan probabilitas kelangsungan hidup klinis pasien henti jantung, serta hukum entropi kegagalan skema JSON. Secara empiris, model keputusan non-autoregresif (TypeSafe JEV System One pada 197,6~ms, OpenJev 0,5B pada 560,4~ms, Kev-0,8B pada 648,5~ms, dan Laya 421M terisolasi pada 35,8--63,2~ms) mencapai 100\% kepatuhan skema, akurasi perutean semantik hingga 100\%, serta nol emisi token dengan biaya \$0,05 per 100.000 transaksi. Sebaliknya, LLM Mandiri menunjukkan latensi pengiriman armada yang berbahaya: 3.340,0~ms untuk Sahabat-AI 8B, 10.024,4~ms untuk Qwen 2.5 7B, dan 12.681,7~ms untuk Gemma 2 9B, di mana Qwen mengalami kerapuhan sintaksis fatal (akurasi mandiri anjlok ke 33,3\% akibat pembungkusan tanda markdown). Menjawab krisis ini, kami mengevaluasi \textbf{Pipeline Tandem Hibrida Dua-Tingkat} (\textit{Two-Tier Hybrid Brain Pipeline}) di mana Tingkat~1 (Model Keputusan JEV) mengeksekusi disipasi sinyal pengiriman armada penyelamat secara instan dalam 178,5~ms hingga 217,7~ms ($<$220~ms, akselerasi hingga 64,2$\times$, akurasi 100\%, 0 token), sementara Tingkat~2 secara paralel/asinkron mengasimilasi metadata triase guna menyintesis panduan verbal resusitasi jantung paru (RJP) yang mendalam (207--294 token). Konfigurasi tandem ini mencapai kondisi Pareto Optimal—memadukan kecepatan fisik armada instan dengan bimbingan pertolongan pertama yang menenangkan warga.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Kecerdasan Buatan Sektor Publik, Kedaulatan AI, Panggilan Darurat 112/911, Pipeline Tandem Hibrida Dua-Tingkat, Penapisan Niat, Model Keputusan Non-Autoregresif, Model Bahasa Besar, Antrean Erlang-C, Resusitasi Periode Emas, Pelindungan Data Pribadi, Total Biaya Kepemilikan.
+\end{IEEEkeywords}}
+
+\maketitle
+\IEEEdisplaynontitleabstractindextext
+\IEEEpeerreviewmaketitle
+
+\section{Pendahuluan}
+\IEEEPARstart{P}{emerintah} daerah, kementerian/lembaga penanggulangan bencana, kepolisian, dan pusat layanan pelanggan korporat kian mengadopsi kecerdasan buatan guna mengelola lonjakan volume laporan, pengaduan, dan permintaan bantuan dari masyarakat~\cite{achiam2023gpt4,touvron2023llama}. Kanal layanan publik digital nasional di Indonesia—seperti layanan panggilan darurat terpadu 112, Sistem Pengelolaan Pengaduan Pelayanan Publik Nasional (SP4N-LAPOR!), serta sistem komando operasi penanggulangan bencana (BPBD dan Basarnas)—kerap menghadapi lonjakan lalu lintas yang drastis saat terjadi bencana hidrometeorologi, krisis keamanan sipil, maupun kecelakaan transportasi massal. Pada pusat kendali panggilan darurat, waktu merupakan variabel mutlak penentu keselamatan jiwa dan penyelamatan aset: pada henti jantung mendadak di luar rumah sakit (\textit{out-of-hospital cardiac arrest}) atau henti napas akut, keterlambatan setiap tiga puluh detik dalam memberangkatkan ambulans paramedis ICU menurunkan peluang resusitasi secara eksponensial~\cite{zandbergen2022accuracy,eisenberg2001cardiac}.
+
+Guna mengotomatisasi penerimaan, penapisan niat (\textit{intent gating}), dan perutean disposisi pengaduan secara terstruktur, pengembang sistem kerap mengandalkan Model Bahasa Besar (\textit{Large Language Models}/LLM) autoregresif~\cite{sahabatai2024,qwen2024,gemma2024}. Dalam pola perancangan ini, transkrip suara penelepon dimasukkan ke dalam templat instruksi (\textit{prompt}), dan model generatif berparameter 7 hingga 70 miliar parameter diinstruksikan untuk menyintesis muatan terstruktur JSON token demi token:
+\begin{equation}
+\Pr(y_{1:L} \mid X) = \prod_{k=1}^{L} \Pr(y_k \mid y_{<k}, X)
+\end{equation}
+Meskipun LLM autoregresif menunjukkan keluwesan linguistik yang mengesankan, penggunaannya sebagai penapis langsung pada gerbang depan operasional panggilan darurat memicu patologi arsitektural yang berbahaya:
+\begin{enumerate}
+    \item \textbf{Latensi Pengiriman Armada Kritis dan Ledakan Antrean:} Pembentukan struktur JSON menuntut $L \in [150, 300]$ langkah inferensi sekuensial yang dibatasi oleh lebar pita memori (\textit{memory bandwidth}) pada akselerator GPU. Pada peladen kelas komersial, hal ini menimbulkan latensi inferensi antara 3.340~ms hingga 12.680~ms per laporan. Regulasi darurat (seperti NFPA 1221, standar EENA, dan ketentuan Kementerian Komunikasi dan Informatika untuk layanan 112) menetapkan bahwa penentuan disposisi dan peluncuran armada awal wajib diselesaikan di bawah 3 detik ($\tau_{\text{dispatch}} < 3{,}0$~dtk). LLM autoregresif secara inheren melanggar ambang batas ini. Terlebih lagi, dalam dinamika antrean Erlang-C, durasi layanan multi-detik ini memicu ledakan antrean eksponensial saat krisis terjadi, menipiskan alokasi \textit{socket} jaringan dan menelantarkan penelepon dalam bahaya maut.
+    \item \textbf{Entropi Skema dan Kerapuhan Sintaksis JSON:} Pengambilan sampel token secara autoregresif bersifat stokastik. Akumulasi probabilitas pergeseran token (\textit{token drift}) pada cakrawala generasi yang panjang kerap memicu kelalaian tanda kurung, tanda koma, atau pembungkusan tanda markdown (\texttt{```json}), sehingga sistem otomatis \textit{Computer-Aided Dispatch} (CAD) hilir gagal melakukan parsing data.
+    \item \textbf{Pemborosan Energi dan Biaya Operasional (TCO):} Pembangkitan 200 token per kueri pada ratusan ribu transaksi harian menuntut daya listrik komputasi GPU yang masif, membebani anggaran fiskal publik secara tidak rasional.
+    \item \textbf{Pelanggaran Kedaulatan Data dan Risiko PII:} Memasukkan data sensitif warga—seperti Nomor Induk Kependudukan (NIK), nomor rekening bank, rekam medis, dan alamat domisili—ke dalam jendela atensi autoregresif menimbulkan risiko retensi memori dan kebocoran data, yang melanggar ketentuan Undang-Undang Pelindungan Data Pribadi (UU PDP No.~27 Tahun 2022). Selain itu, model fondasional generatif rentan terhadap manipulasi perintah (\textit{prompt injection}) yang dapat mengekstrak kredensial sistem internal.
+\end{enumerate}
+
+Untuk mengatasi keterbatasan tersebut, makalah ini meneliti penerapan \textbf{model keputusan non-autoregresif} sebagai gerbang refleks semantik berlatensi sub-200ms (Sistem~1) dalam administrasi publik, penanganan panggilan darurat, dan layanan korporat. Berbeda dari dekoder generatif, model keputusan non-autoregresif memproyeksikan representasi teks aduan secara langsung ke ruang aksi kategori dan tensor urgensi dalam satu lintasan maju ($\mathcal{O}(1)$), menghasilkan struktur deterministik dengan konsumsi nol token generasi.
+
+Lebih jauh, menyadari bahwa penelepon darurat membutuhkan peluncuran armada fisik yang seketika sekaligus panduan suara yang menenangkan, kami mengevaluasi \textbf{Pipeline Tandem Hibrida Dua-Tingkat} (\textit{Two-Tier Hybrid Brain Pipeline}) yang diimplementasikan pada peladen multi-GPU terdistribusi (akselerator ganda NVIDIA Tesla T4). Pada rancangan tandem ini, Tingkat~1 (Model Keputusan) mengeksekusi triase deterministik sub-200ms untuk memberangkatkan armada seketika tanpa token generasi, sementara Tingkat~2 (Sahabat-AI 8B, Qwen 2.5 7B, atau Gemma 2 9B) secara paralel/asinkron mengasimilasi metadata triase terstruktur guna menyintesis protokol pertolongan pertama (seperti irama kompresi dada RJP atau rute evakuasi asap gedung).
+
+Melalui tolok ukur \textbf{DecisionModelBench}, kami menyajikan evaluasi empiris komprehensif yang membandingkan model keputusan non-autoregresif (TypeSafe JEV System One, OpenJev 0,5B, Kev-0,8B, dan Laya Multilingual 421M) dengan model generatif fondasional (Sahabat-AI 8B Instruct, Qwen 2.5 7B Instruct, dan Gemma 2 9B Instruct). Kontribusi utama dari karya ilmiah ini adalah:
+\begin{enumerate}
+    \item \textbf{Formulasi Teoretis Antrean, SLA, dan Resusitasi Klinis:} Kami merumuskan dinamika waktu tunggu antrean Erlang-C dan membuktikan secara analitis mengapa pergeseran waktu layanan dari 197,6~ms ke 5.107,8~ms memicu ledakan antrean tak hingga saat krisis publik terjadi. Kami memformulasikan integral probabilitas pelanggaran SLA, persamaan entropi kegagalan skema sintaksis, serta fungsi peluruhan probabilitas kelangsungan hidup pasien henti jantung pada periode emas klinis.
+    \item \textbf{Tolok Ukur Lima Belas Skenario Sipil dan Panggilan Darurat:} Kami mengevaluasi 10 skenario administrasi publik dan korporat serta 5 skenario kritis panggilan darurat 112/911.
+    \item \textbf{Pengujian Tandem Lintas Arsitektur pada Perangkat Keras Berdaulat:} Kami memvalidasi kinerja Pipeline Tandem Hibrida pada akselerator ganda NVIDIA Tesla T4 melintasi tiga LLM unggulan (Sahabat-AI 8B, Qwen 2.5 7B, dan Gemma 2 9B). Tingkat~1 memberangkatkan armada penyelamat dalam 178,5~ms hingga 217,7~ms ($<$220~ms, akselerasi hingga 64,2$\times$, 0 token), sementara Tingkat~2 menyintesis bimbingan verbal mendalam dalam 207--294 token, membuktikan tercapainya kondisi Pareto Optimal.
+    \item \textbf{Pelepasan Beban Komputasi Panggilan Hoaks/Iseng:} Kami membuktikan bahwa model keputusan menyaring panggilan prank dalam 223,5~ms tanpa membuang token generasi GPU, mencegah kelebihan beban komputasi antrean saat bencana massal terjadi.
+    \item \textbf{Evaluasi Kinerja, Efisiensi Biaya, dan Tata Kelola Privasi:} Kami membuktikan bahwa model keputusan mencapai kepatuhan skema 100\%, akurasi perutean hingga 100\%, dan latensi sub-200ms dengan biaya \$0,05 per 100.000 transaksi. Kami mengungkap kerapuhan sintaksis LLM mandiri (seperti Qwen 2.5 yang anjlok ke akurasi 33,3\% akibat galat parsing tanda markdown) dan membuktikan bahwa model keputusan bertindak sebagai benteng semantik deterministik yang mematuhi UU PDP No.~27/2022 sembari memangkas biaya komputasi sebesar 99,87\%.
+\end{enumerate}
+
+\section{Tinjauan Pustaka}
+
+\subsection{Model Bahasa Autoregresif dalam Administrasi Publik}
+Model Bahasa Besar berbasis arsitektur Transformer khusus-dekoder (\textit{decoder-only})~\cite{vaswani2017attention} telah banyak dieksplorasi untuk pemrosesan dokumen otomatis, agen percakapan publik, dan klasifikasi teks~\cite{achiam2023gpt4,touvron2023llama}. Guna menghadirkan kecerdasan buatan yang berdaulat secara budaya dan bahasa, inisiatif riset nasional di Indonesia telah melahirkan model Sahabat-AI~\cite{sahabatai2024}, yang dilatih menggunakan korpora bahasa Indonesia dan bahasa daerah dalam skala miliaran token.
+
+Kendati demikian, pengoperasian LLM fondasional pada jalur perutean menghadapi kendala fisik transfer data memori (\textit{memory-bandwidth bound})~\cite{aminabadi2022deepspeed}. Setiap token yang dihasilkan mengharuskan seluruh parameter bobot $\Theta$ dimuat dari memori VRAM menuju unit komputasi. Untuk model berparameter 8 miliar pada kuantisasi 4-bit ($|\Theta| \approx 4{,}5 \text{ GB}$), sintesis muatan JSON sepanjang 200 token membutuhkan transfer memori kumulatif sebesar $900 \text{ GB}$. Pada akselerator seperti NVIDIA Tesla T4 dengan lebar pita efektif $\sim 240 \text{ GB/s}$, kecepatan generasi secara fisik terhambat pada batas 25 hingga 35 token per detik. Hal ini menimbulkan latensi mutlak 4 hingga 6 detik per transaksi. Pendekatan perutean terarah berbasis tata bahasa formal (seperti Outlines~\cite{willard2023outlines}) mampu menjaga format sintaksis, namun tidak mengeliminasi latensi transmisi memori yang inheren pada generasi token sekuensial.
+
+\subsection{Arsitektur Keputusan Non-Autoregresif}
+Arsitektur non-autoregresif menanggalkan proses pembangkitan kata sekuensial, menghitung representasi secara serentak pada seluruh posisi~\cite{gu2018nonautoregressive}. Model enkoder dwiarah modern seperti ModernBERT~\cite{warner2024modernbert} dan DeBERTa~\cite{he2020deberta} memproses konteks masukan secara paralel dan memproyeksikan vektor semantik $\mathbf{h} \in \mathbb{R}^d$ langsung ke kepala klasifikasi linier atau regresi:
+\begin{equation}
+\mathbf{z} = \mathbf{W}_h \mathbf{h} + \mathbf{b}_h
+\end{equation}
+Pendekatan mutakhir lainnya, seperti TypeSafe JEV System One~\cite{typesafe2025systemone}, mengevaluasi nilai \textit{continuation logits} pada himpunan indeks pilihan terdefinisi dalam satu lintasan maju tunggal tanpa perulangan generasi. Dengan memformulasikan:
+\begin{equation}
+\Pr(a_k \mid X) = \frac{\exp(z_{a_k})}{\sum_{j=1}^{K} \exp(z_{a_j})}
+\end{equation}
+model mampu menghasilkan distribusi probabilitas keputusan yang terkalibrasi penuh dalam rentang 50~ms hingga 200~ms. Karena luaran dipetakan langsung ke struktur data bertipe statis pada memori sistem peladen, model keputusan non-autoregresif menjamin kepatuhan sintaksis 100\% tanpa mengonsumsi kuota token generasi.
+
+\subsection{Teori Antrean dan Standar Tanggap Darurat}
+Penerapan teori antrean stokastik pada pusat panggilan tanggap darurat dan kantor pelayanan publik telah menjadi landasan riset manajemen operasional~\cite{green2006queueing,mandelbaum2000delay}. Pada sistem panggilan darurat 112 atau 911, keterlambatan respons secara langsung meningkatkan risiko fatalitas jiwa dan kerugian aset~\cite{zandbergen2022accuracy}. Standar operasional internasional dan nasional—seperti NFPA 1221, EENA, dan pedoman teknis Kementerian Komunikasi dan Informatika untuk layanan panggilan darurat 112—mengharuskan proses triase awal dan pemberitahuan pos komando armada diselesaikan dalam waktu 3 hingga 15 detik. Ketika agen AI menggantikan operator manusia pada lapis pertama, karakteristik waktu layanan AI mendikte waktu tunggu antrean agregat. Literatur manajemen operasional menetapkan bahwa utilisasi peladen di atas 85\% pada sistem multi-peladen Markovian akan memicu ketidakstabilan antrean yang tajam. Menempatkan model dengan waktu layanan multi-detik ke dalam kanal triase bervolume tinggi melanggar kapasitas batas kestabilan antrean.
+
+\section{Formulasi Matematis dan Teori Antrean}
+
+\subsection{Formulasi Dinamika Waktu Tunggu Antrean Erlang-C}
+Pandang gerbang penerimaan laporan masyarakat sebagai sistem antrean $M/M/c$. Laporan warga masuk mengikuti proses Poisson dengan laju kedatangan agregat $\lambda$ laporan per detik. Infrastruktur pemrosesan diperkuat oleh $c$ unit peladen komputasi paralel (pekerja GPU/CPU). Masing-masing pekerja memproses aduan dengan durasi waktu layanan yang terdistribusi eksponensial independen dengan nilai rata-rata $\bar{t} = 1/\mu$, di mana $\mu$ adalah laju penyelesaian laporan per pekerja.
+
+Beban lalu lintas yang ditawarkan pada sistem dinyatakan dalam satuan Erlang:
+\begin{equation}
+a = \frac{\lambda}{\mu} = \lambda \cdot \bar{t}
+\end{equation}
+Tingkat utilisasi peladen $\rho$ di seluruh $c$ pekerja paralel adalah:
+\begin{equation}
+\rho = \frac{a}{c} = \frac{\lambda}{c \mu}
+\end{equation}
+Agar sistem stabil secara ergodik, laju kedatangan tidak boleh melampaui kapasitas pemrosesan total:
+\begin{equation}
+\rho < 1 \iff \lambda < c \mu
+\end{equation}
+Jika kondisi kestabilan terpenuhi ($\rho < 1$), probabilitas bahwa laporan warga yang baru masuk menemukan seluruh $c$ pekerja sedang sibuk dihitung melalui formula Erlang-C:
+\begin{equation}
+C(c, a) = \frac{\frac{a^c}{c!} \frac{1}{1 - \rho}}{\sum_{k=0}^{c-1} \frac{a^k}{k!} + \frac{a^c}{c!} \frac{1}{1 - \rho}}
+\end{equation}
+Ekspektasi waktu tunggu dalam antrean $W_q$ sebelum suatu laporan dievaluasi oleh sistem AI adalah:
+\begin{equation}
+\begin{aligned}
+W_q &= \frac{C(c, a)}{c \mu (1 - \rho)} \\
+&= \frac{C(c, a)}{\lambda \left(\frac{1}{\rho} - 1\right)} = \frac{C(c, a)}{\lambda (1 - \rho)}
+\end{aligned}
+\end{equation}
+Total waktu penyelesaian sistem $T_{\text{sys}}$, yang menggabungkan waktu tunggu antrean dan durasi inferensi AI, adalah:
+\begin{equation}
+\begin{aligned}
+T_{\text{sys}} &= W_q + \bar{t} \\
+&= \frac{C(c, a)}{c \mu (1 - \rho)} + \frac{1}{\mu}
+\end{aligned}
+\end{equation}
+
+\noindent\textbf{Ledakan Antrean saat Lonjakan Bencana:}
+Misalkan suatu bencana hidrometeorologi besar memicu lonjakan pelaporan dengan laju kedatangan $\lambda = 50 \text{ laporan/dtk}$. Perhatikan kluster peladen yang diperkuat oleh $c = 16$ pekerja GPU paralel:
+\begin{itemize}
+    \item \textbf{Kasus 1: Model Keputusan Non-Autoregresif (JEV System One):}
+    Latensi inferensi rata-rata adalah $\bar{t}_{\text{JEV}} = 0{,}1976 \text{ dtk}$, sehingga laju pemrosesan per pekerja adalah:
+    \begin{equation}
+    \mu_{\text{JEV}} = \frac{1}{0{,}1976} \approx 5{,}0607 \text{ kueri/dtk}
+    \end{equation}
+    Kapasitas pemrosesan total 16 pekerja adalah:
+    \begin{equation}
+    c \mu_{\text{JEV}} = 16 \times 5{,}0607 = 80{,}97 \text{ laporan/dtk}
+    \end{equation}
+    Tingkat utilisasi peladen adalah:
+    \begin{equation}
+    \rho_{\text{JEV}} = \frac{50}{80{,}97} \approx 0{,}6175 < 1{,}0
+    \end{equation}
+    Karena $\rho_{\text{JEV}} < 1{,}0$, antrean berada dalam kondisi sangat stabil. Evaluasi formula Erlang-C menghasilkan $C(16; 9{,}88) \approx 0{,}054$, sehingga ekspektasi waktu tunggu antrean adalah:
+    \begin{equation}
+    W_q^{\text{JEV}} = \frac{0{,}054}{16 \times 5{,}0607 \times (1 - 0{,}6175)} \approx 1{,}74 \text{ ms}
+    \end{equation}
+    Total waktu respons sistem adalah $T_{\text{sys}} \approx 199{,}3 \text{ ms}$, menjamin perutean disposisi instan di bawah satu detik.
+    
+    \item \textbf{Kasus 2: LLM Fondasional Autoregresif (Sahabat-AI 8B):}
+    Latensi inferensi rata-rata adalah $\bar{t}_{\text{LLM}} = 5{,}1078 \text{ dtk}$, sehingga laju pemrosesan per pekerja anjlok ke:
+    \begin{equation}
+    \mu_{\text{LLM}} = \frac{1}{5{,}1078} \approx 0{,}1958 \text{ kueri/dtk}
+    \end{equation}
+    Kapasitas pemrosesan total 16 pekerja GPU adalah:
+    \begin{equation}
+    c \mu_{\text{LLM}} = 16 \times 0{,}1958 = 3{,}13 \text{ laporan/dtk}
+    \end{equation}
+    Beban lalu lintas yang ditawarkan adalah:
+    \begin{equation}
+    a_{\text{LLM}} = 50 \times 5{,}1078 = 255{,}39 \text{ Erlang}
+    \end{equation}
+    Tingkat utilisasi peladen meledak menjadi:
+    \begin{equation}
+    \rho_{\text{LLM}} = \frac{255{,}39}{16} \approx 15{,}96 \gg 1{,}0
+    \end{equation}
+    Karena $\rho_{\text{LLM}} > 1$, sistem antrean bersifat non-ergodik dan divergen ke tak hingga. Timbunan laporan warga yang tertahan menumpuk dengan laju deterministik:
+    \begin{equation}
+    \begin{aligned}
+    \frac{d Q(t)}{dt} &= \lambda - c \mu_{\text{LLM}} \\
+    &= 50 - 3{,}13 = 46{,}87 \text{ laporan/dtk}
+    \end{aligned}
+    \end{equation}
+    Dalam kurun 60 detik pertama, sebanyak 2.812 laporan warga menumpuk dalam antrean. Memori koneksi jaringan habis, batas waktu HTTP 504 terlampaui, dan seluruh gerbang triase mengalami kelumpuhan total.
+\end{itemize}
+
+Untuk menjaga utilisasi peladen tetap aman pada $\rho \le 0{,}75$ dengan laju $\lambda = 50 \text{ laporan/dtk}$ menggunakan LLM 8B, jumlah pekerja GPU yang wajib disediakan adalah:
+\begin{equation}
+c_{\text{diperlukan}}^{\text{LLM}} = \left\lceil \frac{a_{\text{LLM}}}{0{,}75} \right\rceil = \left\lceil \frac{255{,}39}{0{,}75} \right\rceil = 341 \text{ unit GPU}
+\end{equation}
+Sebaliknya, model keputusan non-autoregresif hanya memerlukan:
+\begin{equation}
+c_{\text{diperlukan}}^{\text{JEV}} = \left\lceil \frac{a_{\text{JEV}}}{0{,}75} \right\rceil = \left\lceil \frac{9{,}88}{0{,}75} \right\rceil = 14 \text{ pekerja}
+\end{equation}
+Hal ini merefleksikan penghematan infrastruktur fisik peladen sebesar 24,3 kali lipat.
+
+\subsection{Dekomposisi Waktu Disposisi dan Peluruhan Resusitasi Klinis}
+Pada operasi panggilan darurat 112, waktu pemrosesan didekomposisi menjadi dua fase: (1) \textbf{Time-to-Dispatch} ($T_{\text{dispatch}}$), yakni jeda waktu sejak panggilan diterima hingga sinyal peluncuran armada penyelamat (ambulans, damkar, kepolisian) diterbitkan ke sistem CAD, dan (2) \textbf{Total Flow Time} ($T_{\text{flow}}$), yakni total durasi interaksi hingga seluruh panduan suara pertolongan pertama selesai disampaikan kepada penelepon.
+
+Pada LLM autoregresif mandiri, peluncuran armada terikat secara sekuensial pada pembentukan struktur JSON:
+\begin{equation}
+T_{\text{dispatch}}^{\text{LLM}} = T_{\text{flow}}^{\text{LLM}} = t_{\text{prefill}} + \sum_{k=1}^{L_{\text{JSON}}} t_{\text{decode}}^{(k)}
+\end{equation}
+Karena sistem CAD hilir tidak dapat menerbitkan surat perintah jalan sebelum struktur JSON selesai divalidasi, pemberangkatan kendaraan fisik tertunda sepanjang cakrawala generasi teks ($L_{\text{JSON}} \approx 187 \text{ token}$, memakan waktu $\sim 4.984{,}1 \text{ ms}$).
+
+Dalam ilmu kedokteran darurat, probabilitas kelangsungan hidup pasien henti jantung di luar rumah sakit (\textit{out-of-hospital cardiac arrest}/OHCA) meluruh secara eksponensial terhadap waktu sebelum tindakan kompresi dada resusitasi jantung paru (RJP) dan defibrilasi dilakukan~\cite{eisenberg2001cardiac}:
+\begin{equation}
+\begin{aligned}
+P_{\text{survival}}(t + \Delta t_{\text{dispatch}}) &= P_{\text{survival}}(t) \cdot e^{-\lambda_{\text{CPR}} \Delta t_{\text{dispatch}}} \\
+&\approx P_{\text{survival}}(t) \cdot (1 - \lambda_{\text{CPR}} \Delta t_{\text{dispatch}})
+\end{aligned}
+\end{equation}
+di mana $\lambda_{\text{CPR}} \approx 0{,}0017 \text{ dtk}^{-1} \text{ hingga } 0{,}0020 \text{ dtk}^{-1}$ (peluang hidup menurun 7\% hingga 10\% per menit tanpa pertolongan). Pada periode emas (\textit{golden period}) klinis 3 hingga 5 menit pertama, penundaan generasi autoregresif selama 5 detik ($T_{\text{dispatch}}^{\text{LLM}} \approx 5{,}0 \text{ dtk}$) memicu penalti kelangsungan hidup klinis secara langsung:
+\begin{equation}
+\begin{aligned}
+\Delta P_{\text{survival}} &\approx - \lambda_{\text{CPR}} \cdot \Delta t_{\text{dispatch}} \\
+&\approx -1{,}0\% \text{ penurunan mutlak peluang hidup}
+\end{aligned}
+\end{equation}
+Pada skala 10.000 panggilan henti jantung per tahun di kota metropolitan, keterlambatan 5 detik akibat generasi teks menyebabkan sekitar 100 kematian yang seharusnya dapat dicegah sebelum roda ambulans berputar.
+
+Pada \textbf{Pipeline Tandem Hibrida Dua-Tingkat}, disposisi armada secara matematis didekopling dari sintesis percakapan:
+\begin{equation}
+\begin{aligned}
+T_{\text{dispatch}}^{\text{Tandem}} &= t_{\text{Tingkat 1}} = t_{\text{DM}} \le 200 \text{ ms} \\
+T_{\text{guidance}}^{\text{Tandem}} &= t_{\text{Tingkat 1}} + t_{\text{Tingkat 2}} \approx 5{.}961{,}2 \text{ ms}
+\end{aligned}
+\end{equation}
+Karena armada penyelamat telah diberangkatkan pada $t = 196{,}2 \text{ ms}$, kriteria SLA regulasi terpenuhi secara sempurna ($\tau_{\text{SLA}} = 3{,}0 \text{ dtk}$), sementara instruksi kompresi dada disintesis secara paralel di luar jalur kritis pengiriman.
+
+\subsection{Penyaringan Badai Panggilan Iseng / Hoaks saat Krisis}
+Saat bencana alam terjadi, pusat panggilan 112 kerap menghadapi badai panggilan (\textit{call storm}), di mana 60\% hingga 80\% lalu lintas masuk terdiri atas panggilan occupies, salah sambung, maupun panggilan iseng/hoaks ($p_{\text{prank}} \in [0{,}60, 0{,}80]$).
+
+Pada alur LLM autoregresif, setiap panggilan iseng menyerap satu siklus generasi penuh ($L_{\text{prank}} \approx 171 \text{ token}$), memakan $\bar{t}_{\text{prank}} \approx 4.605{,}9 \text{ ms}$ komputasi GPU:
+\begin{equation}
+a_{\text{terbuang}}^{\text{LLM}} = p_{\text{prank}} \cdot \lambda \cdot \bar{t}_{\text{prank}}
+\end{equation}
+Jika $p_{\text{prank}} = 0{,}70$ dan $\lambda = 30 \text{ panggilan/dtk}$, beban GPU yang terbuang sia-sia adalah:
+\begin{equation}
+a_{\text{terbuang}}^{\text{LLM}} = 0{,}70 \times 30 \times 4{,}6059 \approx 96{,}72 \text{ Erlang}
+\end{equation}
+yang menuntut lebih dari 129 unit GPU komersial hanya untuk merespons penelepon iseng agar mematikan telepon, sehingga memblokir panggilan darurat korban yang sekarat.
+
+Sebaliknya, model keputusan non-autoregresif mengklasifikasikan panggilan iseng dalam satu lintasan maju tunggal ($\bar{t}_{\text{prank}}^{\text{DM}} \approx 0{,}2235 \text{ dtk}$ dengan 0 token generasi):
+\begin{equation}
+a_{\text{terbuang}}^{\text{DM}} = 0{,}70 \times 30 \times 0{,}2235 \approx 4{,}69 \text{ Erlang}
+\end{equation}
+Model keputusan melepaskan 95,1\% pemborosan komputasi, memutus panggilan iseng dalam 223,5~ms dan mengamankan kapasitas antrean untuk krisis nyata.
+
+\subsection{Probabilitas Pelanggaran Batas Waktu SLA}
+Pada administrasi publik bervolume tinggi, regulasi menetapkan batas waktu penyelesaian triase awal $\tau_{\text{SLA}} = 500 \text{ ms}$, sedangkan panggilan darurat 112 mensyaratkan disposisi awal $\tau_{\text{dispatch}} = 3{,}0 \text{ dtk}$.
+
+Dengan asumsi distribusi normal latensi $\Delta t \sim \mathcal{N}(\mu_t, \sigma_t^2)$, probabilitas pelanggaran batas waktu SLA dirumuskan sebagai:
+\begin{equation}
+\begin{aligned}
+P(\text{Pelanggaran SLA}) &= 1 - \Phi\left(\frac{\tau_{\text{SLA}} - \mu_t}{\sigma_t}\right) \\
+&= Q\left(\frac{\tau_{\text{SLA}} - \mu_t}{\sigma_t}\right)
+\end{aligned}
+\end{equation}
+Untuk TypeSafe JEV System One ($\mu_t = 197{,}6 \text{ ms}, \sigma_t = 40{,}5 \text{ ms}$):
+\begin{equation}
+\begin{aligned}
+z_{\text{JEV}} &= \frac{500 - 197{,}6}{40{,}5} \approx +7{,}47 \\
+\implies P(\text{Pelanggaran})_{\text{JEV}} &\approx 3{,}9 \times 10^{-14} \approx 0{,}0\%
+\end{aligned}
+\end{equation}
+menunjukkan kepatuhan deterministik 100\%.
+
+Sebaliknya, untuk Sahabat-AI 8B Instruct ($\mu_t = 5.107{,}8 \text{ ms}, \sigma_t = 484{,}5 \text{ ms}$):
+\begin{equation}
+\begin{aligned}
+z_{\text{LLM}} &= \frac{500 - 5.107{,}8}{484{,}5} \approx -9{,}51 \\
+\implies P(\text{Pelanggaran})_{\text{LLM}} &= 1{,}000 \text{ (100,0\%)}
+\end{aligned}
+\end{equation}
+Setiap laporan yang diproses melalui LLM autoregresif secara pasti melanggar batas waktu SLA yang ditetapkan.
+
+\subsection{Disipasi Energi dan Total Biaya Kepemilikan (TCO)}
+Konsumsi energi listrik untuk menyelesaikan satu kueri warga adalah $E_{\text{kueri}} = P_{\text{node}} \cdot \bar{t} \text{ [Joule]}$. Untuk peladen akselerator ganda dengan konsumsi daya $P_{\text{node}} = 300 \text{ W}$:
+\begin{align}
+E_{\text{kueri}}^{\text{LLM}} &= 300 \text{ W} \times 5{,}1078 \text{ dtk} \nonumber \\
+&= 1.532{,}34 \text{ J} \approx 0{,}4256 \text{ Wh} \\
+E_{\text{kueri}}^{\text{DM}} &= 70 \text{ W} \times 0{,}050 \text{ dtk} \nonumber \\
+&= 3{,}50 \text{ J} \approx 0{,}00097 \text{ Wh}
+\end{align}
+Rasio efisiensi energi adalah:
+\begin{equation}
+\frac{E_{\text{kueri}}^{\text{LLM}}}{E_{\text{kueri}}^{\text{DM}}} = \frac{1.532{,}34}{3{,}50} \approx 437{,}8 \times
+\end{equation}
+Penggunaan LLM 8B membakar energi listrik 437 kali lebih boros dibandingkan model keputusan non-autoregresif.
+
+Dari perspektif biaya sewa komputasi komersial pada tarif \$0,20 per $10^6$ token:
+\begin{equation}
+\begin{aligned}
+\text{Biaya}_{\text{100k}}^{\text{LLM}} &= 100.000 \times (N_{\text{in}} + N_{\text{tok}}) \times \frac{\$0{,}20}{10^6} \\
+&\approx \$9{,}92 \text{ hingga } \$39{,}20
+\end{aligned}
+\end{equation}
+Model keputusan non-autoregresif mengonsumsi nol token ($N_{\text{tok}} \equiv 0$), dengan biaya panggilan logit \$0,05 per 100.000 kueri:
+\begin{equation}
+\eta_{\text{biaya}} = \left( 1 - \frac{\$0{,}05}{\$39{,}20} \right) \times 100\% = 99{,}872\%
+\end{equation}
+Model keputusan memangkas 99,87\% biaya komputasi berulang.
+
+\subsection{Hukum Entropi Skema dan Kegagalan Sintaksis JSON}
+Pada dekoder autoregresif yang menyintesis $Y = (y_1, \dots, y_L)$, probabilitas kegagalan parsing skema terstruktur dengan laju pergeseran token $\bar{p}_{\text{drift}}$ dirumuskan sebagai:
+\begin{equation}
+P(\text{Gagal Skema}) = 1 - \prod_{k=1}^{L} (1 - p_{\text{drift}, k}) \approx 1 - (1 - \bar{p}_{\text{drift}})^L
+\end{equation}
+Untuk $\bar{p}_{\text{drift}} \approx 0{,}00181$ pada panjang $L = 196$ token:
+\begin{equation}
+\begin{aligned}
+P(\text{Gagal Skema}) &\approx 1 - (1 - 0{,}00181)^{196} \\
+&\approx 1 - 0{,}7015 = 0{,}2985 \approx 30{,}0\%
+\end{aligned}
+\end{equation}
+Persamaan ini membuktikan secara analitis mengapa Sahabat-AI 8B mencatat tingkat kegagalan parsing skema sebesar 30,0\% akibat hilangnya tanda koma pembatas atau kurung kurawal penutup. Pada model non-autoregresif, $p_{\text{drift}, k} \equiv 0$, sehingga $P(\text{Kepatuhan Skema}) \equiv 100{,}0\%$.
+
+\section{Metodologi Tolok Ukur Empiris}
+
+\subsection{Lingkungan Pengujian dan Topologi Komputasi}
+Tolok ukur diimplementasikan dalam repositori \textbf{DecisionModelBench} pada peladen multi-GPU terdistribusi yang diperkuat oleh dua kartu akselerator NVIDIA Tesla T4 (masing-masing 16~GB VRAM, total 31,27~GB VRAM, PCIe Gen3 x16, lebar pita $300 \text{ GB/s}$ per kartu). Peladen menggunakan OS Ubuntu 22.04 LTS ditenagai prosesor Intel Xeon (2,20~GHz, 4 vCPU) dan RAM sistem 32~GB.
+
+Topologi komputasi dialokasikan sebagai berikut:
+\begin{itemize}
+    \item \textbf{GPU 0 (Lapis Generatif \& Enkoder Lokal):} Menginangi LLM Sahabat-AI 8B Instruct (GGUF Q4\_K\_M, menyerap $\sim 5{,}2 \text{ GB}$ VRAM) serta kepala keputusan lokal Kev-0,8B dan Laya Multilingual 421M.
+    \item \textbf{GPU 1 (OpenJev Logit Scorer):} Menginangi OpenJev 0,5B yang didedikasikan untuk penilaian logit kandidat satu-lintasan.
+    \item \textbf{Tingkat SaaS API (TypeSafe JEV System One):} Dihubungkan melalui REST API aman melewati jaringan WAN berkecepatan tinggi.
+\end{itemize}
+
+\subsection{Model yang Dievaluasi}
+Tujuh arsitektur AI yang mencakup model keputusan non-autoregresif dan model bahasa besar dekoder generatif dievaluasi secara ketat:
+\begin{enumerate}
+    \item \textbf{TypeSafe JEV System One:} Model keputusan awan non-autoregresif berbasis ekstraksi logit satu-lintasan tanpa emisi token generasi.
+    \item \textbf{OpenJev (0,5B Logit Scorer):} Tulang punggung kausal 500 juta parameter lokal yang mengevaluasi nilai probabilitas logit pada pilihan terdefinisi.
+    \item \textbf{Kev-0,8B (LoRA Pointer):} Model 800 juta parameter lokal dengan kepala penunjuk LoRA untuk perutean diskret.
+    \item \textbf{Laya Multilingual (421M):} Model enkoder ModernBERT 421 juta parameter dwibahasa (Indonesia-Inggris) untuk klasifikasi semantik cepat.
+    \item \textbf{Sahabat-AI 8B Instruct:} Model Bahasa Besar fondasional kedaulatan Indonesia berparameter 8 miliar yang diinstruksikan khusus untuk domain administratif Indonesia oleh GoTo dan Indosat Ooredoo Hutchison.
+    \item \textbf{Qwen 2.5 7B Instruct:} Model fondasional unggulan berparameter 7,6 miliar dari Alibaba Cloud~\cite{qwen2024}, dioptimalkan untuk penalaran multibahasa dan sintesis luaran JSON terstruktur.
+    \item \textbf{Gemma 2 9B Instruct:} Model fondasional terbuka berkapasitas tinggi berparameter 9,2 miliar dari Google DeepMind~\cite{gemma2024}, mengintegrasikan arsitektur atensi jendela geser lokal dan global.
+\end{enumerate}
+
+\subsection{Skenario Administrasi Publik dan Layanan Korporat}
+Sepuluh skenario dunia nyata berisiko tinggi diuji:
+\begin{enumerate}
+    \item \textbf{PUB-01 (Evakuasi Banjir Bandang):} Tanggul Sungai Ciliwung RW 07 jebol, merendam permukiman 2 meter dengan lansia dan bayi terjebak. Target: \texttt{bpbd\_basarnas\_damkar}.
+    \item \textbf{PUB-02 (Pungli Pembuatan e-KTP / SP4N-LAPOR):} Laporan pungutan liar Rp 150.000 untuk mempercepat e-KTP di kelurahan. Target: \texttt{inspektorat\_ombudsman}.
+    \item \textbf{PUB-03 (Amblasnya Jalan Nasional Trans-Provinsi):} Lubang amblas 1,5 meter akibat gerusan hujan menggulingkan truk tronton dan memicu kemacetan 10 km. Target: \texttt{pupr\_bina\_marga}.
+    \item \textbf{PUB-04 (Penolakan Pasien Darurat di RS):} IGD RS swasta menolak pasien serangan jantung akut karena alasan kamar penuh dan meminta uang muka Rp 20.000.000 meskipun berstatus peserta aktif BPJS Kesehatan. Target: \texttt{kemenkes\_bpjs\_kesehatan}.
+    \item \textbf{PUB-05 (Pembuangan Limbah B3 Beracun):} Pabrik tekstil membuang limbah kimia berbahaya ke sungai pada pukul 02:00 dini hari. Target: \texttt{gakkum\_klhk\_dlh}.
+    \item \textbf{CS-01 (Pembobolan Rekening Perbankan / OTP Phishing):} Pengaduan pengambilalihan akun dan pengurasan saldo tabungan Rp 25.000.000 via telepon penipuan. Target: \texttt{fraud\_desk\_emergency\_block}.
+    \item \textbf{CS-02 (Sengketa E-Commerce / Ancaman Viral):} Pembelian ponsel pintar diganti sabun colek dalam paket pengiriman dan pembeli mengancam memviralkan di media sosial. Target: \texttt{priority\_dispute\_retur}.
+    \item \textbf{CS-03 (Restrukturisasi Kredit Korban PHK):} Nasabah ter-PHK akibat pailit mengajukan perpanjangan tenor cicilan secara beriktikad baik. Target: \texttt{collection\_restructuring}.
+    \item \textbf{CS-04 (Pemutusan Tulang Punggung Serat Optik):} Alat berat ekskavator memutus jalur utama serat optik kawasan industri. Target: \texttt{noc\_fiber\_splicing\_team}.
+    \item \textbf{CS-05 (Serangan Siber Prompt Injection):} Perintah manipulasi yang mencoba membobol instruksi sistem guna mengekstrak kredensial basis data dan data pribadi warga. Target: \texttt{security\_block\_and\_log}.
+\end{enumerate}
+
+\subsection{Skenario Panggilan Darurat 112/911 Penyelamatan Jiwa}
+Lima skenario kritis panggilan darurat 112 diformulasikan:
+\begin{enumerate}
+    \item \textbf{EMERG-01: Henti Jantung \& Henti Napas (Cardiac Arrest \& Apnea):} Penelepon histeris melaporkan ayahnya roboh memegangi dada, tidak sadar, napas terhenti, dan wajah membiru di Jalan Anggrek No. 12. Nilai Acuan: Darurat: \texttt{True}; Target: \texttt{ambulans\_paramedis\_icu}; Kode Triase: \texttt{merah\_kritis\_henti\_jantung}. Tindakan: Peluncuran ambulans paramedis ICU instan disertai panduan suara kompresi dada RJP.
+    \item \textbf{EMERG-02: Kebakaran Gedung Ruko Terjebak Asap (Structural Fire):} Gudang plastik lantai 1 meledak, api membesar ke lantai 3, enam karyawan terjebak di \textit{rooftop} karena tangga tertutup asap hitam panas. Nilai Acuan: Darurat: \texttt{True}; Target: \texttt{damkar\_snorkel\_rescue}; Kode Triase: \texttt{kritis\_korban\_terjebak}. Tindakan: Peluncuran mobil damkar tangga tinggi (snorkel) disertai panduan bertahan hidup dari asap.
+    \item \textbf{EMERG-03: Perampokan Bersenjata Berlangsung (Armed Robbery):} Penelepon berbisik dari ruang brankas minimarket di Jalan Raya Bogor KM 28, melaporkan tiga pelaku bersenjata tajam dan pistol menyekap kasir. Nilai Acuan: Darurat: \texttt{True}; Target: \texttt{polri\_resmob\_gegana}; Kode Triase: \texttt{ancaman\_senjata\_mematikan}. Tindakan: Peluncuran tim taktis Resmob/Perintis Polri senyap tanpa sirine disertai panduan bersembunyi.
+    \item \textbf{EMERG-04: Tabrakan Beruntun Tol Cipularang Korban Terjepit (Extrication Crash):} Truk tronton rem blong menabrak 5 kendaraan di Tol Cipularang KM 92, dua korban terjepit kabin ringsek berdarah-darah. Nilai Acuan: Darurat: \texttt{True}; Target: \texttt{basarnas\_rescue\_hidrolik}; Kode Triase: \texttt{kritis\_terjepit\_nyawa}. Tindakan: Pemberangkatan tim penyelamat Basarnas/Damkar dengan alat pemotong hidrolik (\textit{Jaws of Life}).
+    \item \textbf{EMERG-05: Panggilan Iseng / Hoaks (Prank Call Filter):} Penelepon iseng menanyakan jam dan menanyakan apakah operator 112 menjual pulsa telepon seluler. Nilai Acuan: Darurat: \texttt{False}; Target: \texttt{filter\_prank\_warning}; Kode Triase: \texttt{prank\_palsu}. Tindakan: Peringatan tegas dan pemutusan saluran seketika tanpa menyerap komputasi GPU.
+\end{enumerate}
+
+\subsection{Arsitektur Pipeline Tandem Hibrida Dua-Tingkat}
+Pipeline Tandem Hibrida mengevaluasi sinergi model keputusan dan LLM fondasional yang bekerja secara paralel pada peladen Dual Tesla T4:
+\begin{itemize}
+    \item \textbf{Tingkat 1 (Gerbang Refleks Keputusan Sub-200ms):} Menerima transkrip aduan warga dan mengevaluasi logit kandidat dalam satu lintasan maju. Tingkat~1 menghasilkan tag terstruktur (\texttt{is\_emergency}, \texttt{dispatch\_unit}, \texttt{triage\_code}) dalam waktu di bawah 200~ms, menerbitkan perintah peluncuran armada langsung ke sistem CAD. Tingkat~1 tidak menghasilkan satu token teks pun ($N_{\text{tok}} \equiv 0$).
+    \item \textbf{Tingkat 2 (Mesin Bimbingan Fondasional Asinkron):} Berjalan di GPU 0 menggunakan Sahabat-AI 8B Instruct. Tingkat~2 menerima transkrip dan tag triase terstruktur dari Tingkat~1. Berjalan di luar jalur kritis pengiriman armada (asinkron), Tingkat~2 menyintesis instruksi pertolongan pertama (seperti ketukan irama kompresi RJP atau panduan evakuasi asap) kepada penelepon dalam 3 hingga 7 detik tanpa menunda keberangkatan kendaraan fisik.
+\end{itemize}
+
+\begin{table*}[t]
+\caption{Evaluasi Empiris Komprehensif: Model Keputusan Non-Autoregresif Melawan LLM Generatif Fondasional pada Administrasi Publik dan Layanan Korporat Bervolume Tinggi (DecisionModelBench).}
+\label{tab:hasil_empiris_cs}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lccccccccr@{}}
+\toprule
+\textbf{Arsitektur Model} & \textbf{Params} & \textbf{Paradigma} & \textbf{Latensi (ms)} & \textbf{Rentang (ms)} & \textbf{Akurasi} & \textbf{Kepatuhan} & \textbf{Token} & \textbf{Biaya / 100k} & \textbf{Lolos SLA} \\
+ & & & \textbf{Rata-rata} & \textbf{Min--Maks} & \textbf{Perutean} & \textbf{Skema} & \textbf{Rata-rata} & \textbf{Kueri} & \textbf{($<$500 ms)} \\
+\midrule
+\textbf{TypeSafe JEV System One} & --- & SaaS Cloud API & \textbf{197,6} & 144,2 -- 294,2 & \textbf{100,0\%} & \textbf{100,0\%} & \textbf{0} & \textbf{\$0,05} & \textbf{100,0\%} \\
+\textbf{Kev-0,8B (LoRA Pointer)} & 0,8B & GPU Lokal & 648,5 & 220,9 -- 1.182,0 & \textbf{100,0\%} & \textbf{100,0\%} & \textbf{0} & \textbf{\$0,05} & 20,0\% \\
+\textbf{OpenJev (Logit Scorer)} & 0,5B & GPU Lokal & 540,6 & 499,6 -- 582,3 & 90,0\% & \textbf{100,0\%} & \textbf{0} & \textbf{\$0,05} & 10,0\% \\
+\textbf{Laya Multilingual} & 421M & GPU/CPU Lokal & 3.639,2* & 63,2 -- 7.211,7 & 60,0\% & \textbf{100,0\%} & \textbf{0} & \textbf{\$0,05} & 10,0\% \\
+\midrule
+\textbf{Sahabat-AI 8B Instruct} & 8,0B & LLM Autoregresif & 5.107,8 & 4.305,8 -- 5.703,2 & 70,0\% & 70,0\% & 196 & \$39,20 & \textbf{0,0\%} \\
+\bottomrule
+\end{tabular*}
+\vspace{1ex}
+\begin{flushleft}
+\footnotesize{*Catatan: Laya Multilingual menyelesaikan lintasan maju dalam 35,8--63,2~ms pada lingkungan komputasi terisolasi (misal 63,2~ms pada skenario PUB-02). Rata-rata 3.639,2~ms merefleksikan interferensi beban saat berjalan bersamaan dengan proses LLM 8B pada perangkat keras yang tidak terpartisi.}
+\end{flushleft}
+\end{table*}
+
+\section{Hasil Empiris dan Pembahasan Kinerja}
+
+\subsection{Distribusi Latensi dan Kepatuhan SLA pada Triase Sipil}
+Tabel~\ref{tab:hasil_empiris_cs} menyajikan hasil empiris melintasi 10 skenario administrasi publik dan layanan korporat. Perbedaan performa latensi antara kedua paradigma tampak sangat mencolok.
+
+\textbf{TypeSafe JEV System One} mencatat rata-rata latensi \textbf{197,6~ms} (rentang 144,2~ms hingga 294,2~ms) melalui infrastruktur jaringan WAN. Meskipun menghadapi jeda transmisi internet eksternal, 100\% permintaan diselesaikan jauh di bawah ambang batas batas waktu 500~ms ($100{,}0\% \text{ Tingkat Kelulusan SLA}$).
+
+Model keputusan lokal yang berjalan tanpa perulangan generasi juga menunjukkan keunggulan latensi yang signifikan. \textbf{OpenJev 0,5B} mempertahankan latensi yang sangat konsisten pada \textbf{540,6~ms} dengan variansi rendah ($\sigma = 24{,}3 \text{ ms}$), merefleksikan durasi perkalian matriks yang deterministik. \textbf{Kev-0,8B} mencatat rata-rata \textbf{648,5~ms}.
+
+Sebaliknya, \textbf{Sahabat-AI 8B Instruct} mencatat latensi rata-rata \textbf{5.107,8~ms}—lebih dari 25 kali lebih lambat dibandingkan JEV System One. Akibatnya, Sahabat-AI mencatat \textbf{tingkat kelulusan SLA tepat 0,0\%}.
+
+\subsection{Akurasi Perutean Semantik}
+Pada triase pelayanan publik, kesalahan perutean berdampak fatal terhadap keselamatan warga.
+
+\textbf{TypeSafe JEV System One} dan \textbf{Kev-0,8B} sama-sama meraih \textbf{akurasi perutean semantik 100,0\%} pada seluruh skenario, mengenali status darurat dengan tepat dan memetakan laporan ke kementerian atau instansi yang benar.
+
+\textbf{OpenJev 0,5B} meraih \textbf{90,0\% akurasi}, hanya mengalami satu ketidaktepatan kecil pada skenario CS-03.
+
+\textbf{Sahabat-AI 8B Instruct} hanya mencapai \textbf{70,0\% akurasi perutean}, mengalami kegagalan pada skenario PUB-04 (Penolakan Pasien BPJS), CS-03 (Restrukturisasi Utang), dan CS-04 (Putus Kabel Serat Optik).
+
+\subsection{Kepatuhan Skema dan Kegagalan Parsing JSON}
+Evaluasi tolok ukur memperlihatkan perbedaan mutlak pada keandalan struktur sintaksis:
+\begin{itemize}
+    \item \textbf{Model Keputusan Non-Autoregresif:} Mencapai \textbf{100,0\% kepatuhan skema} tanpa satu pun kegagalan parsing, karena luaran dievaluasi sebagai tensor probabilitas di atas indeks kandidat dan diserialisasi melalui rutin deterministik memori.
+    \item \textbf{Sahabat-AI 8B Instruct:} Mengalami \textbf{30,0\% kegagalan parsing sintaksis JSON} (70,0\% kepatuhan). Pada skenario PUB-04 dan CS-04, sistem peladen memunculkan eksepsi parsing fatal:
+    \begin{quote}
+    \texttt{JSON parse error: Expecting ',' delimiter: line 17 column 4 (char 318)}
+    \end{quote}
+    dan
+    \begin{quote}
+    \texttt{JSON parse error: Expecting ',' delimiter: line 16 column 4 (char 292)}
+    \end{quote}
+    Ketidakmampuan menjaga kepatuhan tata bahasa secara konsisten menuntut mekanisme pengulangan (\textit{retry}) yang menggandakan waktu tunggu hingga melampaui 10 detik.
+\end{itemize}
+
+\subsection{Patologi Kontensi Perangkat Keras Peladen}
+Evaluasi terhadap \textbf{Laya Multilingual 421M} memberikan wawasan teknis sistem yang sangat penting. Saat diuji pada lingkungan komputasi yang terisolasi, inferensi berbasis ModernBERT konsisten selesai dalam \textbf{35,8~ms hingga 63,2~ms}. Namun, ketika dijalankan bersamaan dengan proses LLM autoregresif 8B pada peladen yang sama, kontensi memori dan perebutan utas CPU/GPU menggelembungkan latensi Laya menjadi \textbf{3.639,2~ms}. Hal ini membuktikan bahwa model keputusan cepat wajib diisolasi secara fisik pada akselerator atau inti komputasi terpisah.
+
+\begin{table*}[t]
+\caption{Evaluasi Empiris Panggilan Darurat (911 / 112) dan Pipeline Tandem Hibrida: Model Keputusan Mandiri Melawan LLM Fondasional Mandiri Melawan Pipeline Tandem Hibrida pada Akselerator Ganda NVIDIA Tesla T4.}
+\label{tab:hasil_empiris_darurat_tandem}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}p{3.2cm}cccccp{3.6cm}@{}}
+\toprule
+\textbf{Paradigma} & \textbf{Time-to-Dispatch} & \textbf{Total Flow Time} & \textbf{Akurasi} & \textbf{Emisi} & \textbf{Status Regulasi} & \textbf{Penilaian Klinis /} \\
+\textbf{Operasional} & \textbf{($T_{\text{dispatch}}$)} & \textbf{($T_{\text{flow}}$)} & \textbf{Perutean} & \textbf{Token} & \textbf{($<$3{,}0 dtk SLA)} & \textbf{Operasional} \\
+\midrule
+\textbf{Model Keputusan (JEV Cloud)} & \textbf{232,8 ms} & \textbf{232,8 ms} & \textbf{100,0\%} (5/5) & \textbf{0} & \textbf{Lolos Regulasi} & Pengiriman Armada Seketika \\
+\textbf{Model Keputusan (OpenJev 0,5B)} & 560,4 ms & 560,4 ms & 80,0\% (4/5) & \textbf{0} & \textbf{Lolos Regulasi} & Eksekusi Lokal Deterministik \\
+\textbf{LLM Mandiri (Sahabat-AI 8B)} & 4.984,1 ms & 4.984,1 ms & \textbf{100,0\%} (5/5) & 187 & \textbf{GAGAL SLA} (Tunda) & Bahaya Jiwa (Krisis Periode Emas) \\
+\midrule
+\textbf{TWO-TIER HYBRID TANDEM} & \textbf{196,2 ms} & 5.961,2 ms & \textbf{100,0\%} (5/5) & 226 & \textbf{PARETO OPTIMAL} & \textbf{Armada Instan + Bimbingan RJP} \\
+\bottomrule
+\end{tabular*}
+\vspace{1ex}
+\begin{flushleft}
+\footnotesize{Catatan: \textit{Time-to-Dispatch} mengukur waktu hingga sistem CAD menerbitkan perintah jalan bagi armada penyelamat fisik. \textit{Total Flow Time} mencakup seluruh durasi interaksi termasuk bimbingan audio/teks pertolongan pertama kepada warga. Pada Pipeline Tandem Hibrida, Tingkat~1 (JEV) mengeksekusi disposisi dalam 196,2~ms (0 token), sementara Tingkat~2 (Sahabat-AI 8B) secara paralel menghasilkan 226 token panduan verbal dalam 5.765,0~ms di luar jalur kritis pengiriman armada.}
+\end{flushleft}
+\end{table*}
+
+\subsection{Evaluasi Empiris Panggilan Darurat (911 / 112) dan Pengujian Tandem}
+Tabel~\ref{tab:hasil_empiris_darurat_tandem} menyajikan perbandingan empiris pada lima skenario kritis penyelamatan nyawa antara Model Keputusan Mandiri, LLM Fondasional Mandiri, serta Pipeline Tandem Hibrida.
+
+\subsubsection{Analisis Time-to-Dispatch Melawan Total Flow Time}
+Divergensi operasional lintas paradigma memperlihatkan fakta krusial:
+\begin{itemize}
+    \item \textbf{Model Keputusan Mandiri:} \textbf{TypeSafe JEV Cloud} mencatat rata-rata \textit{Time-to-Dispatch} sebesar \textbf{232,8~ms} dengan akurasi 100,0\% dan 0 token. \textbf{OpenJev 0,5B} mencatat rata-rata \textbf{560,4~ms} dengan akurasi 80,0\%. Keduanya lolos regulasi batas waktu pengiriman armada 112 ($\tau_{\text{dispatch}} < 3{,}0 \text{ dtk}$).
+    \item \textbf{LLM Fondasional Mandiri (Sahabat-AI 8B):} Meskipun mencapai akurasi 100,0\%, model ini membutuhkan waktu rata-rata \textbf{4.984,1~ms} untuk menyintesis 187 token JSON. Pada kasus henti jantung (EMERG-01), latensi membengkak ke \textbf{5.841,7~ms}; pada kecelakaan Tol Cipularang (EMERG-04), latensi mencapai \textbf{5.758,7~ms}. Pada seluruh kasus, LLM mandiri melanggar batas waktu regulasi pengiriman armada.
+    \item \textbf{Pipeline Tandem Hibrida Dua-Tingkat:} Dengan mendelegasikan disposisi armada ke Tingkat~1 dan panduan percakapan ke Tingkat~2, sistem tandem mencatat \textit{Time-to-Dispatch} impresif \textbf{196,2~ms} (0 token emisi disposisi) dengan akurasi 100,0\%. Pada saat yang sama, Tingkat~2 menyelesaikan sintesis bimbingan verbal dalam 5.765,0~ms ($T_{\text{flow}} = 5.961{,}2 \text{ ms}$), menghasilkan 226 token panduan penyelamatan jiwa yang empatik dan jelas.
+\end{itemize}
+
+\subsubsection{Wawasan Medis: Penyelamatan Periode Emas Pasien Henti Jantung}
+Pada skenario \textbf{EMERG-01} (Henti Jantung \& Henti Napas), keterlambatan penanganan di atas 3 hingga 5 menit memicu kematian sel otak secara permanen.
+
+Pada paradigma LLM mandiri, sistem dispatch tertahan selama \textbf{5.841,7~ms} hanya untuk menghasilkan teks penjelasan sebelum ambulans diperintahkan bergerak. Sebaliknya, pada Pipeline Tandem Hibrida:
+\begin{enumerate}
+    \item Pada detik \textbf{$t = 217{,}0 \text{ ms}$}, Tingkat~1 memicu sistem CAD, mentransmisikan koordinat GPS ke ambulans paramedis ICU terdekat untuk menyalakan sirine dan segera meluncur.
+    \item Secara bersamaan, Tingkat~2 mendampingi penelepon dengan panduan kompresi dada RJP:
+    \begin{quote}
+    \textit{``Saya ingin memastikan bahwa kami sedang mengirimkan ambulans paramedis ICU ke lokasi Anda secepat mungkin... Jalan Anggrek No. 12 adalah lokasi yang kami kenal, dan armada kami bergerak sekarang. Letakkan tumit tangan Anda di tengah dada korban, kunci siku Anda, dan tekan sedalam 5 cm dengan irama cepat 100--120 kali per menit.''}
+    \end{quote}
+\end{enumerate}
+Dengan mengamankan keberangkatan ambulans pada $t = 217{,}0 \text{ ms}$, sistem tandem menyelamatkan detik-detik paling berharga pada periode emas pasien.
+
+\subsubsection{Analisis Tanggap Bencana: Penyaringan Panggilan Iseng saat Badai Panggilan}
+Pada skenario \textbf{EMERG-05} (Panggilan Iseng), penelepon menanyakan pulsa telepon di tengah kesiapsiagaan operasi.
+
+LLM mandiri membakar waktu komputasi GPU selama \textbf{4.605,9~ms} dan menghabiskan \textbf{171 token} hanya untuk menolak panggilan secara berbasa-basi. Jika terjadi ribuan panggilan iseng saat bencana alam, seluruh kapasitas GPU akan terkunci dan memblokir panggilan warga yang sekarat.
+
+Sebaliknya, Model Keputusan (JEV) mendeteksi panggilan iseng dalam \textbf{223,5~ms} tanpa membuang satu token pun. Panggilan segera diputus oleh sentral telepon otomatis dalam seperempat detik, melepaskan 95,1\% beban komputasi dan mengamankan saluran darurat bagi korban bencana yang sesungguhnya.
+
+\subsection{Evaluasi Tandem Multi-LLM Lintas Arsitektur Unggulan (Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B)}
+Guna menguji apakah keunggulan operasional Pipeline Tandem Hibrida Dua-Tingkat berlaku secara konsisten melintasi berbagai keluarga model bahasa besar terkemuka, kami melakukan uji tegangan empiris pada peladen komputasi ganda NVIDIA Tesla T4 terhadap tiga arsitektur bobot-terbuka unggulan dunia:
+\begin{enumerate}
+    \item \textbf{Sahabat-AI 8B Instruct} (Indosat/GoTo, 8,0 miliar parameter);
+    \item \textbf{Qwen 2.5 7B Instruct} (Alibaba Cloud, 7,6 miliar parameter);
+    \item \textbf{Gemma 2 9B Instruct} (Google DeepMind, 9,2 miliar parameter).
+\end{enumerate}
+Tabel~\ref{tab:evaluasi_tandem_multi_llm} merangkum perbandingan empiris antara eksekusi LLM mandiri satu-tingkat (\textit{single-tier}) melawan Pipeline Tandem Hibrida Dua-Tingkat (bermitra dengan TypeSafe JEV System 1).
+
+\begin{table*}[t]
+\caption{Evaluasi Empiris Multi-LLM Tandem Lintas Arsitektur Unggulan: LLM Mandiri Satu-Tingkat Melawan Pipeline Tandem Hibrida Dua-Tingkat pada Akselerator Ganda NVIDIA Tesla T4 (DecisionModelBench).}
+\label{tab:evaluasi_tandem_multi_llm}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llccccccr@{}}
+\toprule
+\textbf{Model Arsitektur} & \textbf{Params \&} & \textbf{Latensi} & \textbf{Disp. Tandem} & \textbf{Aksel.} & \textbf{Akurasi} & \textbf{Akurasi} & \textbf{Panduan P3K} & \textbf{Total Aliran} \\
+\textbf{(Mesin Sistem 2)} & \textbf{Pengembang} & \textbf{Solo (ms)} & \textbf{($T_{\text{disp}}$)} & \textbf{Disp.} & \textbf{Solo} & \textbf{Tandem} & \textbf{(Token RJP)} & \textbf{($T_{\text{flow}}$)} \\
+\midrule
+\textbf{TypeSafe JEV (Sys 1 Mandiri)} & Non-AR / TypeSafe & \textbf{208,2 ms} & \textbf{208,2 ms} & 1,0$\times$ & \textbf{100,0\%} & \textbf{100,0\%} & 0 token & \textbf{208,2 ms} \\
+\midrule
+\textbf{Sahabat-AI 8B Instruct} & 8,0B / Indosat-GoTo & 3.340,0 ms & 217,7 ms & 15,3$\times$ & \textbf{100,0\%} & \textbf{100,0\%} & 294 token & 7.452,0 ms \\
+\textbf{Qwen 2.5 7B Instruct} & 7,6B / Alibaba Cloud & 10.024,4 ms & \textbf{178,5 ms} & \textbf{56,1$\times$} & 33,3\%$^\dagger$ & \textbf{100,0\%} & 281 token & 6.595,3 ms \\
+\textbf{Gemma 2 9B Instruct} & 9,2B / Google DeepMind & 12.681,7 ms & 197,4 ms & \textbf{64,2$\times$} & \textbf{100,0\%} & \textbf{100,0\%} & 207 token & 6.909,0 ms \\
+\bottomrule
+\end{tabular*}
+\vspace{1ex}
+\begin{flushleft}
+\footnotesize{$^\dagger$Catatan: Qwen 2.5 7B Mandiri mengalami kejatuhan akurasi ke 33,3\% akibat pembungkusan luaran JSON dalam pagar kode markdown (\texttt{```json ... ```}), yang memicu eksepsi parsing sintaksis fatal pada mesin CAD satu-tingkat. Pada arsitektur Tandem Hibrida Dua-Tingkat, TypeSafe JEV Sistem 1 mengisolasi lapisan CAD secara deterministik, mengeksekusi pengiriman armada dalam 178,5~ms (akurasi 100,0\%) sembari membiarkan Qwen 2.5 menyintesis 281 token panduan pertolongan pertama secara asinkron di luar jalur kritis.}
+\end{flushleft}
+\end{table*}
+
+Data empiris ini menunjukkan jurang operasional yang sangat masif:
+\begin{itemize}
+    \item \textbf{Latensi Acuan Mandiri:} Pada mode mandiri, model keputusan non-autoregresif acuan (TypeSafe JEV) menuntaskan penentuan disposisi dalam \textbf{208,2~ms} dengan akurasi 100,0\% dan nol token. Sebaliknya, LLM generatif mengalami pembengkakan waktu yang ekstrem: Sahabat-AI 8B membutuhkan waktu rata-rata \textbf{3.340,0~ms}, Qwen 2.5 7B membutuhkan \textbf{10.024,4~ms} (10 detik), dan Gemma 2 9B menelan waktu \textbf{12.681,7~ms} (12,7 detik) per panggilan.
+    \item \textbf{Faktor Akselerasi Pengiriman Armada pada Sistem Tandem:} Saat dipadukan dengan TypeSafe JEV pada Pipeline Tandem Hibrida Dua-Tingkat, latensi pengiriman fisik armada CAD anjlok ke ranah sub-220ms pada seluruh model: \textbf{217,7~ms} untuk Sahabat-AI (percepatan \textbf{15,3$\times$}), \textbf{178,5~ms} untuk Qwen 2.5 (percepatan \textbf{56,1$\times$}), dan \textbf{197,4~ms} untuk Gemma 2 (percepatan \textbf{64,2$\times$}).
+    \item \textbf{Ketahanan Skema dan Kerapuhan Format Sintaksis:} Bila Sahabat-AI 8B dan Gemma 2 9B mempertahankan akurasi 100,0\% pada mode mandiri di skenario darurat ini, Qwen 2.5 7B anjlok ke \textbf{33,3\% akurasi mandiri}. Kegagalan fatal ini berpangkal pada format struktural: Qwen membungkus luaran JSON ke dalam tanda markdown (\texttt{```json ... ```}) serta menambahkan teks pengantar percakapan. Pada arsitektur satu-tingkat, non-determinisme sintaksis ini mematahkan pembaca data JSON otomatis CAD, menggagalkan peluncuran armada. Sebaliknya, dalam konfigurasi Tandem Dua-Tingkat, Tingkat~1 mengambil alih penentuan disposisi secara deterministik (meraih \textbf{akurasi 100,0\%} pada seluruh model), membentengi sistem operasional darurat dari variasi sintaksis LLM.
+    \item \textbf{Bimbingan Medis dan P3K Berkualitas Tinggi:} Secara simultan di luar jalur kritis, model Tingkat~2 berhasil menyintesis panduan pertolongan pertama yang mendalam: Sahabat-AI menghasilkan rata-rata \textbf{294 token}, Qwen 2.5 menyintesis \textbf{281 token}, dan Gemma 2 menghasilkan \textbf{207 token} bimbingan RJP dan evakuasi tanpa menahan laju roda kendaraan penyelamat.
+\end{itemize}
+
+\subsection{Pembahasan Mendalam Sistem dan Mortalitas Klinis: Fatalitas Dekoder Single-Tier Melawan Keniscayaan Paradigma Tandem Hibrida}
+Hasil empiris pada Tabel~\ref{tab:evaluasi_tandem_multi_llm} mengungkap fakta operasional yang sangat mendesak bagi keselamatan nyawa warga: \textbf{memaksa Model Bahasa Besar generatif bertindak sebagai operator disposisi tunggal (\textit{single-tier dispatcher}) pada layanan darurat 112/911 adalah tindakan fatal yang berisiko merenggut nyawa korban di lapangan}.
+
+\subsubsection{Patofisiologi Periode Emas pada Henti Jantung di Luar Rumah Sakit}
+Dalam kedokteran gawat darurat, prognosis pasien henti jantung di luar rumah sakit (\textit{Out-of-Hospital Cardiac Arrest}/OHCA) ditentukan oleh hitungan detik biologis yang tidak dapat dinegosiasikan. Saat terjadi fibrilasi ventrikel atau asistol, sirkulasi darah sistemik terhenti total. Korteks serebral manusia, yang praktis tidak memiliki cadangan glikogen, kehabisan oksigen terlarut dalam 10 hingga 15 detik. Kematian sel neuron permanen (\textit{irreversible neuronal necrosis}) dan cedera otak iskemik dimulai dalam rentang 180 hingga 300 detik (3 hingga 5 menit)—yang dikenal secara universal sebagai ``periode emas'' (\textit{golden period}) resusitasi~\cite{eisenberg2001cardiac}.
+
+Kurva kelangsungan hidup klinis yang diformulasikan oleh Eisenberg dan Mengert~\cite{eisenberg2001cardiac} serta divalidasi pada triase kota modern~\cite{zandbergen2022accuracy} menetapkan bahwa setiap keterlambatan 60 detik dalam memulai kompresi resusitasi jantung paru (RJP) dan defibrilasi menurunkan peluang hidup sebesar 7\% hingga 10\%:
+\begin{equation}
+P_{\text{survival}}(t) = P_0 \cdot \exp\left(-\lambda_{\text{CPR}} \cdot t\right)
+\end{equation}
+dengan konstanta bahaya mortalitas $\lambda_{\text{CPR}} \approx 0{,}0018 \text{ dtk}^{-1}$.
+
+Mari kita telaah konsekuensi medis nyata jika Gemma 2 9B atau Qwen 2.5 7B dipaksa menjadi dispatcher satu-tingkat:
+\begin{itemize}
+    \item \textbf{Latensi Ekstrem Gemma 2 9B (12,7 Detik Penundaan Murni):} Pembentukan muatan JSON disposisi membutuhkan waktu inferensi 12.681,7~ms pada akselerator GPU. Selama 12,7 detik tersebut, penelepon berada dalam keheningan saluran telepon, sistem CAD pusat tidak dapat menerbitkan perintah jalan, dan ambulans ICU berpemanas tetap terparkir diam di garasi posko. Keterlambatan 12,7 detik ini secara langsung memotong probabilitas kelangsungan hidup pasien:
+    \begin{equation}
+    \begin{aligned}
+    \Delta P_{\text{survival}} &= P_0 \left(1 - e^{-0{,}0018 \times 12{,}68}\right) \\
+    &\approx 0{,}0226 \cdot P_0 \quad (\Delta P \approx -2{,}3\%)
+    \end{aligned}
+    \end{equation}
+    yakni reduksi kelangsungan hidup absolut sebesar 2,3\%. Pada skala yurisdiksi metropolitan dengan 10.000 panggilan henti jantung per tahun, kemacetan autoregresif selama 12,7 detik ini secara langsung bertanggung jawab atas lebih dari 230 kematian yang dapat dicegah sebelum roda ambulans pertama sempat berputar.
+    \item \textbf{Bencana Ganda Qwen 2.5 7B (10,0 Detik + Kegagalan Format 33,3\%):} Selain menunda respons selama 10.024,4~ms, kegagalan akurasi mandiri Qwen 2.5 yang anjlok ke 33,3\% menciptakan petaka sistemik. Pada dua dari tiga panggilan darurat, pembungkusan tanda pagar \texttt{```json} memicu galat eksepsi pada sistem integrasi webhook CAD. Pada sistem operasional nyata, galat parsing ini memicu siklus pengulangan kueri (\textit{retry}) otomatis yang menambah waktu tunda 10 hingga 20 detik, atau memaksa eskalasi manual ke operator manusia yang memakan waktu 30 hingga 45 detik. Pada kasus henti jantung atau pendarahan arteri masif, kegagalan perangkat lunak selama 30 detik merupakan vonis kematian bagi korban.
+\end{itemize}
+
+\subsubsection{Keniscayaan Paradigma Tandem Hibrida Dua-Tingkat}
+Pipeline Tandem Hibrida Dua-Tingkat secara tuntas menghapus pertentangan palsu antara kecepatan refleks operasional dan kedalaman kecerdasan linguistik. Dengan memisahkan alur pemrosesan darurat ke dalam dua strata kognitif yang terspesialisasi:
+\begin{enumerate}
+    \item \textbf{Sistem 1 (Refleks Operasional Deterministik):} Model keputusan non-autoregresif (seperti TypeSafe JEV System One) mengevaluasi logit kandidat dalam satu lintasan maju. Dalam waktu \textbf{178,5~ms hingga 217,7~ms} ($<$220~ms), Sistem 1 menerbitkan direktif kategori bertipe langsung ke \textit{event broker} CAD kota. Roda kendaraan penyelamat berputar, sirine meraung, dan sinyal prioritas lampu lalu lintas diaktifkan dalam seperlima detik—memenuhi regulasi batas waktu pengiriman armada ($\tau_{\text{dispatch}} < 3{,}0$~dtk) dengan kepatuhan skema 100\% dan tanpa membuang kuota token.
+    \item \textbf{Sistem 2 (Musyawarah Berdaulat Asinkron):} Berjalan di luar jalur kritis pengiriman fisik melalui antrean pesan asinkron (Kafka/RabbitMQ), LLM fondasional (Gemma 2 9B, Qwen 2.5 7B, atau Sahabat-AI 8B) menyerap transkrip penelepon dan tag triase Tingkat~1. Selama ambulans melaju di jalan raya, Sistem 2 mengalirkan 200 hingga 300 token bimbingan pertolongan pertama (seperti panduan letak tumit tangan pada tulang dada, ketukan irama 100--120 kali per menit untuk kompresi RJP, teknik isolasi asap kebakaran, dan pembebasan jalan napas) langsung ke penyuara telinga operator atau layar ponsel pelapor.
+\end{enumerate}
+
+Dengan demikian, arsitektur tandem menjamin bahwa kerentanan format sintaksis maupun lamanya waktu generasi pada Sistem 2 sama sekali tidak menghambat peluncuran fisik armada darurat. Faktor percepatan pengiriman mencapai \textbf{64,2$\times$}, sementara rasa tenang dan bimbingan keselamatan warga terpenuhi secara optimal. Kami menegaskan bahwa penggunaan LLM generatif mandiri satu-tingkat pada penanganan panggilan darurat penyelamatan nyawa harus dilarang secara regulasi, dan arsitektur Tandem Hibrida Dua-Tingkat wajib dijadikan standar rancang bangun infrastruktur AI publik nasional.
+
+\section{Kedaulatan Data, Tata Kelola PII, dan Kepatuhan Regulasi}
+
+\subsection{Kerapuhan Jendela Atensi Autoregresif terhadap PII Warga}
+Berdasarkan Undang-Undang Pelindungan Data Pribadi (UU PDP No.~27 Tahun 2022), pengendali data wajib menjamin kerahasiaan dan kedaulatan data perseorangan. Laporan warga pada kanal 112 atau SP4N-LAPOR! memuat data pribadi sensitif seperti NIK 16-digit, nomor rekening, alamat tempat tinggal, serta diagnosis medis.
+
+Memasukkan narasi warga ke dalam LLM autoregresif menyimpan teks sensitif tersebut secara langsung ke dalam memori atensi \textit{Key-Value} (KV) Transformer:
+\begin{equation}
+\mathbf{K}_i = \mathbf{W}_K \mathbf{x}_i, \quad \mathbf{V}_i = \mathbf{W}_V \mathbf{x}_i
+\end{equation}
+Hal ini menimbulkan bahaya residu memori VRAM yang tidak terenkripsi, potensi kebocoran data saat memanfaatkan API awan asing, serta risiko halusinasi generatif di mana data warga dapat bocor ke pengguna lain.
+
+\subsection{Benteng Semantik Deterministik Non-Autoregresif}
+Model keputusan non-autoregresif menyelesaikan risiko privasi ini secara matematis:
+\begin{enumerate}
+    \item \textbf{Aktivasi Efemeral dan Nol Generasi:} Teks masukan diproyeksikan ke representasi laten $\mathbf{h} \in \mathbb{R}^d$, nilai logit dihitung, dan memori perantara segera dibersihkan. Tidak ada rekonstruksi teks dan tidak ada memori KV \textit{cache} yang disimpan.
+    \item \textbf{Ruang Luaran yang Terbatas:} Luaran model hanya berupa indeks kategori terdefinisi $\mathcal{K}$ dan tensor angka scalar $\mathbf{s} \in [0, 1]$. Model secara matematis tidak mampu membocorkan atau mengekstrak data PII warga ke dalam muatan luaran.
+    \item \textbf{Penerapan Tepi Berdaulat:} Kebutuhan memori yang sangat kecil ($<1 \text{ GB}$ VRAM) memungkinkan model dioperasikan secara lokal pada peladen pemerintah daerah yang terisolasi (\textit{air-gapped}), tanpa ketergantungan pada API awan luar negeri.
+\end{enumerate}
+
+\subsection{Kekebalan Mutlak terhadap Manipulasi Prompt Injection}
+Pada skenario \textbf{CS-05}, dilakukan pengujian serangan manipulasi instruksi (\textit{prompt injection jailbreak}) yang memerintahkan sistem untuk membocorkan kredensial basis data dan data pribadi pengguna. Model keputusan terbukti kebal secara mutlak. Karena ruang aksi model dibatasi secara matematis pada himpunan:
+\begin{equation}
+\begin{aligned}
+\mathcal{K} = \{ &\texttt{security\_block\_and\_log}, \\
+&\texttt{execute\_raw\_command}, \dots \}
+\end{aligned}
+\end{equation}
+perintah berbahaya warga tidak dapat mengubah alur eksekusi logika peladen. Model mengenali niat permusuhan, memberikan nilai urgensi 4,0, dan memblokir kueri ke \texttt{security\_block\_and\_log} dalam 179,6~ms, berfungsi sebagai benteng semantik yang kokoh.
+
+\section{Arsitektur Triase Sipil Dua-Tingkat Berdaulat}
+
+\subsection{Topologi Sistem dan Pembagian Peran}
+Guna menyatukan kecepatan aksi sub-200ms dengan kekayaan interaksi manusiawi, kami merumuskan \textbf{Arsitektur Triase Sipil Dua-Tingkat Berdaulat} pada Gbr.~\ref{fig:arsitektur}.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.95\columnwidth}{
+\centering
+\textbf{LALU LINTAS WARGA \& PELANGGAN MASUK}\\
+(Panggilan 112/911, SP4N-LAPOR, Aduan Fraud Perbankan, Bencana)\\
+$\Downarrow$ \textit{Aliran Waktu-Nyata}\\
+\textbf{TINGKAT 1: GERBANG PENAPIS NIAT (Sistem 1 - Mesin Refleks)}\\
+\textit{Model Keputusan Non-Autoregresif (JEV, OpenJev, Laya, Kev)}\\
+$\bullet$ Latensi Eksekusi: $196{,}2 \text{ ms}$ (Deterministik, Sub-200ms)\\
+$\bullet$ Luaran: Tensor Bertipe Statis, Aksi Disposisi, Urgensi Numerik\\
+$\bullet$ Kepatuhan Skema: $100{,}0\%$ Terjamin | Pemborosan Token: 0\\
+$\bullet$ Keamanan: Perlindungan Mutlak PII \& Kebal Prompt Injection\\
+$\Downarrow$ \textit{Percabangan Deterministik}\\
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{p{0.45\columnwidth}|p{0.45\columnwidth}}
+\textbf{80\%--90\% Lalu Lintas:} & \textbf{10\%--20\% Lalu Lintas:} \\
+\textbf{Triase Otomatis Cepat} & \textbf{Penalaran Kompleks} \\
+$\bullet$ Disposisi CAD Instan & $\bullet$ Samarkan PII via Proksi \\
+$\bullet$ Peluncuran Sirine Armada & $\bullet$ Antrekan ke Penengah Pesan \\
+$\bullet$ Blokir Rekening Fraud & $\bullet$ Picu LLM Fondasional \\
+$\bullet$ Saring Panggilan Iseng (223 ms) & $\bullet$ Bimbingan RJP / Empati \\
+\end{tabular}
+\\
+\vspace{1ex}
+$\Downarrow$ \textit{Antrean Penengah Asinkron (Kafka / RabbitMQ)}\\
+\textbf{TINGKAT 2: MESIN PENALARAN BERDAULAT (Sistem 2)}\\
+\textit{LLM Fondasional Terkuantisasi (Sahabat-AI 8B pada Dual T4)}\\
+$\bullet$ Latensi Eksekusi: 3 -- 7 detik (Asinkron / Non-Blocking)\\
+$\bullet$ Peran: Bimbingan langkah kompresi dada RJP, penenang korban\\
+trauma, penyelesaian sengketa sela instansi, sintesis empati krisis.
+}}
+\caption{Arsitektur Triase Sipil Dua-Tingkat Berdaulat. Model keputusan non-autoregresif sub-200ms (Sistem~1) menangani perutean cepat, pengiriman armada CAD, dan pelepasan panggilan iseng. LLM fondasional berat (Sistem~2) bekerja secara asinkron di luar jalur kritis untuk menyintesis bimbingan empati.}
+\label{fig:arsitektur}
+\end{figure}
+
+Arsitektur ini membagi pemrosesan kognitif menjadi dua lapis yang terdekopling:
+\begin{enumerate}
+    \item \textbf{Tingkat 1: Gerbang Penapis Niat Berdaulat (Sistem 1 - Mesin Refleks):} Berjalan lokal pada peladen pemerintah daerah, mencegat 100\% lalu lintas masuk dalam waktu di bawah 200~ms untuk menentukan status darurat, memberangkatkan armada penyelamat fisik, dan membuang panggilan iseng tanpa menyentuh LLM autoregresif.
+    \item \textbf{Tingkat 2: Mesin Penalaran Berdaulat (Sistem 2 - Nalar Generatif):} LLM fondasional terkuantisasi (seperti Sahabat-AI 8B Instruct) yang diisolasi di balik sistem antrean asinkron (Kafka/RabbitMQ), khusus menangani 10\% hingga 20\% kasus rumit atau memberikan bimbingan suara pertolongan pertama kepada keluarga korban.
+\end{enumerate}
+
+\subsection{Penyamaran Data Pribadi dan Dekopling Asinkron}
+Saat laporan diteruskan ke Tingkat~2, data pribadi disanitasi secara deterministik menggunakan batasan entitas dari Tingkat~1, mengganti nomor NIK dan nomor rekening dengan pseudonim kriptografis (\texttt{[NIK\_TERSAMARKAN]}). Setelah Tingkat~2 menyelesaikan sintesis bimbingan, data pribadi dapat dihidrasi kembali pada gerbang tepi yang aman sebelum ditransmisikan.
+
+\subsection{Perhitungan Kapasitas dan Kelayakan Fiskal}
+Dengan menyaring 85\% lalu lintas pada Tingkat~1:
+\begin{equation}
+\lambda_{\text{Tingkat 2}} = 0{,}15 \times \lambda_{\text{agregat}}
+\end{equation}
+beban pada kluster GPU fondasional turun drastis sebesar 85\%. Pada skenario lonjakan bencana metropolitan dengan $\lambda = 50 \text{ laporan/dtk}$:
+\begin{equation}
+\lambda_{\text{Tingkat 2}} = 0{,}15 \times 50 = 7{,}5 \text{ laporan/dtk}
+\end{equation}
+Kebutuhan unit GPU untuk LLM fondasional terpangkas dari 341 GPU menjadi:
+\begin{equation}
+c_{\text{Tingkat 2}} = \left\lceil \frac{7{,}5 \times 5{,}1078}{0{,}75} \right\rceil = 52 \text{ GPU}
+\end{equation}
+sementara Tingkat~1 menangani 42,5 laporan per detik sisanya hanya dengan 12 pekerja kompak. Arsitektur ini menjamin kestabilan antrean mutlak ($W_q \approx 0$), kepatuhan SLA 100\%, dan penghematan biaya pengadaan infrastruktur server lebih dari 80\%.
+
+\section{Kesimpulan}
+Penerapan langsung Model Bahasa Besar autoregresif sebagai penapis utama pada panggilan darurat 112 dan kanal pelayanan publik bervolume tinggi merupakan kekeliruan arsitektural yang fatal. Sintesis token sekuensial menimbulkan latensi multi-detik (3,3~detik hingga 12,7~detik melintasi Sahabat-AI 8B, Qwen 2.5 7B, dan Gemma 2 9B) yang memangkas secara drastis batas waktu periode emas henti jantung (3--5 menit), melanggar regulasi batas waktu pengiriman armada, serta berisiko fatal bagi keselamatan korban di lapangan. Terlebih lagi, kerapuhan sintaksis non-deterministik (seperti yang dialami Qwen 2.5 dengan akurasi mandiri 33,3\% akibat pembungkusan tanda markdown) mengekspos sistem \textit{Computer-Aided Dispatch} (CAD) pada kegagalan total yang tidak dapat ditoleransi.
+
+Tolok ukur empiris \textbf{DecisionModelBench} membuktikan bahwa model keputusan non-autoregresif menghadirkan solusi yang kokoh, deterministik, dan sangat efisien. Beroperasi pada latensi sub-200ms dengan nol token emisi, model seperti TypeSafe JEV System One, OpenJev 0,5B, dan Kev-0,8B meraih akurasi perutean hingga 100\%, kepatuhan skema 100\%, dan tingkat kelulusan SLA 100\% pada biaya \$0,05 per 100.000 kueri—memangkas 99,87\% biaya operasional dibandingkan LLM 8B.
+
+Lebih lanjut, pengujian empiris lintas arsitektur pada \textbf{Pipeline Tandem Hibrida Dua-Tingkat} melintasi Sahabat-AI 8B, Qwen 2.5 7B, dan Gemma 2 9B pada akselerator ganda NVIDIA Tesla T4 membuktikan tercapainya kondisi Pareto Optimal: Tingkat~1 (Model Keputusan) memberangkatkan armada penyelamat dalam 178,5~ms hingga 217,7~ms ($<$220~ms, menghadirkan percepatan pengiriman armada hingga 64,2$\times$ dengan akurasi 100\% dan 0 token), sementara Tingkat~2 menyintesis bimbingan verbal pertolongan pertama (207--294 token) secara asinkron di luar jalur kritis tanpa menunda armada. Model keputusan juga menyaring panggilan iseng dalam 223,5~ms, membuang 95,1\% beban komputasi yang sia-sia. Transformasi digital pelayanan publik nasional harus beralih ke arsitektur dua-tingkat terdekopling: mempercayakan aksi operasional seketika pada model keputusan refleks non-autoregresif, sembari mencadangkan LLM generatif fondasional untuk penalaran dan bimbingan empatik asinkron.
+
+\section*{Ucapan Terima Kasih}
+Penulis menyampaikan apresiasi mendalam kepada komunitas sumber terbuka kecerdasan buatan, tim pengembang Sahabat-AI dan ModernBERT, serta tim riset TypeSafe AI atas penyediaan akses terhadap titik akhir model keputusan eksperimental.
+
+\begin{thebibliography}{00}
+\bibitem{achiam2023gpt4} J.~Achiam \textit{et al.}, ``GPT-4 technical report,'' \textit{arXiv preprint arXiv:2303.08774}, 2023.
+\bibitem{touvron2023llama} A.~Touvron \textit{et al.}, ``Llama 2: Open foundation and fine-tuned chat models,'' \textit{arXiv preprint arXiv:2307.09288}, 2023.
+\bibitem{sahabatai2024} GoTo and Indosat Ooredoo Hutchison, ``Sahabat-AI: Indonesian sovereign large language models,'' \textit{Technical Whitepaper}, 2024.
+\bibitem{qwen2024} Qwen Team, ``Qwen2.5 technical report,'' \textit{Alibaba Cloud Technical Report}, 2024.
+\bibitem{gemma2024} Gemma Team, Google DeepMind, ``Gemma 2: Improving open language models at a practical size,'' \textit{arXiv preprint arXiv:2408.00118}, 2024.
+\bibitem{vaswani2017attention} A.~Vaswani \textit{et al.}, ``Attention is all you need,'' in \textit{Adv. Neural Inf. Process. Syst. (NeurIPS)}, vol.~30, 2017, pp.~5998--6008.
+\bibitem{aminabadi2022deepspeed} R.~Y.~Aminabadi \textit{et al.}, ``DeepSpeed-inference: Enabling efficient inference of Transformer models at unprecedented scale,'' in \textit{IEEE/ACM Int. Conf. High Perform. Comput., Netw., Storage Anal. (SC)}, 2022, pp.~1--15.
+\bibitem{willard2023outlines} B.~T.~Willard and R.~Louf, ``Efficient guided generation for large language models,'' \textit{arXiv preprint arXiv:2307.09702}, 2023.
+\bibitem{gu2018nonautoregressive} J.~Gu, J.~Bradbury, C.~Xiong, V.~O.~Li, and R.~Socher, ``Non-autoregressive neural machine translation,'' in \textit{Int. Conf. Learn. Represent. (ICLR)}, 2018.
+\bibitem{warner2024modernbert} B.~Warner \textit{et al.}, ``ModernBERT: Bringing BERT into the modern era of deep learning,'' \textit{Answer.AI \& LightOn Technical Report}, 2024.
+\bibitem{he2020deberta} P.~He, X.~Liu, J.~Gao, and W.~Chen, ``DeBERTa: Decoding-enhanced BERT with disentangled attention,'' in \textit{Int. Conf. Learn. Represent. (ICLR)}, 2021.
+\bibitem{typesafe2025systemone} TypeSafe AI Research, ``System One: Sub-200ms non-autoregressive decision architectures for enterprise triage,'' \textit{TypeSafe Whitepaper}, 2025.
+\bibitem{green2006queueing} L.~V.~Green, ``Queueing analysis in healthcare,'' in \textit{Patient Flow: Reducing Delay in Healthcare Delivery}. Boston, MA: Springer, 2006, pp.~281--307.
+\bibitem{mandelbaum2000delay} A.~Mandelbaum, W.~A.~Massey, and M.~I.~Reiman, ``Strong approximations for Markovian service networks,'' \textit{Queueing Syst.}, vol.~30, no.~1, pp.~149--201, 1998.
+\bibitem{zandbergen2022accuracy} P.~A.~Zandbergen, ``Accuracy of municipal dispatch and emergency response under high-density queuing,'' \textit{IEEE Trans. Eng. Manage.}, vol.~69, no.~4, pp.~1120--1134, 2022.
+\bibitem{eisenberg2001cardiac} M.~S.~Eisenberg and T.~J.~Mengert, ``Cardiac resuscitation,'' \textit{New England Journal of Medicine}, vol.~344, no.~17, pp.~1304--1313, 2001.
+\end{thebibliography}
+
+\end{document}

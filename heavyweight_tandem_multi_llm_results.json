@@ -1,0 +1,33 @@
+{
+  "author": "Richie O. Sumual",
+  "jev_baseline_ms": 208.17666666666665,
+  "models": {
+    "sahabatai": {
+      "name": "Sahabat-AI 8B Instruct (Indosat/GoTo)",
+      "standalone_lat_mean": 3339.9666666666667,
+      "standalone_tokens_mean": 120.66666666666667,
+      "standalone_acc": 100.0,
+      "tandem_dispatch_mean": 217.66666666666666,
+      "tandem_total_flow_mean": 7452.033333333333,
+      "tandem_tokens_mean": 294.0
+    },
+    "qwen": {
+      "name": "Qwen 2.5 7B Instruct (Alibaba Cloud)",
+      "standalone_lat_mean": 10024.433333333334,
+      "standalone_tokens_mean": 110.66666666666667,
+      "standalone_acc": 33.33333333333333,
+      "tandem_dispatch_mean": 178.53333333333333,
+      "tandem_total_flow_mean": 6595.3,
+      "tandem_tokens_mean": 281.3333333333333
+    },
+    "gemma": {
+      "name": "Gemma 2 9B Instruct (Google DeepMind)",
+      "standalone_lat_mean": 12681.666666666666,
+      "standalone_tokens_mean": 99.66666666666667,
+      "standalone_acc": 100.0,
+      "tandem_dispatch_mean": 197.4333333333333,
+      "tandem_total_flow_mean": 6909.0,
+      "tandem_tokens_mean": 207.0
+    }
+  }
+}

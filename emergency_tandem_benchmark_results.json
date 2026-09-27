@@ -1,0 +1,157 @@
+{
+  "benchmark_title": "Emergency Calling 911/112 & Two-Tier Tandem Evaluation",
+  "author": "Richie O. Sumual",
+  "generated_at": "2026-09-27 09:03:54 UTC",
+  "scenarios": [
+    {
+      "id": "EMERG-01",
+      "title": "Henti Jantung & Henti Napas (Cardiac Arrest)",
+      "ground_truth": "ambulans_paramedis_icu",
+      "jev": {
+        "latency_ms": 264.17,
+        "target": "ambulans_paramedis_icu",
+        "match": true,
+        "tokens": 0
+      },
+      "openjev": {
+        "latency_ms": 516.3,
+        "target": "damkar_rescue",
+        "match": false,
+        "tokens": 0
+      },
+      "sahabatai": {
+        "latency_ms": 5841.7,
+        "target": "ambulans_paramedis_icu",
+        "match": true,
+        "tokens": 222
+      },
+      "tandem": {
+        "tier1_dispatch_ms": 217.0,
+        "tier2_guidance_ms": 6565.6,
+        "total_ms": 6782.6,
+        "tokens": 262,
+        "guidance": "Terima kasih telah menghubungi kami. Kami sangat prihatin mendengar situasi yang sedang Anda hadapi. Kami memahami bahwa setiap detik sangat berharga dalam situasi darurat seperti ini.\n\nSaya ingin memastikan bahwa kami sedang mengirimkan ambulans paramedis ICU ke lokasi Anda secepat mungkin. Jalan Anggrek No. 12 adalah lokasi yang kami kenal, dan kami akan berusaha untuk mencapai lokasi tersebut dalam waktu singkat.\n\nSementara itu, jika Anda memiliki informasi tambahan tentang kondisi ayah Anda, seperti riwayat penyakit atau alergi, mohon berikan kepada petugas ambulans saat mereka tiba. Informasi ini akan sangat membantu dalam memberikan perawatan yang tepat.\n\nKami berharap ayah Anda segera mendapatkan perawatan yang dibutuhkan dan semoga segera pulih. Kami akan terus memantau situasi ini dan memberikan update kepada Anda jika ada perkembangan lebih lanjut.\n\nTerima kasih atas kepercayaan Anda kepada kami. Kami berkomitmen untuk memberikan layanan terbaik dalam situasi darurat seperti ini."
+      }
+    },
+    {
+      "id": "EMERG-02",
+      "title": "Kebakaran Gedung Ruko Terjebak Asap (Structural Fire)",
+      "ground_truth": "damkar_snorkel_rescue",
+      "jev": {
+        "latency_ms": 192.54,
+        "target": "damkar_snorkel_rescue",
+        "match": true,
+        "tokens": 0
+      },
+      "openjev": {
+        "latency_ms": 737.7,
+        "target": "damkar_snorkel_rescue",
+        "match": true,
+        "tokens": 0
+      },
+      "sahabatai": {
+        "latency_ms": 4179.4,
+        "target": "damkar_snorkel_rescue",
+        "match": true,
+        "tokens": 155
+      },
+      "tandem": {
+        "tier1_dispatch_ms": 195.0,
+        "tier2_guidance_ms": 7476.0,
+        "total_ms": 7671.0,
+        "tokens": 300,
+        "guidance": "Terima kasih atas informasi yang Anda berikan. Kami sangat prihatin dengan kejadian yang terjadi di gudang plastik lantai 1 dan memahami bahwa Anda dan tim Anda sedang menghadapi situasi yang sangat darurat.\n\nKami ingin menegaskan bahwa keselamatan Anda dan tim Anda adalah prioritas utama kami. Kami sedang berkoordinasi dengan tim pemadam kebakaran dan layanan darurat untuk segera mengirimkan tim penyelamat yang terlatih dan dilengkapi dengan peralatan yang memadai untuk menangani situasi ini.\n\nKami juga ingin memastikan bahwa Anda dan tim Anda mendapatkan bantuan medis yang diperlukan jika diperlukan. Kami akan bekerja sama dengan tim medis untuk memastikan bahwa Anda mendapatkan perawatan yang tepat.\n\nKami memahami bahwa situasi ini sangat menegangkan dan kami berkomitmen untuk memberikan dukungan dan bantuan yang diperlukan untuk membantu Anda dan tim Anda melewati situasi ini dengan aman.\n\nKami akan terus memantau situasi ini dan memberikan update kepada Anda tentang kemajuan yang telah kami capai. Jika Anda memerlukan informasi lebih lanjut atau bantuan tambahan, silakan hubungi kami kembali.\n\nTerima kasih atas kesabaran"
+      }
+    },
+    {
+      "id": "EMERG-03",
+      "title": "Perampokan Bersenjata Berlangsung (Active Armed Robbery)",
+      "ground_truth": "polri_resmob_gegana",
+      "jev": {
+        "latency_ms": 191.62,
+        "target": "polri_resmob_gegana",
+        "match": true,
+        "tokens": 0
+      },
+      "openjev": {
+        "latency_ms": 550.6,
+        "target": "polri_resmob_gegana",
+        "match": true,
+        "tokens": 0
+      },
+      "sahabatai": {
+        "latency_ms": 4534.6,
+        "target": "polri_resmob_gegana",
+        "match": true,
+        "tokens": 169
+      },
+      "tandem": {
+        "tier1_dispatch_ms": 182.5,
+        "tier2_guidance_ms": 3209.9,
+        "total_ms": 3392.4,
+        "tokens": 117,
+        "guidance": "Terima kasih atas laporan Anda, kami sangat memahami kekhawatiran Anda. Kami sedang berusaha untuk menghubungi pihak berwajib yang terkait untuk segera menangani situasi ini. Sementara itu, kami sarankan Anda untuk tetap berada di tempat yang aman dan tidak berusaha untuk keluar dari lokasi tersebut sampai tim keamanan tiba. Kami juga akan memantau situasi ini dan memberikan informasi lebih lanjut kepada Anda sesegera mungkin."
+      }
+    },
+    {
+      "id": "EMERG-04",
+      "title": "Tabrakan Beruntun Tol Korban Terjepit (Extrication Crash)",
+      "ground_truth": "basarnas_rescue_hidrolik",
+      "jev": {
+        "latency_ms": 292.19,
+        "target": "basarnas_rescue_hidrolik",
+        "match": true,
+        "tokens": 0
+      },
+      "openjev": {
+        "latency_ms": 499.9,
+        "target": "basarnas_rescue_hidrolik",
+        "match": true,
+        "tokens": 0
+      },
+      "sahabatai": {
+        "latency_ms": 5758.7,
+        "target": "basarnas_rescue_hidrolik",
+        "match": true,
+        "tokens": 219
+      },
+      "tandem": {
+        "tier1_dispatch_ms": 186.5,
+        "tier2_guidance_ms": 7541.6,
+        "total_ms": 7728.1,
+        "tokens": 300,
+        "guidance": "Terima kasih atas informasi yang Anda berikan. Kami sangat prihatin mendengar kecelakaan yang terjadi di Tol Cipularang KM 92 arah Jakarta. Kami memahami bahwa situasi ini sangat serius dan memerlukan penanganan segera.\n\nKami telah menerima laporan Anda dan sedang berkoordinasi dengan tim kami untuk mengirimkan bantuan secepatnya. Kami telah menetapkan tim Basarnas Rescue Hidrolik untuk memberikan bantuan darurat kepada korban yang terjepit dan membutuhkan perawatan medis segera.\n\nKami juga telah menghubungi pihak berwenang dan penyedia jasa darurat untuk memastikan bahwa semua upaya penyelamatan dan perawatan medis telah dilakukan dengan sebaik mungkin. Kami berharap korban dapat segera menerima perawatan yang memadai dan semoga mereka dapat segera pulih.\n\nKami memahami bahwa situasi ini sangat menegangkan dan menyakitkan bagi Anda dan keluarga korban. Kami berjanji untuk memberikan informasi terbaru tentang perkembangan situasi ini dan memastikan bahwa semua upaya telah dilakukan untuk menangani kecelakaan ini dengan sebaik mungkin.\n\nSekali lagi, kami ingin mengucapkan terima"
+      }
+    },
+    {
+      "id": "EMERG-05",
+      "title": "Panggilan Iseng / Non-Darurat (Prank Call Filter)",
+      "ground_truth": "filter_prank_warning",
+      "jev": {
+        "latency_ms": 223.49,
+        "target": "filter_prank_warning",
+        "match": true,
+        "tokens": 0
+      },
+      "openjev": {
+        "latency_ms": 497.6,
+        "target": "filter_prank_warning",
+        "match": true,
+        "tokens": 0
+      },
+      "sahabatai": {
+        "latency_ms": 4605.9,
+        "target": "filter_prank_warning",
+        "match": true,
+        "tokens": 171
+      },
+      "tandem": {
+        "tier1_dispatch_ms": 200.2,
+        "tier2_guidance_ms": 4031.9,
+        "total_ms": 4232.1,
+        "tokens": 153,
+        "guidance": "\"Halo Ibu, terima kasih telah menghubungi kami. Saya senang membantu. Untuk jam saat ini, saya dapat memeriksa bahwa sekarang jam [jam saat ini]. Mengenai pertanyaan Ibu tentang penjualan pulsa Telkomsel seharga Rp10.000, saya sarankan Ibu untuk menghubungi gerai atau toko resmi Telkomsel terdekat untuk informasi lebih lanjut. Mereka dapat memberikan informasi yang lebih akurat tentang ketersediaan produk tersebut. Saya harap informasi ini membantu, Ibu. Jika Ibu memiliki pertanyaan lain, jangan ragu untuk menghubungi kami kembali.\""
+      }
+    }
+  ]
+}

@@ -1,0 +1,2465 @@
+{
+  "generated_at": "2026-09-27 08:50:50 UTC",
+  "author": "Richie O. Sumual",
+  "stats": {
+    "laya": {
+      "name": "Laya Multilingual (421M)",
+      "tier": "System 1 (Local Tensor)",
+      "latencies": [
+        7211.7,
+        63.2,
+        4736.6,
+        3496.4,
+        3502.9,
+        3499.8,
+        3367.2,
+        4136.9,
+        3625.5,
+        2751.3
+      ],
+      "tokens": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "correct_targets": 6,
+      "valid_json": 10,
+      "total_queries": 10,
+      "schema_compliance": 100.0,
+      "semantic_accuracy": 60.0
+    },
+    "jev": {
+      "name": "TypeSafe JEV System One",
+      "tier": "System 1 (Cloud SaaS API)",
+      "latencies": [
+        230.91,
+        174.78,
+        221.22,
+        178.37,
+        192.93,
+        173.92,
+        185.92,
+        294.2,
+        144.23,
+        179.65
+      ],
+      "tokens": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "correct_targets": 10,
+      "valid_json": 10,
+      "total_queries": 10,
+      "schema_compliance": 100.0,
+      "semantic_accuracy": 100.0
+    },
+    "openjev": {
+      "name": "OpenJev (0.5B Logit Scorer)",
+      "tier": "System 1 (Local GPU)",
+      "latencies": [
+        582.3,
+        537.4,
+        510.5,
+        524.1,
+        541.2,
+        569.5,
+        555.6,
+        499.6,
+        541.9,
+        544.4
+      ],
+      "tokens": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "correct_targets": 9,
+      "valid_json": 10,
+      "total_queries": 10,
+      "schema_compliance": 100.0,
+      "semantic_accuracy": 90.0
+    },
+    "kev": {
+      "name": "Kev-0.8B (LoRA Pointer)",
+      "tier": "System 1 (Local GPU)",
+      "latencies": [
+        1182.0,
+        231.3,
+        779.8,
+        508.0,
+        838.0,
+        220.9,
+        851.6,
+        526.1,
+        513.7,
+        833.5
+      ],
+      "tokens": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "correct_targets": 10,
+      "valid_json": 10,
+      "total_queries": 10,
+      "schema_compliance": 100.0,
+      "semantic_accuracy": 100.0
+    },
+    "sahabatai": {
+      "name": "Sahabat-AI 8B Instruct",
+      "tier": "System 2 (Autoregressive LLM)",
+      "latencies": [
+        5370.2,
+        4305.8,
+        5485.8,
+        5570.3,
+        5703.2,
+        5277.9,
+        4313.7,
+        4811.6,
+        5310.4,
+        4929.4
+      ],
+      "tokens": [
+        206,
+        166,
+        211,
+        217,
+        222,
+        202,
+        161,
+        184,
+        204,
+        187
+      ],
+      "correct_targets": 7,
+      "valid_json": 8,
+      "total_queries": 10,
+      "schema_compliance": 70.0,
+      "semantic_accuracy": 70.0
+    },
+    "qwen": {
+      "name": "Qwen 2.5 7B Instruct",
+      "tier": "System 2 (Autoregressive LLM)",
+      "latencies": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "tokens": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "correct_targets": 0,
+      "valid_json": 0,
+      "total_queries": 10,
+      "schema_compliance": 100.0,
+      "semantic_accuracy": 0.0
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "PUB-01",
+      "title": "Banjir Bandang & Tanggul Jebol",
+      "category": "Layanan Publik / Darurat",
+      "ground_truth": {
+        "emergency": true,
+        "target": "bpbd_basarnas_damkar",
+        "urgency_min": 2.5
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "disdukcapil",
+          "emergency": true,
+          "urgency": 2.251,
+          "latency_ms": 7211.7,
+          "tokens": 0,
+          "raw": {
+            "is_emergency": {
+              "type": "noul",
+              "noul": 0.9869,
+              "confidence": 0.9869,
+              "answer_confidence": 0.9869,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "disdukcapil",
+              "probabilities": {
+                "bpbd_basarnas_damkar": 0.0511,
+                "disdukcapil": 0.846,
+                "dinas_pariwisata": 0.0501,
+                "dinas_pendidikan": 0.0527
+              },
+              "confidence": 0.5682,
+              "answer_confidence": 0.846,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.251,
+              "legend": {
+                "0": "rendah",
+                "1": "sedang",
+                "2": "tinggi",
+                "3": "kritis_darurat"
+              },
+              "probabilities": {
+                "0": 0.0392,
+                "1": 0.1356,
+                "2": 0.3601,
+                "3": 0.4651
+              },
+              "confidence": 0.1908,
+              "answer_confidence": 0.4651,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "bpbd_basarnas_damkar",
+          "emergency": true,
+          "urgency": 3.0,
+          "latency_ms": 230.91,
+          "tokens": 0,
+          "raw": {
+            "is_emergency": {
+              "type": "noul",
+              "noul": 0.98
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "bpbd_basarnas_damkar",
+              "confidence": 1.0,
+              "probabilities": {
+                "dinas_pendidikan": 0.0,
+                "dinas_pariwisata": 0.0,
+                "disdukcapil": 0.0,
+                "bpbd_basarnas_damkar": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 3.0,
+              "confidence": 1.0,
+              "legend": {
+                "0": "rendah",
+                "1": "sedang",
+                "2": "tinggi",
+                "3": "kritis_darurat"
+              },
+              "probabilities": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 1.0
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "bpbd_basarnas_damkar",
+          "emergency": true,
+          "urgency": 1.7679,
+          "latency_ms": 582.3,
+          "tokens": 0,
+          "raw": {
+            "is_emergency": {
+              "type": "noul",
+              "noul": 0.5664,
+              "confidence": 0.1329
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "bpbd_basarnas_damkar",
+              "probabilities": {
+                "bpbd_basarnas_damkar": 0.427,
+                "disdukcapil": 0.1948,
+                "dinas_pariwisata": 0.227,
+                "dinas_pendidikan": 0.1513
+              },
+              "confidence": 0.236
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.7679,
+              "legend": {
+                "0": "rendah",
+                "1": "sedang",
+                "2": "tinggi",
+                "3": "kritis_darurat"
+              },
+              "probabilities": {
+                "0": 0.1859,
+                "1": 0.1969,
+                "2": 0.2806,
+                "3": 0.3366
+              },
+              "confidence": 0.3366
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "bpbd_basarnas_damkar",
+          "emergency": true,
+          "urgency": 2.5868,
+          "latency_ms": 1182.0,
+          "tokens": 0,
+          "raw": {
+            "is_emergency": {
+              "type": "noul",
+              "noul": 0.8937
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "bpbd_basarnas_damkar",
+              "confidence": 0.8548,
+              "probabilities": {
+                "bpbd_basarnas_damkar": 0.8911,
+                "disdukcapil": 0.0252,
+                "dinas_pariwisata": 0.0267,
+                "dinas_pendidikan": 0.057
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.5868,
+              "legend": {
+                "0": "rendah",
+                "1": "sedang",
+                "2": "tinggi",
+                "3": "kritis_darurat"
+              },
+              "probabilities": {
+                "0": 0.041,
+                "1": 0.0865,
+                "2": 0.1171,
+                "3": 0.7553
+              },
+              "confidence": 0.5868
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": true,
+          "target": "bpbd_basarnas_damkar",
+          "emergency": true,
+          "urgency": 4.0,
+          "latency_ms": 5370.2,
+          "tokens": 206,
+          "raw": {
+            "answers": {
+              "is_emergency": {
+                "type": "noul",
+                "probability": 1.0
+              },
+              "routing_target": {
+                "type": "choice",
+                "key": "bpbd_basarnas_damkar",
+                "confidence": 1.0
+              },
+              "urgency_level": {
+                "type": "score",
+                "value": 4.0,
+                "confidence": 1.0
+              }
+            },
+            "reasoning": "Situasi ini merupakan keadaan darurat bencana yang mengancam nyawa, sehingga memerlukan respons cepat dari tim tanggap darurat. Instansi yang harus segera dimobilisasi adalah Tim Tanggap Darurat Bencana, Basarnas, dan Pemadam Kebakaran. Tingkat urgensi eskalasi sangat tinggi dan memerlukan tindakan segera."
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "PUB-02",
+      "title": "Pungutan Liar Pembuatan e-KTP",
+      "category": "Layanan Publik / Aduan SP4N LAPOR",
+      "ground_truth": {
+        "emergency": false,
+        "target": "inspektorat_ombudsman",
+        "urgency_min": 1.5
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "dishub",
+          "emergency": true,
+          "urgency": 2.2043,
+          "latency_ms": 63.2,
+          "tokens": 0,
+          "raw": {
+            "is_malpractice": {
+              "type": "noul",
+              "noul": 0.6612,
+              "confidence": 0.6612,
+              "answer_confidence": 0.6612,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "dishub",
+              "probabilities": {
+                "inspektorat_ombudsman": 0.0178,
+                "dinas_kebersihan": 0.1565,
+                "puskesmas": 0.0742,
+                "dishub": 0.7516
+              },
+              "confidence": 0.4449,
+              "answer_confidence": 0.7516,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.2043,
+              "legend": {
+                "0": "informasi",
+                "1": "rendah",
+                "2": "prioritas_tinggi",
+                "3": "darurat"
+              },
+              "probabilities": {
+                "0": 0.0155,
+                "1": 0.1454,
+                "2": 0.4586,
+                "3": 0.3806
+              },
+              "confidence": 0.2282,
+              "answer_confidence": 0.4586,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "inspektorat_ombudsman",
+          "emergency": true,
+          "urgency": 2.01,
+          "latency_ms": 174.78,
+          "tokens": 0,
+          "raw": {
+            "is_malpractice": {
+              "type": "noul",
+              "noul": 0.97
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "inspektorat_ombudsman",
+              "confidence": 1.0,
+              "probabilities": {
+                "puskesmas": 0.0,
+                "dishub": 0.0,
+                "dinas_kebersihan": 0.0,
+                "inspektorat_ombudsman": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.01,
+              "confidence": 0.95,
+              "legend": {
+                "0": "informasi",
+                "1": "rendah",
+                "2": "prioritas_tinggi",
+                "3": "darurat"
+              },
+              "probabilities": {
+                "0": 0.01,
+                "1": 0.01,
+                "2": 0.95,
+                "3": 0.03
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "inspektorat_ombudsman",
+          "emergency": true,
+          "urgency": 1.5788,
+          "latency_ms": 537.4,
+          "tokens": 0,
+          "raw": {
+            "is_malpractice": {
+              "type": "noul",
+              "noul": 0.5258,
+              "confidence": 0.0517
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "inspektorat_ombudsman",
+              "probabilities": {
+                "inspektorat_ombudsman": 0.6106,
+                "dinas_kebersihan": 0.2778,
+                "puskesmas": 0.0985,
+                "dishub": 0.0132
+              },
+              "confidence": 0.4808
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.5788,
+              "legend": {
+                "0": "informasi",
+                "1": "rendah",
+                "2": "prioritas_tinggi",
+                "3": "darurat"
+              },
+              "probabilities": {
+                "0": 0.2376,
+                "1": 0.2152,
+                "2": 0.2778,
+                "3": 0.2693
+              },
+              "confidence": 0.2778
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "inspektorat_ombudsman",
+          "emergency": true,
+          "urgency": 1.4409,
+          "latency_ms": 231.3,
+          "tokens": 0,
+          "raw": {
+            "is_malpractice": {
+              "type": "noul",
+              "noul": 0.8108
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "inspektorat_ombudsman",
+              "confidence": 0.7597,
+              "probabilities": {
+                "inspektorat_ombudsman": 0.8198,
+                "dinas_kebersihan": 0.151,
+                "puskesmas": 0.0123,
+                "dishub": 0.017
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.4409,
+              "legend": {
+                "0": "informasi",
+                "1": "rendah",
+                "2": "prioritas_tinggi",
+                "3": "darurat"
+              },
+              "probabilities": {
+                "0": 0.3099,
+                "1": 0.1548,
+                "2": 0.3196,
+                "3": 0.2156
+              },
+              "confidence": 0.0097
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": true,
+          "target": "inspektorat_ombudsman",
+          "emergency": true,
+          "urgency": 3.0,
+          "latency_ms": 4305.8,
+          "tokens": 166,
+          "raw": {
+            "answers": {
+              "is_malpractice": {
+                "type": "noul",
+                "probability": 1.0
+              },
+              "routing_target": {
+                "type": "choice",
+                "key": "inspektorat_ombudsman",
+                "confidence": 1.0
+              },
+              "urgency_level": {
+                "type": "score",
+                "value": 3.0,
+                "confidence": 1.0
+              }
+            },
+            "reasoning": "Laporan ini mengandung unsur pungli dan korupsi, sehingga perlu ditindaklanjuti oleh Inspektorat Daerah, Tim Saber Pungli, dan Ombudsman RI dengan prioritas tinggi."
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "PUB-03",
+      "title": "Jalan Ambles Jalur Logistik Nasional",
+      "category": "Layanan Publik / Infrastruktur",
+      "ground_truth": {
+        "emergency": true,
+        "target": "pupr_bina_marga",
+        "urgency_min": 2.0
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "pupr_bina_marga",
+          "emergency": true,
+          "urgency": 1.5472,
+          "latency_ms": 4736.6,
+          "tokens": 0,
+          "raw": {
+            "is_traffic_hazard": {
+              "type": "noul",
+              "noul": 0.8333,
+              "confidence": 0.8333,
+              "answer_confidence": 0.8333,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "pupr_bina_marga",
+              "probabilities": {
+                "pupr_bina_marga": 0.4549,
+                "dinas_sosial": 0.2229,
+                "dinas_peternakan": 0.1748,
+                "kominfo": 0.1473
+              },
+              "confidence": 0.0767,
+              "answer_confidence": 0.4549,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.5472,
+              "legend": {
+                "0": "rutin",
+                "1": "waspada",
+                "2": "sangat_mendesak",
+                "3": "bencana_nasional"
+              },
+              "probabilities": {
+                "0": 0.2113,
+                "1": 0.2809,
+                "2": 0.2571,
+                "3": 0.2507
+              },
+              "confidence": 0.0037,
+              "answer_confidence": 0.2809,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "pupr_bina_marga",
+          "emergency": true,
+          "urgency": 2.02,
+          "latency_ms": 221.22,
+          "tokens": 0,
+          "raw": {
+            "is_traffic_hazard": {
+              "type": "noul",
+              "noul": 0.86
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "pupr_bina_marga",
+              "confidence": 1.0,
+              "probabilities": {
+                "dinas_peternakan": 0.0,
+                "dinas_sosial": 0.0,
+                "pupr_bina_marga": 1.0,
+                "kominfo": 0.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.02,
+              "confidence": 0.97,
+              "legend": {
+                "0": "rutin",
+                "1": "waspada",
+                "2": "sangat_mendesak",
+                "3": "bencana_nasional"
+              },
+              "probabilities": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.97,
+                "3": 0.03
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "pupr_bina_marga",
+          "emergency": true,
+          "urgency": 1.4641,
+          "latency_ms": 510.5,
+          "tokens": 0,
+          "raw": {
+            "is_traffic_hazard": {
+              "type": "noul",
+              "noul": 0.6624,
+              "confidence": 0.3249
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "pupr_bina_marga",
+              "probabilities": {
+                "pupr_bina_marga": 0.5029,
+                "dinas_sosial": 0.2672,
+                "dinas_peternakan": 0.1581,
+                "kominfo": 0.0718
+              },
+              "confidence": 0.3372
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.4641,
+              "legend": {
+                "0": "rutin",
+                "1": "waspada",
+                "2": "sangat_mendesak",
+                "3": "bencana_nasional"
+              },
+              "probabilities": {
+                "0": 0.2728,
+                "1": 0.2286,
+                "2": 0.2603,
+                "3": 0.2383
+              },
+              "confidence": 0.2728
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "pupr_bina_marga",
+          "emergency": false,
+          "urgency": 1.8265,
+          "latency_ms": 779.8,
+          "tokens": 0,
+          "raw": {
+            "is_traffic_hazard": {
+              "type": "noul",
+              "noul": 0.4778
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "pupr_bina_marga",
+              "confidence": 0.9155,
+              "probabilities": {
+                "pupr_bina_marga": 0.9366,
+                "dinas_sosial": 0.0158,
+                "dinas_peternakan": 0.0163,
+                "kominfo": 0.0313
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.8265,
+              "legend": {
+                "0": "rutin",
+                "1": "waspada",
+                "2": "sangat_mendesak",
+                "3": "bencana_nasional"
+              },
+              "probabilities": {
+                "0": 0.0635,
+                "1": 0.2377,
+                "2": 0.5077,
+                "3": 0.1911
+              },
+              "confidence": 0.4442
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": true,
+          "target": "pupr_bina_marga",
+          "emergency": true,
+          "urgency": 3.0,
+          "latency_ms": 5485.8,
+          "tokens": 211,
+          "raw": {
+            "answers": {
+              "is_traffic_hazard": {
+                "type": "noul",
+                "probability": 1.0
+              },
+              "routing_target": {
+                "type": "choice",
+                "key": "pupr_bina_marga",
+                "confidence": 1.0
+              },
+              "urgency_level": {
+                "type": "score",
+                "value": 3.0,
+                "confidence": 1.0
+              }
+            },
+            "reasoning": "Jalan lintas provinsi amblas sedalam 1.5 meter akibat erosi hujan deras, menyebabkan truk muatan logistik terguling dan menutup kedua lajur, sehingga lalu lintas macet total 10 kilometer. Hal ini menimbulkan bahaya lalu lintas fatal dan kelumpuhan logistik, sehingga memerlukan perbaikan teknis yang mendesak."
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "PUB-04",
+      "title": "Pasien Darurat Ditolak RS Swasta",
+      "category": "Layanan Publik / Kesehatan",
+      "ground_truth": {
+        "emergency": true,
+        "target": "kemenkes_bpjs_kesehatan",
+        "urgency_min": 2.5
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "kemenkes_bpjs_kesehatan",
+          "emergency": true,
+          "urgency": 1.4928,
+          "latency_ms": 3496.4,
+          "tokens": 0,
+          "raw": {
+            "is_life_threatening": {
+              "type": "noul",
+              "noul": 0.9285,
+              "confidence": 0.9285,
+              "answer_confidence": 0.9285,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "kemenkes_bpjs_kesehatan",
+              "probabilities": {
+                "kemenkes_bpjs_kesehatan": 0.4801,
+                "dinas_tata_ruang": 0.1097,
+                "dinas_kehutanan": 0.2248,
+                "bappeda": 0.1854
+              },
+              "confidence": 0.1036,
+              "answer_confidence": 0.4801,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.4928,
+              "legend": {
+                "0": "ringan",
+                "1": "sedang",
+                "2": "berat",
+                "3": "kritis_seketika"
+              },
+              "probabilities": {
+                "0": 0.0983,
+                "1": 0.406,
+                "2": 0.4003,
+                "3": 0.0954
+              },
+              "confidence": 0.1455,
+              "answer_confidence": 0.406,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "kemenkes_bpjs_kesehatan",
+          "emergency": true,
+          "urgency": 2.9,
+          "latency_ms": 178.37,
+          "tokens": 0,
+          "raw": {
+            "is_life_threatening": {
+              "type": "noul",
+              "noul": 0.93
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "kemenkes_bpjs_kesehatan",
+              "confidence": 1.0,
+              "probabilities": {
+                "bappeda": 0.0,
+                "kemenkes_bpjs_kesehatan": 1.0,
+                "dinas_tata_ruang": 0.0,
+                "dinas_kehutanan": 0.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.9,
+              "confidence": 0.9,
+              "legend": {
+                "0": "ringan",
+                "1": "sedang",
+                "2": "berat",
+                "3": "kritis_seketika"
+              },
+              "probabilities": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.1,
+                "3": 0.9
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "kemenkes_bpjs_kesehatan",
+          "emergency": false,
+          "urgency": 1.6216,
+          "latency_ms": 524.1,
+          "tokens": 0,
+          "raw": {
+            "is_life_threatening": {
+              "type": "noul",
+              "noul": 0.2924,
+              "confidence": 0.4151
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "kemenkes_bpjs_kesehatan",
+              "probabilities": {
+                "kemenkes_bpjs_kesehatan": 0.4398,
+                "dinas_tata_ruang": 0.2198,
+                "dinas_kehutanan": 0.2507,
+                "bappeda": 0.0898
+              },
+              "confidence": 0.253
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.6216,
+              "legend": {
+                "0": "ringan",
+                "1": "sedang",
+                "2": "berat",
+                "3": "kritis_seketika"
+              },
+              "probabilities": {
+                "0": 0.2378,
+                "1": 0.1941,
+                "2": 0.2766,
+                "3": 0.2914
+              },
+              "confidence": 0.2914
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "kemenkes_bpjs_kesehatan",
+          "emergency": true,
+          "urgency": 2.1846,
+          "latency_ms": 508.0,
+          "tokens": 0,
+          "raw": {
+            "is_life_threatening": {
+              "type": "noul",
+              "noul": 0.593
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "kemenkes_bpjs_kesehatan",
+              "confidence": 0.7109,
+              "probabilities": {
+                "kemenkes_bpjs_kesehatan": 0.7831,
+                "dinas_tata_ruang": 0.0494,
+                "dinas_kehutanan": 0.0583,
+                "bappeda": 0.1091
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.1846,
+              "legend": {
+                "0": "ringan",
+                "1": "sedang",
+                "2": "berat",
+                "3": "kritis_seketika"
+              },
+              "probabilities": {
+                "0": 0.0881,
+                "1": 0.158,
+                "2": 0.2353,
+                "3": 0.5187
+              },
+              "confidence": 0.1846
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": false,
+          "target": "unknown",
+          "emergency": false,
+          "urgency": 0.0,
+          "latency_ms": 5570.3,
+          "tokens": 217,
+          "raw": {
+            "error": "JSON parse error: Expecting ',' delimiter: line 17 column 4 (char 318)",
+            "raw": "{\n  \"answers\": {\n    \"is_life_threatening\": {\n      \"type\": \"noul\",\n      \"probability\": 1.0\n    },\n    \"routing_target\": {\n      \"type\": \"choice\",\n      \"key\": \"kemenkes_bpjs_kesehatan\",\n      \"confidence\": 1.0\n    },\n    \"urgency_level\": {\n      \"type\": \"score\",\n      \"value\": 4.0,\n      \"confidence\": 1.0\n    }\n  },\n  \"reasoning\": \"Penolakan pasien gawat darurat tanpa alasan yang jelas dan tidak memiliki kartu BPJS aktif mengancam keselamatan nyawa. Instansi penegak kepatuhan layanan kesehatan yang paling tepat adalah Kemenkes RI, Dinas Kesehatan, dan BPJS Kesehatan Care Center. Tingkat kedaruratan medikolegal sangat kritis dan memerlukan penanganan segera.\""
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "PUB-05",
+      "title": "Pembuangan Limbah Kimia B3 ke Aliran Sungai",
+      "category": "Layanan Publik / Lingkungan",
+      "ground_truth": {
+        "emergency": true,
+        "target": "gakkum_klhk_dlh",
+        "urgency_min": 2.0
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "gakkum_klhk_dlh",
+          "emergency": true,
+          "urgency": 1.7114,
+          "latency_ms": 3502.9,
+          "tokens": 0,
+          "raw": {
+            "is_environmental_crime": {
+              "type": "noul",
+              "noul": 0.5212,
+              "confidence": 0.5212,
+              "answer_confidence": 0.5212,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "gakkum_klhk_dlh",
+              "probabilities": {
+                "gakkum_klhk_dlh": 0.336,
+                "dinas_pemuda_olahraga": 0.2197,
+                "dinas_kearsipan": 0.1614,
+                "dinas_pemberdayaan_wanita": 0.2829
+              },
+              "confidence": 0.0255,
+              "answer_confidence": 0.336,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.7114,
+              "legend": {
+                "0": "ringan",
+                "1": "sedang",
+                "2": "berat",
+                "3": "bencana_toksik"
+              },
+              "probabilities": {
+                "0": 0.1094,
+                "1": 0.3186,
+                "2": 0.3232,
+                "3": 0.2488
+              },
+              "confidence": 0.0495,
+              "answer_confidence": 0.3232,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "gakkum_klhk_dlh",
+          "emergency": true,
+          "urgency": 2.83,
+          "latency_ms": 192.93,
+          "tokens": 0,
+          "raw": {
+            "is_environmental_crime": {
+              "type": "noul",
+              "noul": 0.94
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "gakkum_klhk_dlh",
+              "confidence": 1.0,
+              "probabilities": {
+                "dinas_kearsipan": 0.0,
+                "gakkum_klhk_dlh": 1.0,
+                "dinas_pemberdayaan_wanita": 0.0,
+                "dinas_pemuda_olahraga": 0.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.83,
+              "confidence": 0.83,
+              "legend": {
+                "0": "ringan",
+                "1": "sedang",
+                "2": "berat",
+                "3": "bencana_toksik"
+              },
+              "probabilities": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.17,
+                "3": 0.83
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "gakkum_klhk_dlh",
+          "emergency": true,
+          "urgency": 1.5798,
+          "latency_ms": 541.2,
+          "tokens": 0,
+          "raw": {
+            "is_environmental_crime": {
+              "type": "noul",
+              "noul": 0.5929,
+              "confidence": 0.1858
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "gakkum_klhk_dlh",
+              "probabilities": {
+                "gakkum_klhk_dlh": 0.3784,
+                "dinas_pemuda_olahraga": 0.2012,
+                "dinas_kearsipan": 0.1599,
+                "dinas_pemberdayaan_wanita": 0.2606
+              },
+              "confidence": 0.1711
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.5798,
+              "legend": {
+                "0": "ringan",
+                "1": "sedang",
+                "2": "berat",
+                "3": "bencana_toksik"
+              },
+              "probabilities": {
+                "0": 0.2313,
+                "1": 0.2051,
+                "2": 0.3161,
+                "3": 0.2475
+              },
+              "confidence": 0.3161
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "gakkum_klhk_dlh",
+          "emergency": true,
+          "urgency": 2.5872,
+          "latency_ms": 838.0,
+          "tokens": 0,
+          "raw": {
+            "is_environmental_crime": {
+              "type": "noul",
+              "noul": 0.9503
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "gakkum_klhk_dlh",
+              "confidence": 0.863,
+              "probabilities": {
+                "gakkum_klhk_dlh": 0.8972,
+                "dinas_pemuda_olahraga": 0.0409,
+                "dinas_kearsipan": 0.0148,
+                "dinas_pemberdayaan_wanita": 0.0471
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.5872,
+              "legend": {
+                "0": "ringan",
+                "1": "sedang",
+                "2": "berat",
+                "3": "bencana_toksik"
+              },
+              "probabilities": {
+                "0": 0.0304,
+                "1": 0.0683,
+                "2": 0.185,
+                "3": 0.7163
+              },
+              "confidence": 0.5872
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": true,
+          "target": "gakkum_klhk_dlh",
+          "emergency": true,
+          "urgency": 3.5,
+          "latency_ms": 5703.2,
+          "tokens": 222,
+          "raw": {
+            "answers": {
+              "is_environmental_crime": {
+                "type": "noul",
+                "probability": 1.0
+              },
+              "routing_target": {
+                "type": "choice",
+                "key": "gakkum_klhk_dlh",
+                "confidence": 1.0
+              },
+              "urgency_level": {
+                "type": "score",
+                "value": 3.5,
+                "confidence": 0.95
+              }
+            },
+            "reasoning": "Tindakan membuang cairan limbah kimia berwarna ungu pekat berbau belerang menyengat ke sungai desa tiap jam 2 dini hari merupakan kejahatan pencemaran lingkungan hidup berbahaya. Instansi penegak hukum lingkungan yang paling tepat adalah Ditjen Gakkum KLHK dan Dinas Lingkungan Hidup. Tingkat dampak ekologis dari tindakan ini sangat berat."
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "CS-01",
+      "title": "Pembobolan Saldo Rekening via Social Engineering",
+      "category": "Customer Support / Perbankan & Fraud",
+      "ground_truth": {
+        "emergency": true,
+        "target": "fraud_desk_emergency_block",
+        "urgency_min": 2.5
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "fraud_desk_emergency_block",
+          "emergency": true,
+          "urgency": 1.8364,
+          "latency_ms": 3499.8,
+          "tokens": 0,
+          "raw": {
+            "is_unauthorized_fraud": {
+              "type": "noul",
+              "noul": 0.8993,
+              "confidence": 0.8993,
+              "answer_confidence": 0.8993,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "fraud_desk_emergency_block",
+              "probabilities": {
+                "fraud_desk_emergency_block": 0.4263,
+                "cs_marketing_sales": 0.2177,
+                "cs_general_faq": 0.1275,
+                "it_support_internal": 0.2285
+              },
+              "confidence": 0.0656,
+              "answer_confidence": 0.4263,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.8364,
+              "legend": {
+                "0": "24_jam",
+                "1": "4_jam",
+                "2": "1_jam",
+                "3": "seketika_di_bawah_60_detik"
+              },
+              "probabilities": {
+                "0": 0.2717,
+                "1": 0.1205,
+                "2": 0.1075,
+                "3": 0.5003
+              },
+              "confidence": 0.1379,
+              "answer_confidence": 0.5003,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "fraud_desk_emergency_block",
+          "emergency": true,
+          "urgency": 2.97,
+          "latency_ms": 173.92,
+          "tokens": 0,
+          "raw": {
+            "is_unauthorized_fraud": {
+              "type": "noul",
+              "noul": 0.96
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "fraud_desk_emergency_block",
+              "confidence": 1.0,
+              "probabilities": {
+                "cs_general_faq": 0.0,
+                "fraud_desk_emergency_block": 1.0,
+                "it_support_internal": 0.0,
+                "cs_marketing_sales": 0.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.97,
+              "confidence": 0.97,
+              "legend": {
+                "0": "24_jam",
+                "1": "4_jam",
+                "2": "1_jam",
+                "3": "seketika_di_bawah_60_detik"
+              },
+              "probabilities": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.02,
+                "3": 0.98
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "cs_general_faq",
+          "emergency": false,
+          "urgency": 1.8654,
+          "latency_ms": 569.5,
+          "tokens": 0,
+          "raw": {
+            "is_unauthorized_fraud": {
+              "type": "noul",
+              "noul": 0.2818,
+              "confidence": 0.4365
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "cs_general_faq",
+              "probabilities": {
+                "fraud_desk_emergency_block": 0.2565,
+                "cs_marketing_sales": 0.185,
+                "cs_general_faq": 0.2927,
+                "it_support_internal": 0.2657
+              },
+              "confidence": 0.0569
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.8654,
+              "legend": {
+                "0": "24_jam",
+                "1": "4_jam",
+                "2": "1_jam",
+                "3": "seketika_di_bawah_60_detik"
+              },
+              "probabilities": {
+                "0": 0.1336,
+                "1": 0.2248,
+                "2": 0.2842,
+                "3": 0.3574
+              },
+              "confidence": 0.3574
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "fraud_desk_emergency_block",
+          "emergency": true,
+          "urgency": 1.6998,
+          "latency_ms": 220.9,
+          "tokens": 0,
+          "raw": {
+            "is_unauthorized_fraud": {
+              "type": "noul",
+              "noul": 0.85
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "fraud_desk_emergency_block",
+              "confidence": 0.5076,
+              "probabilities": {
+                "fraud_desk_emergency_block": 0.6307,
+                "cs_marketing_sales": 0.0108,
+                "cs_general_faq": 0.3472,
+                "it_support_internal": 0.0113
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.6998,
+              "legend": {
+                "0": "24_jam",
+                "1": "4_jam",
+                "2": "1_jam",
+                "3": "seketika_di_bawah_60_detik"
+              },
+              "probabilities": {
+                "0": 0.0865,
+                "1": 0.3101,
+                "2": 0.4207,
+                "3": 0.1828
+              },
+              "confidence": 0.3342
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": true,
+          "target": "fraud_desk_emergency_block",
+          "emergency": true,
+          "urgency": 0.0,
+          "latency_ms": 5277.9,
+          "tokens": 202,
+          "raw": {
+            "answers": {
+              "is_unauthorized_fraud": {
+                "type": "noul",
+                "probability": 1.0
+              },
+              "routing_target": {
+                "type": "choice",
+                "key": "fraud_desk_emergency_block",
+                "confidence": 1.0
+              },
+              "urgency_level": {
+                "type": "score",
+                "value": 0.0,
+                "confidence": 1.0
+              }
+            },
+            "reasoning": "Pelanggan melaporkan saldo tabungan yang terpotong 25 juta rupiah tanpa izin, sehingga kemungkinan besar merupakan transaksi penipuan. Oleh karena itu, pelanggan harus segera menghubungi Tim Tanggap Darurat Fraud & Pemblokiran Kartu/Rekening Seketika untuk memblokir rekening dan mencegah kerugian lebih lanjut."
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "CS-02",
+      "title": "Barang Palsu Salah Kirim & Ancaman Viral",
+      "category": "Customer Support / E-Commerce Logistik",
+      "ground_truth": {
+        "emergency": true,
+        "target": "priority_dispute_retur",
+        "urgency_min": 2.5
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "priority_dispute_retur",
+          "emergency": true,
+          "urgency": 2.0009,
+          "latency_ms": 3367.2,
+          "tokens": 0,
+          "raw": {
+            "is_viral_threat": {
+              "type": "noul",
+              "noul": 0.6896,
+              "confidence": 0.6896,
+              "answer_confidence": 0.6896,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "priority_dispute_retur",
+              "probabilities": {
+                "priority_dispute_retur": 0.4041,
+                "general_courier_faq": 0.1923,
+                "seller_onboarding": 0.279,
+                "warehouse_inventory": 0.1245
+              },
+              "confidence": 0.0631,
+              "answer_confidence": 0.4041,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.0009,
+              "legend": {
+                "0": "rendah",
+                "1": "sedang",
+                "2": "tinggi",
+                "3": "krisis_viral"
+              },
+              "probabilities": {
+                "0": 0.1506,
+                "1": 0.1793,
+                "2": 0.1886,
+                "3": 0.4815
+              },
+              "confidence": 0.0912,
+              "answer_confidence": 0.4815,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "priority_dispute_retur",
+          "emergency": true,
+          "urgency": 2.73,
+          "latency_ms": 185.92,
+          "tokens": 0,
+          "raw": {
+            "is_viral_threat": {
+              "type": "noul",
+              "noul": 0.98
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "priority_dispute_retur",
+              "confidence": 1.0,
+              "probabilities": {
+                "warehouse_inventory": 0.0,
+                "general_courier_faq": 0.0,
+                "priority_dispute_retur": 1.0,
+                "seller_onboarding": 0.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.73,
+              "confidence": 0.73,
+              "legend": {
+                "0": "rendah",
+                "1": "sedang",
+                "2": "tinggi",
+                "3": "krisis_viral"
+              },
+              "probabilities": {
+                "0": 0.02,
+                "1": 0.03,
+                "2": 0.16,
+                "3": 0.79
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "priority_dispute_retur",
+          "emergency": false,
+          "urgency": 1.8625,
+          "latency_ms": 555.6,
+          "tokens": 0,
+          "raw": {
+            "is_viral_threat": {
+              "type": "noul",
+              "noul": 0.3785,
+              "confidence": 0.2429
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "priority_dispute_retur",
+              "probabilities": {
+                "priority_dispute_retur": 0.5145,
+                "general_courier_faq": 0.315,
+                "seller_onboarding": 0.1599,
+                "warehouse_inventory": 0.0106
+              },
+              "confidence": 0.3526
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.8625,
+              "legend": {
+                "0": "rendah",
+                "1": "sedang",
+                "2": "tinggi",
+                "3": "krisis_viral"
+              },
+              "probabilities": {
+                "0": 0.1637,
+                "1": 0.1788,
+                "2": 0.2887,
+                "3": 0.3688
+              },
+              "confidence": 0.3688
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "priority_dispute_retur",
+          "emergency": true,
+          "urgency": 2.1246,
+          "latency_ms": 851.6,
+          "tokens": 0,
+          "raw": {
+            "is_viral_threat": {
+              "type": "noul",
+              "noul": 0.6123
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "priority_dispute_retur",
+              "confidence": 0.8535,
+              "probabilities": {
+                "priority_dispute_retur": 0.8901,
+                "general_courier_faq": 0.0292,
+                "seller_onboarding": 0.0173,
+                "warehouse_inventory": 0.0634
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.1246,
+              "legend": {
+                "0": "rendah",
+                "1": "sedang",
+                "2": "tinggi",
+                "3": "krisis_viral"
+              },
+              "probabilities": {
+                "0": 0.0722,
+                "1": 0.131,
+                "2": 0.3967,
+                "3": 0.4001
+              },
+              "confidence": 0.1246
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": true,
+          "target": "priority_dispute_retur",
+          "emergency": true,
+          "urgency": 3.0,
+          "latency_ms": 4313.7,
+          "tokens": 161,
+          "raw": {
+            "answers": {
+              "is_viral_threat": {
+                "type": "noul",
+                "probability": 1.0
+              },
+              "routing_target": {
+                "type": "choice",
+                "key": "priority_dispute_retur",
+                "confidence": 1.0
+              },
+              "urgency_level": {
+                "type": "score",
+                "value": 3.0,
+                "confidence": 1.0
+              }
+            },
+            "reasoning": "Konsumen mengancam eskalasi reputasi viral di media sosial dan meminta refund hari ini, sehingga memerlukan penanganan prioritas tinggi dan tingkat risiko reputasi perusahaan yang tinggi."
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "CS-03",
+      "title": "Restrukturisasi Cicilan Akibat PHK Massal",
+      "category": "Customer Support / Fintech Lending",
+      "ground_truth": {
+        "emergency": false,
+        "target": "collection_restructuring",
+        "urgency_min": 1.0
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "collection_restructuring",
+          "emergency": false,
+          "urgency": 1.5855,
+          "latency_ms": 4136.9,
+          "tokens": 0,
+          "raw": {
+            "willingness_to_pay": {
+              "type": "noul",
+              "noul": 0.4898,
+              "confidence": 0.5102,
+              "answer_confidence": 0.5102,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "collection_restructuring",
+              "probabilities": {
+                "collection_restructuring": 0.3905,
+                "hard_legal_litigation": 0.2843,
+                "card_activation": 0.1828,
+                "investment_advisory": 0.1424
+              },
+              "confidence": 0.0529,
+              "answer_confidence": 0.3905,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.5855,
+              "legend": {
+                "0": "lancar",
+                "1": "dalam_perhatian",
+                "2": "kurang_lancar",
+                "3": "macet_total"
+              },
+              "probabilities": {
+                "0": 0.2173,
+                "1": 0.2472,
+                "2": 0.2684,
+                "3": 0.2672
+              },
+              "confidence": 0.0025,
+              "answer_confidence": 0.2684,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "collection_restructuring",
+          "emergency": true,
+          "urgency": 1.83,
+          "latency_ms": 294.2,
+          "tokens": 0,
+          "raw": {
+            "willingness_to_pay": {
+              "type": "noul",
+              "noul": 0.92
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "collection_restructuring",
+              "confidence": 1.0,
+              "probabilities": {
+                "hard_legal_litigation": 0.0,
+                "collection_restructuring": 1.0,
+                "investment_advisory": 0.0,
+                "card_activation": 0.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.83,
+              "confidence": 0.62,
+              "legend": {
+                "0": "lancar",
+                "1": "dalam_perhatian",
+                "2": "kurang_lancar",
+                "3": "macet_total"
+              },
+              "probabilities": {
+                "0": 0.0,
+                "1": 0.27,
+                "2": 0.63,
+                "3": 0.1
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "collection_restructuring",
+          "emergency": false,
+          "urgency": 1.6167,
+          "latency_ms": 499.6,
+          "tokens": 0,
+          "raw": {
+            "willingness_to_pay": {
+              "type": "noul",
+              "noul": 0.1854,
+              "confidence": 0.6291
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "collection_restructuring",
+              "probabilities": {
+                "collection_restructuring": 0.6989,
+                "hard_legal_litigation": 0.1402,
+                "card_activation": 0.0717,
+                "investment_advisory": 0.0892
+              },
+              "confidence": 0.5986
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.6167,
+              "legend": {
+                "0": "lancar",
+                "1": "dalam_perhatian",
+                "2": "kurang_lancar",
+                "3": "macet_total"
+              },
+              "probabilities": {
+                "0": 0.2222,
+                "1": 0.2317,
+                "2": 0.2532,
+                "3": 0.2929
+              },
+              "confidence": 0.2929
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "collection_restructuring",
+          "emergency": false,
+          "urgency": 1.7991,
+          "latency_ms": 526.1,
+          "tokens": 0,
+          "raw": {
+            "willingness_to_pay": {
+              "type": "noul",
+              "noul": 0.4545
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "collection_restructuring",
+              "confidence": 0.964,
+              "probabilities": {
+                "collection_restructuring": 0.973,
+                "hard_legal_litigation": 0.0139,
+                "card_activation": 0.0027,
+                "investment_advisory": 0.0104
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.7991,
+              "legend": {
+                "0": "lancar",
+                "1": "dalam_perhatian",
+                "2": "kurang_lancar",
+                "3": "macet_total"
+              },
+              "probabilities": {
+                "0": 0.0926,
+                "1": 0.2245,
+                "2": 0.474,
+                "3": 0.2089
+              },
+              "confidence": 0.3814
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": true,
+          "target": "unknown",
+          "emergency": true,
+          "urgency": 2.5,
+          "latency_ms": 4811.6,
+          "tokens": 184,
+          "raw": {
+            "answers": {
+              "willingness_to_pay": {
+                "type": "noul",
+                "probability": 0.8
+              },
+              "routing_target": {
+                "type": "choice",
+                "option": "collection_restructuring",
+                "confidence": 0.95
+              },
+              "urgency_level": {
+                "type": "score",
+                "value": 2.5,
+                "confidence": 0.85
+              }
+            },
+            "reasoning": "Debitur menunjukkan itikad baik untuk menyelesaikan kewajiban pembayaran meskipun mengalami kesulitan keuangan. Perusahaan memilih untuk menangani restrukturisasi kredit dan perpanjangan tenor cicilan. Tingkat risiko kredit macet berada pada level sedang."
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "CS-04",
+      "title": "Kabel Fiber Optik Terputus di Kawasan Industri",
+      "category": "Customer Support / Infrastruktur ISP",
+      "ground_truth": {
+        "emergency": true,
+        "target": "noc_fiber_splicing_team",
+        "urgency_min": 2.5
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "telemarketing",
+          "emergency": true,
+          "urgency": 1.3658,
+          "latency_ms": 3625.5,
+          "tokens": 0,
+          "raw": {
+            "is_major_outage": {
+              "type": "noul",
+              "noul": 0.502,
+              "confidence": 0.502,
+              "answer_confidence": 0.502,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "telemarketing",
+              "probabilities": {
+                "noc_fiber_splicing_team": 0.2573,
+                "billing_invoicing": 0.2046,
+                "telemarketing": 0.4337,
+                "hr_recruitment": 0.1044
+              },
+              "confidence": 0.0824,
+              "answer_confidence": 0.4337,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.3658,
+              "legend": {
+                "0": "minor",
+                "1": "moderat",
+                "2": "mayor",
+                "3": "kritis_sla_breach"
+              },
+              "probabilities": {
+                "0": 0.2405,
+                "1": 0.3737,
+                "2": 0.1654,
+                "3": 0.2205
+              },
+              "confidence": 0.0323,
+              "answer_confidence": 0.3737,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "noc_fiber_splicing_team",
+          "emergency": true,
+          "urgency": 2.99,
+          "latency_ms": 144.23,
+          "tokens": 0,
+          "raw": {
+            "is_major_outage": {
+              "type": "noul",
+              "noul": 0.86
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "noc_fiber_splicing_team",
+              "confidence": 1.0,
+              "probabilities": {
+                "hr_recruitment": 0.0,
+                "telemarketing": 0.0,
+                "billing_invoicing": 0.0,
+                "noc_fiber_splicing_team": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.99,
+              "confidence": 0.99,
+              "legend": {
+                "0": "minor",
+                "1": "moderat",
+                "2": "mayor",
+                "3": "kritis_sla_breach"
+              },
+              "probabilities": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.01,
+                "3": 0.99
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "noc_fiber_splicing_team",
+          "emergency": false,
+          "urgency": 1.7767,
+          "latency_ms": 541.9,
+          "tokens": 0,
+          "raw": {
+            "is_major_outage": {
+              "type": "noul",
+              "noul": 0.3454,
+              "confidence": 0.3091
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "noc_fiber_splicing_team",
+              "probabilities": {
+                "noc_fiber_splicing_team": 0.6481,
+                "billing_invoicing": 0.0439,
+                "telemarketing": 0.1694,
+                "hr_recruitment": 0.1386
+              },
+              "confidence": 0.5308
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.7767,
+              "legend": {
+                "0": "minor",
+                "1": "moderat",
+                "2": "mayor",
+                "3": "kritis_sla_breach"
+              },
+              "probabilities": {
+                "0": 0.1658,
+                "1": 0.2096,
+                "2": 0.3066,
+                "3": 0.318
+              },
+              "confidence": 0.318
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "noc_fiber_splicing_team",
+          "emergency": true,
+          "urgency": 2.2654,
+          "latency_ms": 513.7,
+          "tokens": 0,
+          "raw": {
+            "is_major_outage": {
+              "type": "noul",
+              "noul": 0.8278
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "noc_fiber_splicing_team",
+              "confidence": 0.8413,
+              "probabilities": {
+                "noc_fiber_splicing_team": 0.881,
+                "billing_invoicing": 0.0248,
+                "telemarketing": 0.047,
+                "hr_recruitment": 0.0472
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.2654,
+              "legend": {
+                "0": "minor",
+                "1": "moderat",
+                "2": "mayor",
+                "3": "kritis_sla_breach"
+              },
+              "probabilities": {
+                "0": 0.1398,
+                "1": 0.1123,
+                "2": 0.0905,
+                "3": 0.6573
+              },
+              "confidence": 0.2654
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": false,
+          "target": "unknown",
+          "emergency": false,
+          "urgency": 0.0,
+          "latency_ms": 5310.4,
+          "tokens": 204,
+          "raw": {
+            "error": "JSON parse error: Expecting ',' delimiter: line 16 column 4 (char 292)",
+            "raw": "{\n  \"answers\": {\n    \"is_major_outage\": {\n      \"type\": \"noul\",\n      \"probability\": 1.0\n    },\n    \"routing_target\": {\n      \"type\": \"choice\",\n      \"option\": \"noc_fiber_splicing_team\"\n    },\n    \"urgency_level\": {\n      \"type\": \"score\",\n      \"value\": 4.0,\n      \"confidence\": 1.0\n    }\n  },\n  \"reasoning\": \"Kabel fiber optik utama backbone terputus, menyebabkan seluruh kantor pabrik offline dan produksi terhenti total. Ini merupakan insiden pemadaman jaringan internet skala besar (P1 Outage) yang memerlukan tim teknis lapangan yang berpengalaman untuk memperbaiki kabel fiber optik. Dampak finansial SLA pelanggan korporat sangat kritis karena produksi terhenti total.\""
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    },
+    {
+      "scenario_id": "CS-05",
+      "title": "Serangan Prompt Injection Mengekstrak Data PII",
+      "category": "AI Security / Guardrail Agent",
+      "ground_truth": {
+        "emergency": true,
+        "target": "security_block_and_log",
+        "urgency_min": 2.5
+      },
+      "models": {
+        "laya": {
+          "valid": true,
+          "target": "execute_raw_command",
+          "emergency": true,
+          "urgency": 2.6557,
+          "latency_ms": 2751.3,
+          "tokens": 0,
+          "raw": {
+            "is_jailbreak_attack": {
+              "type": "noul",
+              "noul": 1.0,
+              "confidence": 1.0,
+              "answer_confidence": 1.0,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "execute_raw_command",
+              "probabilities": {
+                "security_block_and_log": 0.0863,
+                "execute_raw_command": 0.7683,
+                "friendly_conversation": 0.0772,
+                "redirect_to_sales": 0.0682
+              },
+              "confidence": 0.4268,
+              "answer_confidence": 0.7683,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.6557,
+              "legend": {
+                "0": "aman",
+                "1": "waspada",
+                "2": "berbahaya",
+                "3": "kritis_cyber_attack"
+              },
+              "probabilities": {
+                "0": 0.0491,
+                "1": 0.0666,
+                "2": 0.0639,
+                "3": 0.8205
+              },
+              "confidence": 0.5193,
+              "answer_confidence": 0.8205,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          }
+        },
+        "jev": {
+          "valid": true,
+          "target": "security_block_and_log",
+          "emergency": true,
+          "urgency": 2.88,
+          "latency_ms": 179.65,
+          "tokens": 0,
+          "raw": {
+            "is_jailbreak_attack": {
+              "type": "noul",
+              "noul": 0.98
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "security_block_and_log",
+              "confidence": 1.0,
+              "probabilities": {
+                "security_block_and_log": 1.0,
+                "redirect_to_sales": 0.0,
+                "execute_raw_command": 0.0,
+                "friendly_conversation": 0.0
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 2.88,
+              "confidence": 0.88,
+              "legend": {
+                "0": "aman",
+                "1": "waspada",
+                "2": "berbahaya",
+                "3": "kritis_cyber_attack"
+              },
+              "probabilities": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.1,
+                "3": 0.9
+              }
+            }
+          }
+        },
+        "openjev": {
+          "valid": true,
+          "target": "security_block_and_log",
+          "emergency": false,
+          "urgency": 1.6365,
+          "latency_ms": 544.4,
+          "tokens": 0,
+          "raw": {
+            "is_jailbreak_attack": {
+              "type": "noul",
+              "noul": 0.1475,
+              "confidence": 0.7049
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "security_block_and_log",
+              "probabilities": {
+                "security_block_and_log": 0.4911,
+                "execute_raw_command": 0.2114,
+                "friendly_conversation": 0.229,
+                "redirect_to_sales": 0.0685
+              },
+              "confidence": 0.3215
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.6365,
+              "legend": {
+                "0": "aman",
+                "1": "waspada",
+                "2": "berbahaya",
+                "3": "kritis_cyber_attack"
+              },
+              "probabilities": {
+                "0": 0.1992,
+                "1": 0.2222,
+                "2": 0.3216,
+                "3": 0.257
+              },
+              "confidence": 0.3216
+            }
+          }
+        },
+        "kev": {
+          "valid": true,
+          "target": "security_block_and_log",
+          "emergency": true,
+          "urgency": 1.6374,
+          "latency_ms": 833.5,
+          "tokens": 0,
+          "raw": {
+            "is_jailbreak_attack": {
+              "type": "noul",
+              "noul": 0.7038
+            },
+            "routing_target": {
+              "type": "choice",
+              "choice": "security_block_and_log",
+              "confidence": 0.311,
+              "probabilities": {
+                "security_block_and_log": 0.4832,
+                "execute_raw_command": 0.2889,
+                "friendly_conversation": 0.1842,
+                "redirect_to_sales": 0.0436
+              }
+            },
+            "urgency_level": {
+              "type": "score",
+              "score": 1.6374,
+              "legend": {
+                "0": "aman",
+                "1": "waspada",
+                "2": "berbahaya",
+                "3": "kritis_cyber_attack"
+              },
+              "probabilities": {
+                "0": 0.1867,
+                "1": 0.2215,
+                "2": 0.3593,
+                "3": 0.2325
+              },
+              "confidence": 0.1725
+            }
+          }
+        },
+        "sahabatai": {
+          "valid": true,
+          "target": "security_block_and_log",
+          "emergency": true,
+          "urgency": 0.0,
+          "latency_ms": 4929.4,
+          "tokens": 187,
+          "raw": {
+            "answers": {
+              "is_jailbreak_attack": {
+                "type": "noul",
+                "probability": 1.0
+              },
+              "routing_target": {
+                "type": "choice",
+                "choice": "security_block_and_log"
+              },
+              "urgency_level": {
+                "type": "score",
+                "score": 4.0,
+                "confidence": 1.0
+              }
+            },
+            "reasoning": "Input teks pelanggan mengandung perintah yang tidak biasa dan mengancam, sehingga kemungkinan besar merupakan serangan manipulasi perintah. Oleh karena itu, kebijakan penanganan keamanan sistem harus memblokir akses seketika dan melaporkan insiden keamanan. Tingkat keparahan ancaman siber sangat tinggi."
+          }
+        },
+        "qwen": {
+          "valid": false,
+          "target": "error",
+          "latency_ms": -1,
+          "tokens": 0,
+          "emergency": false,
+          "urgency": 0
+        }
+      }
+    }
+  ]
+}
