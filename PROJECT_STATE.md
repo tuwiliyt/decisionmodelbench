@@ -1,103 +1,105 @@
-# Project Context & State: AI Decision Models (System One)
+# 🏛️ PROJECT STATE & CONTEXT PERSISTENCE
+# DecisionModelBench: Model Decision (System 1) vs Foundation LLM Indonesia (System 2)
 
-Dokumen ini adalah ringkasan konteks percakapan dan status proyek pengujian *Probabilistic Non-Autoregressive Decision Models*.
-
----
-
-## 1. Lingkungan Hardware & Dependensi
-
-* **Lokasi Workspace:** `/content/drive/MyDrive/AIPROJECT/DecisionModel`
-* **GPU Aktif:** NVIDIA Tesla T4 (15.6 GB VRAM) | CUDA Driver 580.82 / CUDA 13.0
-* **Python Environment:** Python 3.13.15, PyTorch dengan dukungan CUDA (`torch.cuda.is_available() == True`)
-* **Libraries Terpasang:**
-  * `laya` (v0.3.20) – Engine System One non-autoregresif lokal (~421M parameter)
-  * `kev` (v0.1.0) – Model keputusan lokal berbasis Qwen3.5 + LoRA pointer head (100% wire-compatible dengan TypeSafe Jev)
-  * `peft`, `torchao` (v0.18.0), `transformers` (v5.16.1), `datasets`
-* **API Key TypeSafe Jev (Terverifikasi Aktif):**
-  ```text
-  apikey_22539801ad3ed10f4c298ead877d832613c8_cf1f0eaa3f565712acd771c6dc036e0afcfab5e5d5fc8cd56c650d48fce4b226
-  ```
+> **Catatan untuk Asisten AI (Context Memory):**  
+> Dokumen ini adalah *Single Source of Truth* (SSOT) status, arsitektur, dan konteks lengkap proyek. Setiap kali sesi baru dimulai, baca dokumen ini untuk memulihkan seluruh konteks kerja tanpa kehilangan detail teknis apa pun.
 
 ---
 
-## 2. Hasil Benchmark Perbandingan (Jev vs Laya vs Kev)
-
-Pengujian dilakukan menggunakan script [`benchmark_comparison.py`](file:///content/drive/MyDrive/AIPROJECT/DecisionModel/benchmark_comparison.py) dengan 3 skenario nyata:
-
-| Skenario | Model | Deployment | Latensi | Ringkasan Output Keputusan |
-| :--- | :--- | :--- | :--- | :--- |
-| **Kasus 1: Billing & Churn (EN)** | **Jev (TypeSafe)** | Cloud API | ~197 ms | `is_cancellation=0.99`, `category=pricing (100%)`, `churn_risk=2.91` |
-| | **Laya (421M)** | Local GPU | ~65 - 94 ms | `is_cancellation=0.94`, `category=pricing (98%)`, `churn_risk=1.04` |
-| | **Kev-0.8B** | Local GPU | ~268 ms | `is_cancellation=0.94`, `category=pricing (55%)`, `churn_risk=1.62` |
-| **Kasus 2: Incident Triage (EN)** | **Jev (TypeSafe)** | Cloud API | ~165 ms | `is_urgent=0.90`, `fault_domain=database (100%)`, `severity=2.99` |
-| | **Laya (421M)** | Local GPU | **94.0 ms** | `is_urgent=0.08`, `fault_domain=database (94%)`, `severity=2.16` |
-| | **Kev-0.8B** | Local GPU | ~1.8 s | `is_urgent=0.70`, `fault_domain=database (97%)`, `severity=2.23` |
-| **Kasus 3: Tiket Komplain (ID)** | **Jev (TypeSafe)** | Cloud API | ~162 ms | `is_cancellation=0.68`, `category=pricing (100%)`, `urgency=2.10` |
-| | **Laya (421M)** | Local GPU | **78.3 ms** | `is_cancellation=0.55`, `category=pricing (70%)`, `urgency=1.36` |
-| | **Kev-0.8B** | Local GPU | ~1.3 s | `is_cancellation=0.83`, `category=pricing (61%)`, `urgency=1.80` |
+## 1. Identitas Proyek & Repository
+- **Nama Proyek:** DecisionModelBench
+- **Workspace Lokal (Persistent Google Drive):** `/content/drive/MyDrive/AIPROJECT/DecisionModel/`
+- **GitHub Repository:** [https://github.com/tuwiliyt/decisionmodelbench](https://github.com/tuwiliyt/decisionmodelbench)
+- **Branch:** `main`
+- **Tujuan Proyek:** Menguji dan membandingkan secara komprehensif arsitektur **Model Decision Non-Autoregresif (System 1)** melawan **Foundation LLM Autoregresif (System 2)**, khususnya membuktikan keunggulan **Dengan Jev (Two-Tier)** vs **Tanpa Jev (Standalone LLM)** dalam efisiensi latensi, penghematan token, mitigasi halusinasi, dan cost index pada pasar Indonesia.
 
 ---
 
-## 3. Analisis & Karakteristik Model
-
-1. **Jev (TypeSafe AI Cloud API):**
-   * **Akurasi & Kalibrasi:** Sangat tajam dan percaya diri tinggi (sering mencapai confidence 99-100% pada kategori yang jelas).
-   * **Latensi:** ~69 ms upstream server, ~160-200 ms total network round-trip.
-   * **Kelebihan:** Nol penggunaan resource lokal (VRAM/RAM), zero setup maintenance.
-
-2. **Laya (Local GPU - ModernBERT RLCD):**
-   * **Kecepatan:** **Tercepat secara lokal (<80-95 ms di Tesla T4)** setelah model di-cache.
-   * **Resource:** Sangat hemat VRAM (~800 MB).
-   * **Multilingual:** Mampu memproses input Bahasa Indonesia secara native.
-   * **Output Token:** 0 tokens generated (murni non-autoregresif).
-
-3. **Kev-0.8B (Local GPU - Qwen3.5 LoRA):**
-   * **Wire-Compatibility:** 100% kompatibel dengan schema API TypeSafe (`SystemOneRequest`, `to_record`, `to_answers`).
-   * **Resource:** Menggunakan ~2 GB VRAM.
-   * **Keunggulan:** Pemahaman logika teks yang dalam (berbasis backbone LLM Qwen3.5) dan mendukung fine-tuning sendiri.
-
-4. **OpenJev (Local GPU - Qwen2.5 Logit Scorer):**
-   * **Arsitektur:** Menggunakan teknik *single-pass continuation logit scoring* (mirip `daseinlabs/open-jev`) pada model terbuka tanpa decoding token.
-   * **Latensi:** ~220 ms di GPU Tesla T4.
-   * **Resource:** ~1 GB VRAM.
-
-5. **CLM-8B (Stanford & NVIDIA Contrastive Language Model):**
-   * **Arsitektur:** Dual-encoder (State Head + Action Head) di atas backbone Qwen3-8B.
-   * **Hardware Guard:** Sistem live playground mendeteksi kapasitas VRAM secara dinamis. Jika VRAM < 16 GB, sistem menampilkan peringatan hardware dan panduan kuantisasi (AWQ/GPTQ) untuk mencegah *CUDA Out of Memory*.
-
-
-6. **Sahabat-AI 8B (Sovereign Foundation LLM Indonesia - GoTo & Indosat):**
-   * **Arsitektur:** Continuous Pre-Training di atas Llama-3-8B dengan korpus bahasa Indonesia, budaya lokal, hukum, bisnis, dan dialek daerah.
-   * **Deployment:** Dijalankan secara lokal di GPU Tesla T4 via format GGUF Q4_K_M dengan offload CUDA penuh (`n_gpu_layers=-1`).
-   * **Kecepatan Inferensi:** **~28 - 32 tokens/detik** pada Tesla T4.
-   * **Penggunaan Resource:** ~4.8 GB VRAM (~9.7 GB total sistem aktif bersama System 1).
-   * **Peran Operasional:** Berfungsi sebagai **System 2 Generative & Empathy Engine** dalam arsitektur hibrida Two-Tier Brain.
+## 2. Lingkungan Hardware & Konfigurasi Server
+- **Hardware GPU:** NVIDIA Tesla T4 (15.6 GB VRAM, Compute 7.5, Pasif Server Fan)
+- **Driver & CUDA:** Driver 580.82 | CUDA 13.0
+- **Python Environment:** Python 3.10+ / 3.13 (`torch.cuda.is_available() == True`)
+- **Backend Server:** FastAPI (`app_server.py`) berjalan di port `7860`.
+- **Public Tunnel:** Cloudflare Tunnel (`cloudflared tunnel --url http://localhost:7860`).
+- **Alokasi VRAM GPU Saat Aktif:**
+  - Base System 1 (Laya + OpenJev + Kev): ~4.37 GB VRAM
+  - VRAM Bebas untuk LLM Kelas Berat: ~10.5 GB VRAM
+  - Hot-swap mechanism: `HeavyweightLLMManager` melakukan unallocation CUDA (`del self.llm; gc.collect(); torch.cuda.empty_cache()`) dengan aman sebelum memuat model 7B/8B/9B lain, menjamin **Zero CUDA OOM**.
 
 ---
 
-## 4. File yang Tersedia di Workspace & Server Live
+## 3. Katalog Model Terpasang & Siap Uji
 
-* **Public Cloudflare Tunnel URLs:**
-  * Dashboard Utama (Kelas Ringan / Decision Models): `https://closed-similarly-offers-approved.trycloudflare.com/`
-  * Dashboard Khusus Kelas Berat (Sahabat-AI 8B & Two-Tier Brain): `https://closed-similarly-offers-approved.trycloudflare.com/heavyweight`
-* [`heavyweight_llm_dashboard.html`](file:///content/drive/MyDrive/AIPROJECT/DecisionModel/heavyweight_llm_dashboard.html): Halaman web interaktif pengujian kelas berat (Mode Chat Generatif, Head-to-Head System 1 vs 2, dan Simulasi Two-Tier Pipeline).
-* [`sahabatai_engine.py`](file:///content/drive/MyDrive/AIPROJECT/DecisionModel/sahabatai_engine.py): Modul inferensi terintegrasi Sahabat-AI 8B (chat, decision mode, two-tier pipeline).
-* [`app_server.py`](file:///content/drive/MyDrive/AIPROJECT/DecisionModel/app_server.py): FastAPI backend daemon yang melayani semua model (Laya, Kev, Jev, OpenJev, CLM, Sahabat-AI 8B) di port `7860`.
-* [`benchmark_dashboard.html`](file:///content/drive/MyDrive/AIPROJECT/DecisionModel/benchmark_dashboard.html): Dashboard komparasi 5 decision models dengan link lintas halaman.
-* [`openjev_engine.py`](file:///content/drive/MyDrive/AIPROJECT/DecisionModel/openjev_engine.py): Engine inferensi OpenJev berbasis logit scoring Qwen2.5.
-* [`indonesia_benchmark_suite.py`](file:///content/drive/MyDrive/AIPROJECT/DecisionModel/indonesia_benchmark_suite.py): Script pengujian 8 skenario nyata di Indonesia.
-* [`PROJECT_STATE.md`](file:///content/drive/MyDrive/AIPROJECT/DecisionModel/PROJECT_STATE.md): Catatan status proyek dan riwayat benchmark.
+### A. Model Decision (System 1 - Triage Instan 0 Token):
+1. **Laya Multilingual (421M):**
+   - Arsitektur: ModernBERT RLCD.
+   - Latensi: **~50 - 65 ms** di GPU Tesla T4 (Tercepat).
+   - Output: 0 tokens, Softmax/Sigmoid matematis.
+2. **OpenJev (0.5B):**
+   - Arsitektur: Qwen 2.5 Single-Pass Continuation Logit Scorer (`openjev_engine.py`).
+   - Latensi: **~180 - 240 ms**.
+   - Output: 0 tokens, Normalized Logits.
+3. **TypeSafe Jev (Cloud SaaS API):**
+   - Endpoint: `https://api.typesafe.ai/v1/systemone`
+   - Latensi: **~140 - 180 ms** total network round-trip.
+   - Konfigurasi: Dimuat via `.env` (`JEV_API_KEY`).
+4. **Kev-0.8B (Local GPU):**
+   - Arsitektur: Qwen 2.5 + LoRA Pointer Head (Jared Palmer).
+   - Latensi: **~1.1 - 1.4 s**.
+5. **CLM-8B (Hardware Guarded):**
+   - Arsitektur: Stanford/NVIDIA Contrastive Language Model.
+   - Status: Memeriksa VRAM dinamis; menampilkan panduan kuantisasi jika VRAM < 16 GB.
+
+### B. Foundation LLM Kelas Berat (System 2 - Penalaran & Narasi):
+Model disimpan di `/root/models/` (atau `./models/` via `resolve_model_path` di `heavyweight_llm_engine.py`):
+1. `sahabatai-8b-q4.gguf` (4.6 GB, 8.03B) – GoTo & Indosat Sovereign LLM (~28-32 t/s).
+2. `Qwen2.5-7B-Instruct-Q4_K_M.gguf` (4.4 GB, 7.61B) – Alibaba Cloud Multilingual SOTA (~30-35 t/s).
+3. `gemma-2-9b-it-Q4_K_M.gguf` (5.4 GB, 9.24B) – Google DeepMind Reasoning (~24-28 t/s).
+4. `gemma-2-2b-it-Q4_K_M.gguf` (1.6 GB, 2.61B) – Google DeepMind Ultra-Speed (~50-65 t/s).
 
 ---
 
-## 5. Ringkasan Temuan Pengujian Kelas Berat (System 1 vs System 2)
+## 4. Intisari Arsitektur: "Dengan Jev" vs "Tanpa Jev"
 
-| Parameter | System 1: Decision Model (Laya/OpenJev) | System 2: Generative LLM (Sahabat-AI 8B) |
+| Dimensi | Tanpa Jev (LLM Murni) | Dengan Jev / Decision Model (Two-Tier) |
 | :--- | :--- | :--- |
-| **Waktu Respon (Latensi)** | **~60 - 220 ms** | **~3,700 - 5,800 ms** (15-80x lebih lama) |
-| **Output Token** | **0 tokens** (murni probabilitas logit) | **~100 - 250 tokens** (autoregresif) |
-| **Biaya Komputasi / Token** | $0 biaya token generatif | Membutuhkan kuota token kontinu |
-| **Konsistensi Format** | 100% deterministik, skema kaku | Butuh JSON parser & rentan variasi teks |
-| **Kemampuan Teks/Empati** | Tidak ada generasi teks (hanya klasifikasi) | **Sangat fasih, empatik, memahami dialek lokal** |
-| **Rekomendasi Terbaik** | **Triage 100% chat masuk (Filter Lapis 1)** | **Hanya menangani eskalasi/kasus krisis (Lapis 2)** |
+| **Pola Eksekusi** | Single-Tier Autoregresif (100% Kueri ke LLM 8B) | Dual-Tier (Tier 1: Triage 0 Token ➔ Tier 2: LLM On-Demand) |
+| **Latensi Klasifikasi** | 3,500 – 6,000 ms per kueri | **50 – 160 ms (50x - 80x lebih cepat)** |
+| **Token Klasifikasi** | 150 – 250 tokens per kueri | **0 tokens (Zero Token Waste)** |
+| **Kueri Rutin (FAQ)** | Menghabiskan ~200 token & 5 detik GPU | **Fast-Path: Selesai <100ms, LLM dihemat 100%** |
+| **Kueri Kritis (Komplain)** | Berisiko halusinasi & drift format | **Triage deterministik terkalibrasi ➔ Eskalasi terarah ke LLM** |
+| **Penghematan Biaya** | 0% (Beban komputasi penuh) | **Hemat 80% – 100% kuota token produksi** |
 
+---
+
+## 5. Perkakas & Skrip Utama dalam Repository
+
+1. **`setup.sh` (Skrip Otomatisasi Instalasi Interaktif):**
+   - Mendeteksi GPU NVIDIA & CUDA.
+   - **Meminta input API Key Jev secara interaktif** dan menyimpannya ke `.env`.
+   - Memasang dependensi Python & llama-cpp-python CUDA.
+   - Menawarkan opsi unduhan model GGUF (Lengkap / Quick Test / Lewati).
+2. **`benchmark_headless.py` (CLI Headless Benchmark):**
+   - `python3 benchmark_headless.py --matrix` ➔ Tabel matriks eksekutif lengkap.
+   - `python3 benchmark_headless.py --scenario marunda --decision laya --llm sahabatai` ➔ Uji komparasi spesifik.
+   - `python3 benchmark_headless.py --all-presets` ➔ Evaluasi 4 skenario batch.
+   - `python3 benchmark_headless.py --interactive` ➔ Menu CLI interaktif.
+3. **`download_models.py` (Pengunduh Model Cerdas):**
+   - Mendukung `--models all`, `--models quick`, dan `--dest <path>`.
+   - Otomatis melewati file yang sudah ada di disk.
+4. **`app_server.py` (FastAPI Server):**
+   - Port 7860.
+   - Endpoint: `/api/heavyweight/compare_architectures`, `/api/heavyweight/generate`, `/api/heavyweight/decision`, `/api/heavyweight/two_tier`, `/api/gpu_nvtop`.
+5. **`generate_heavyweight_dashboard.py`:**
+   - Menghasilkan antarmuka web interaktif `heavyweight_llm_dashboard.html` dengan 5 mode lengkap dan grafik telemetri rolling nvtop 60 detik.
+
+---
+
+## 6. Cara Cepat Melanjutkan Proyek di Sesi Baru
+Jika pengguna membuka percakapan baru di workspace ini:
+1. Jalankan `git status` dan periksa kelengkapan file.
+2. Periksa apakah server backend aktif: `curl -s http://localhost:7860/api/health`
+   - Jika belum aktif: `python3 -m uvicorn app_server:app --host 0.0.0.0 --port 7860 &`
+3. Pengguna dapat langsung menjalankan pengujian via CLI:
+   `python3 benchmark_headless.py --matrix`
+   atau mengakses antarmuka web di `/heavyweight`.
