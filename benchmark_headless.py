@@ -281,7 +281,7 @@ def print_result_rich(data: dict):
     dec_lat = with_jev.get('decision_latency_ms', 0)
     llm_lat = no_jev.get('total_latency_ms', 0)
     
-    why_won_text = f"""[bold green]✓ Efisiensi Latensi:[/bold green] Triage selesai dalam [bold cyan]{dec_lat} ms[/bold cyan] vs [bold red]{llm_lat} ms[/bold red] ([bold yellow]{speedup_val} lebih cepat[/bold yellow]).
+    why_won_text = f"""[bold green]✓ Efisiensi Latensi:[/bold green] Triage selesai dalam [bold cyan]{dec_lat} ms[/bold cyan] vs [bold red]{llm_lat} ms[/bold red] ([bold yellow]{speedup_val}[/bold yellow]).
 [bold green]✓ Efisiensi Token:[/bold green] Menghemat [bold green]{token_saved} output tokens[/bold green] (Klasifikasi murni 0 tokens tensor).
 [bold green]✓ Keamanan & Akurasi:[/bold green] Keputusan 100% deterministik terkalibrasi tanpa resiko format drift JSON.
 [bold green]✓ Keputusan Routing:[/bold green] [bold white]{routing_action}[/bold white]"""
