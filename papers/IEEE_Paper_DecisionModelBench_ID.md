@@ -1,9 +1,11 @@
 # Kekeliruan Autoregresi dalam Sistem Siber-Fisik Kritis-Waktu dan Perdagangan Algoritmik: Tolok Ukur Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional
 
 **Richie O. Sumual**  
+**PANITA GORONTALO**  
 *Advanced Agentic AI & Distributed Systems Research*  
-Jakarta, Indonesia  
-`richie@panita.web.id`
+Gorontalo, Indonesia  
+`richie@panita.web.id`  
+*Identitas Laporan:* Riset Mandiri — PANITA GORONTALO — Richie O. Sumual (`richie@panita.web.id`, September 2026)
 
 ---
 

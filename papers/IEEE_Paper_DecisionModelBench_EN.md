@@ -1,9 +1,11 @@
 # The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading: An Empirical Benchmark of Non-Autoregressive Decision Models versus Foundation Large Language Models
 
 **Richie O. Sumual**  
+**PANITA GORONTALO**  
 *Advanced Agentic AI & Distributed Systems Research*  
-Jakarta, Indonesia  
-`richie@panita.web.id`
+Gorontalo, Indonesia  
+`richie@panita.web.id`  
+*Report Reference:* Riset Mandiri — PANITA GORONTALO — Richie O. Sumual (`richie@panita.web.id`, September 2026)
 
 ---
 

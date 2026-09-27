@@ -1,10 +1,11 @@
 # Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration
 
 **Author:** Richie O. Sumual  
-*Advanced Agentic AI & Distributed Systems Research, Jakarta, Indonesia*  
+**Affiliation:** PANITA GORONTALO & Advanced Agentic AI & Distributed Systems Research  
+*Location:* Gorontalo, Indonesia  
 *Contact:* `richie@panita.web.id`  
 *Publication Venue:* IEEE Transactions on Computational Social Systems / IEEE Transactions on Services Computing  
-*Report Reference:* Independent Research Report — Richie O. Sumual (Research Project #3, September 2026)
+*Report Reference:* Riset Mandiri — PANITA GORONTALO — Richie O. Sumual (`richie@panita.web.id`, September 2026)
 
 ---
 

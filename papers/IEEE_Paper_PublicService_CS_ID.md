@@ -1,10 +1,11 @@
 # Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi
 
 **Penulis:** Richie O. Sumual  
-*Advanced Agentic AI & Distributed Systems Research, Jakarta, Indonesia*  
+**Afiliasi:** PANITA GORONTALO & Advanced Agentic AI & Distributed Systems Research  
+*Lokasi:* Gorontalo, Indonesia  
 *Kontak:* `richie@panita.web.id`  
 *Format Naskah:* IEEE Transactions on Computational Social Systems / IEEE Transactions on Services Computing  
-*Identitas Laporan:* Riset Mandiri — Richie O. Sumual (Riset Mandiri Ke-3, September 2026)
+*Identitas Laporan:* Riset Mandiri — PANITA GORONTALO — Richie O. Sumual (`richie@panita.web.id`, September 2026)
 
 ---
 
