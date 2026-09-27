@@ -74,23 +74,28 @@ Model disimpan di `/root/models/` (atau `./models/` via `resolve_model_path` di 
 
 ## 5. Perkakas & Skrip Utama dalam Repository
 
-1. **`setup.sh` (Skrip Otomatisasi Instalasi Interaktif):**
-   - Mendeteksi GPU NVIDIA & CUDA.
-   - **Meminta input API Key Jev secara interaktif** dan menyimpannya ke `.env`.
+1. **`setup.sh` (Skrip Otomatisasi Instalasi Interaktif & Diagnostik):**
+   - Mendeteksi GPU NVIDIA & CUDA Toolkit (VRAM, Driver, Compute Capability).
+   - **Meminta input API Key Jev interaktif dengan LIVE connectivity verification** (menguji HTTP 200 & mengukur latensi round-trip secara langsung).
    - Memasang dependensi Python & llama-cpp-python CUDA.
-   - Menawarkan opsi unduhan model GGUF (Lengkap / Quick Test / Lewati).
+   - Mengunduh model kelas berat dengan live progress tracker (MB/s, ETA, ukuran bytes).
+   - **Menjalankan diagnostik otomatis pemuatan model (`verify_models.py`)** untuk memvalidasi alokasi VRAM, layer offload CUDA, dan respon triage 0 token.
 2. **`benchmark_headless.py` (CLI Headless Benchmark):**
    - `python3 benchmark_headless.py --matrix` ➔ Tabel matriks eksekutif lengkap.
    - `python3 benchmark_headless.py --scenario marunda --decision laya --llm sahabatai` ➔ Uji komparasi spesifik.
    - `python3 benchmark_headless.py --all-presets` ➔ Evaluasi 4 skenario batch.
    - `python3 benchmark_headless.py --interactive` ➔ Menu CLI interaktif.
-3. **`download_models.py` (Pengunduh Model Cerdas):**
+3. **`verify_models.py` (Suite Diagnostik Pemuatan Model & VRAM):**
+   - Memuat dan menguji Laya Multilingual (ModernBERT), OpenJev (0.5B Logit Scorer), Kev-0.8B (LoRA), TypeSafe Jev Cloud, dan Foundation LLM.
+   - Melaporkan waktu pemuatan, alokasi VRAM, latensi inferensi triage 0 token, dan token per detik LLM.
+4. **`download_models.py` (Pengunduh Model Cerdas & Real-time):**
    - Mendukung `--models all`, `--models quick`, dan `--dest <path>`.
-   - Otomatis melewati file yang sudah ada di disk.
-4. **`app_server.py` (FastAPI Server):**
+   - Menampilkan detail metadata arsitektur, parameter, kuantisasi, dan progress bar transfer MB/s.
+   - Menampilkan tabel rangkuman kapasitas disk model yang terpasang.
+5. **`app_server.py` (FastAPI Server):**
    - Port 7860.
    - Endpoint: `/api/heavyweight/compare_architectures`, `/api/heavyweight/generate`, `/api/heavyweight/decision`, `/api/heavyweight/two_tier`, `/api/gpu_nvtop`.
-5. **`generate_heavyweight_dashboard.py`:**
+6. **`generate_heavyweight_dashboard.py`:**
    - Menghasilkan antarmuka web interaktif `heavyweight_llm_dashboard.html` dengan 5 mode lengkap dan grafik telemetri rolling nvtop 60 detik.
 
 ---

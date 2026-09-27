@@ -99,26 +99,42 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-#### 🔑 Alur Input Interaktif API Key TypeSafe Jev:
-Saat menjalankan `./setup.sh`, terminal akan menampilkan prompt interaktif:
+#### 🔑 Alur Input Interaktif & Validasi Online API Key TypeSafe Jev:
+Saat menjalankan `./setup.sh`, terminal akan menampilkan prompt interaktif dan melakukan uji koneksi online secara *real-time*:
 ```text
 ==============================================================================
-🔑 [3/6] KONFIGURASI API KEY TYPESAFE JEV
+🔑 [3/6] KONFIGURASI & VALIDASI API KEY TYPESAFE JEV
 ==============================================================================
-Sistem mendukung integrasi cloud SaaS TypeSafe Jev API (https://typesafe.ai).
-Jika Anda memiliki API Key TypeSafe Jev, masukkan di bawah ini.
-Tekan [Enter] untuk melewati jika hanya ingin menggunakan model lokal GPU (Laya, OpenJev, Kev).
+Sistem mengintegrasikan cloud SaaS TypeSafe Jev API (https://typesafe.ai).
+Pemberian API Key bersifat opsional:
+  • Jika Anda memiliki API Key: masukkan di bawah untuk mengaktifkan TypeSafe Jev Cloud.
+  • Jika tidak: tekan [Enter] untuk melewati dan menggunakan 100% model lokal (Laya, OpenJev, Kev).
 ------------------------------------------------------------------------------
-Masukkan TypeSafe Jev API Key: <masukkan_api_key_anda_di_sini>
-```
-- Jika Anda memasukkan API key, skrip otomatis menyimpannya ke file `.env`.
-- Jika Anda menekan `[Enter]` (melewati), pengujian tetap berjalan 100% menggunakan model lokal (**Laya**, **OpenJev**, dan **Kev**).
+Masukkan TypeSafe Jev API Key: apikey_xxxxxxxxxxxx
 
-#### 📥 Pilihan Unduhan Model:
-Skrip akan menanyakan pilihan paket model:
+⏳ Menguji koneksi langsung ke endpoint cloud TypeSafe Jev...
+  • Endpoint URL         : https://api.typesafe.ai/v1/systemone
+  • Status Respons HTTP  : 200 OK
+  • Latensi Koneksi      : 215.4 ms
+  ✓ SUKSES: API KEY VALID & AKTIF TERHUBUNG KE TYPESAFE JEV!
+```
+- Jika API key valid, skrip otomatis menyimpannya ke `.env` dan mengaktifkan fitur SaaS.
+- Jika API key tidak valid (HTTP 401/403), sistem memberikan opsi untuk memasukkan ulang atau langsung melanjutkan dalam mode lokal 100% (**Laya**, **OpenJev**, dan **Kev**).
+
+#### 📥 Detail Pengunduhan Model dengan Live Progress:
+Skrip akan menampilkan detail metadata model (Parameter, Kuantisasi, Konteks, Ukuran, Repo HF) dan menjalankan download stream dengan indikator kecepatan `MB/s`, estimasi waktu (`ETA`), dan tabel rangkuman kapasitas disk:
 1. **Unduh Lengkap (~16 GB):** Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B.
-2. **Unduh Cepat (~6.2 GB):** Sahabat-AI 8B + Gemma 2 2B (Direkomendasikan untuk uji kilat).
-3. **Lewati:** Unduh kapan saja nanti via `python3 download_models.py`.
+2. **Unduh Cepat (~6.2 GB):** Sahabat-AI 8B + Gemma 2 2B (Direkomendasikan).
+3. **Sahabat-AI 8B Saja (~4.6 GB):** Model utama Bahasa Indonesia.
+4. **Lewati:** Unduh kapan saja nanti via `python3 download_models.py`.
+
+#### 🔬 Diagnostik Otomatis Pemuatan Model & Alokasi VRAM (`verify_models.py`):
+Di akhir instalasi, skrip otomatis memuat dan menguji setiap model pada CUDA GPU untuk memastikan kesiapan:
+- **Laya Multilingual (421M):** Waktu muat 0.04s, VRAM, uji triage 0 token pass.
+- **OpenJev (0.5B):** Waktu muat 6.5s, VRAM ~950 MiB, uji normalisasi logit head 270 ms.
+- **Kev-0.8B (Local):** Waktu muat 13s, VRAM ~1.4 GB, uji triage wire-compatible.
+- **Foundation LLM (CUDA Engine):** 100% GPU layer offload, uji generasi tokens/detik.
+- **TypeSafe Jev Cloud API:** Uji ping status HTTP 200 & latensi.
 
 ---
 
