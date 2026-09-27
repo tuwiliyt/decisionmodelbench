@@ -3,7 +3,7 @@
 **Richie O. Sumual**  
 *Advanced Agentic AI & Distributed Systems Research*  
 Jakarta, Indonesia  
-`richie.sumual@research.org`
+`richie@panita.web.id`
 
 ---
 

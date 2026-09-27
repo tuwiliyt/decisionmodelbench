@@ -2,7 +2,7 @@
 
 **Penulis:** Richie O. Sumual  
 *Advanced Agentic AI & Distributed Systems Research, Jakarta, Indonesia*  
-*Kontak:* `richie.sumual@research.org`  
+*Kontak:* `richie@panita.web.id`  
 *Format Naskah:* IEEE Transactions on Computational Social Systems / IEEE Transactions on Services Computing  
 *Identitas Laporan:* Riset Mandiri — Richie O. Sumual (Riset Mandiri Ke-3, September 2026)
 

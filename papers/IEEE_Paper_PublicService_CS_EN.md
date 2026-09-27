@@ -2,7 +2,7 @@
 
 **Author:** Richie O. Sumual  
 *Advanced Agentic AI & Distributed Systems Research, Jakarta, Indonesia*  
-*Contact:* `richie.sumual@research.org`  
+*Contact:* `richie@panita.web.id`  
 *Publication Venue:* IEEE Transactions on Computational Social Systems / IEEE Transactions on Services Computing  
 *Report Reference:* Independent Research Report — Richie O. Sumual (Research Project #3, September 2026)
 
