@@ -150,21 +150,89 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 5. Heavyweight LLM Models Download
+# 5. Heavyweight LLM Models Download with Dynamic Hardware Auto-Offering
 # ------------------------------------------------------------------------------
 echo ""
 echo -e "${BOLD}${CYAN}==============================================================================${NC}"
-echo -e "${BOLD}${CYAN}📥 [5/6] PENGUNDUHAN MODEL LLM KELAS BERAT (GGUF 4-BIT QUANTIZED)${NC}"
+echo -e "${BOLD}${CYAN}📥 [5/6] DETEKSI HARDWARE & PENAWARAN MODEL LLM KELAS BERAT (GGUF)${NC}"
 echo -e "${BOLD}${CYAN}==============================================================================${NC}"
-echo -e "Pilih paket pengunduhan model LLM System 2:"
-echo -e "  1) Unduh Lengkap (~16 GB: Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B) [Standar]"
-echo -e "  2) Unduh Cepat (~6.2 GB: Sahabat-AI 8B + Gemma 2 2B) [Rekomendasi Uji Cepat]"
-echo -e "  3) Unduh Sahabat-AI 8B Saja (~4.6 GB)"
-echo -e "  4) Unduh Paket Enterprise Flagship (+ Qwen 2.5 14B) ~25 GB [Rekomendasi GPU 24GB-80GB: A10G/L4/RTX 3090/4090/A100]"
-echo -e "  5) Lewati sekarang (Unduh nanti dengan: python3 download_models.py)"
+
+HW_INFO=$(python3 -c "
+try:
+    from gpu_manager import get_hardware_profile
+    hw = get_hardware_profile()
+    vram = float(hw.get('total_vram_all_gpus_gb', 0.0))
+    dev = hw.get('primary_device', 'CPU')
+    tier = hw.get('tier', 'Unknown')
+    count = int(hw.get('device_count', 0))
+    print(f'{vram}|{dev}|{tier}|{count}')
+except Exception:
+    print('0.0|CPU|CPU|0')
+")
+
+VRAM_TOTAL=$(echo "$HW_INFO" | cut -d'|' -f1)
+PRIMARY_DEV=$(echo "$HW_INFO" | cut -d'|' -f2)
+GPU_TIER=$(echo "$HW_INFO" | cut -d'|' -f3)
+GPU_COUNT=$(echo "$HW_INFO" | cut -d'|' -f4)
+
+CAN_RUN_14B=$(python3 -c "print(1 if float('$VRAM_TOTAL') >= 20.0 else 0)")
+CAN_RUN_FULL=$(python3 -c "print(1 if float('$VRAM_TOTAL') >= 12.0 else 0)")
+
+if [ "$CAN_RUN_14B" -eq 1 ]; then
+    DEFAULT_CHOICE="4"
+    echo -e "${BOLD}${GREEN}🚀 KAPASITAS HARDWARE BESAR TERDETEKSI: ${VRAM_TOTAL} GB VRAM (${GPU_COUNT}x GPU)!${NC}"
+    echo -e "  • Perangkat Primer   : ${GREEN}${PRIMARY_DEV}${NC}"
+    echo -e "  • Klasifikasi Tier   : ${GREEN}${GPU_TIER}${NC}"
+    echo -e "  • Total VRAM Gabungan: ${GREEN}${VRAM_TOTAL} GB${NC}"
+    echo -e ""
+    echo -e "${BOLD}${MAGENTA}🔥 PENAWARAN MODEL BESAR (FLAGSHIP HEAVYWEIGHT):${NC}"
+    echo -e "  Sistem mendeteksi hardware Anda ${BOLD}${GREEN}SANGAT MAMPU${NC} menjalankan model LLM besar:"
+    echo -e "    ⭐ ${BOLD}Qwen 2.5 14B Instruct${NC} (14.7B Parameter, 32K context, ~9.0 GB VRAM)"
+    echo -e "    ⭐ ${BOLD}Gemma 2 9B Instruct${NC} (9.24B Parameter, ~5.4 GB VRAM)"
+    echo -e "    ⭐ ${BOLD}Sahabat-AI 8B Instruct${NC} (8.03B Parameter, ~4.58 GB VRAM)"
+    echo -e "  Model 14B sangat direkomendasikan untuk pengujian kelas berat & penalaran kompleks."
+    echo -e "  ${YELLOW}Sistem otomatis merekomendasikan: Pilihan 4 (Paket Enterprise Flagship).${NC}"
+elif [ "$CAN_RUN_FULL" -eq 1 ]; then
+    DEFAULT_CHOICE="1"
+    echo -e "${BOLD}${GREEN}💡 GPU SERVER TERDETEKSI: ${VRAM_TOTAL} GB VRAM (${PRIMARY_DEV})!${NC}"
+    echo -e "  • Klasifikasi Tier   : ${GREEN}${GPU_TIER}${NC}"
+    echo -e ""
+    echo -e "${BOLD}${CYAN}🎯 PENAWARAN MODEL KELAS BERAT:${NC}"
+    echo -e "  GPU Anda mampu menjalankan model kelas berat 8B/9B:"
+    echo -e "    ⭐ ${BOLD}Gemma 2 9B Instruct${NC} (~5.4 GB VRAM)"
+    echo -e "    ⭐ ${BOLD}Sahabat-AI 8B Instruct${NC} (~4.58 GB VRAM)"
+    echo -e "    ⭐ ${BOLD}Qwen 2.5 7B Instruct${NC} (~4.40 GB VRAM)"
+    echo -e "  ${YELLOW}Sistem otomatis merekomendasikan: Pilihan 1 (Unduh Lengkap 4 Model).${NC}"
+else
+    DEFAULT_CHOICE="2"
+    echo -e "${YELLOW}ℹ️  Kapasitas VRAM terbatas (${VRAM_TOTAL} GB VRAM / ${PRIMARY_DEV}).${NC}"
+    echo -e "  Direkomendasikan paket 'Unduh Cepat' (Sahabat-AI 8B + Gemma 2 2B) untuk menghemat VRAM."
+fi
+
 echo -e "------------------------------------------------------------------------------"
-read -r -p "Pilihan Anda [1/2/3/4/5, default: 2]: " DOWNLOAD_CHOICE
-DOWNLOAD_CHOICE=${DOWNLOAD_CHOICE:-2}
+echo -e "Pilih paket pengunduhan model LLM System 2:"
+if [ "$CAN_RUN_14B" -eq 1 ]; then
+    echo -e "  1) Unduh Lengkap (~16 GB: Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B)"
+    echo -e "  2) Unduh Cepat (~6.2 GB: Sahabat-AI 8B + Gemma 2 2B)"
+    echo -e "  3) Unduh Sahabat-AI 8B Saja (~4.6 GB)"
+    echo -e "  ${BOLD}${GREEN}4) Unduh Paket Enterprise Flagship (+ Qwen 2.5 14B) ~25 GB  [⭐ DIREKOMENDASIKAN UNTUK GPU ANDA]${NC}"
+    echo -e "  5) Lewati sekarang (Unduh nanti dengan: python3 download_models.py)"
+elif [ "$CAN_RUN_FULL" -eq 1 ]; then
+    echo -e "  ${BOLD}${GREEN}1) Unduh Lengkap (~16 GB: Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B)  [⭐ DIREKOMENDASIKAN UNTUK GPU ANDA]${NC}"
+    echo -e "  2) Unduh Cepat (~6.2 GB: Sahabat-AI 8B + Gemma 2 2B)"
+    echo -e "  3) Unduh Sahabat-AI 8B Saja (~4.6 GB)"
+    echo -e "  4) Unduh Paket Enterprise Flagship (+ Qwen 2.5 14B) ~25 GB (Membutuhkan >=20 GB VRAM)"
+    echo -e "  5) Lewati sekarang (Unduh nanti dengan: python3 download_models.py)"
+else
+    echo -e "  1) Unduh Lengkap (~16 GB: Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B)"
+    echo -e "  ${BOLD}${GREEN}2) Unduh Cepat (~6.2 GB: Sahabat-AI 8B + Gemma 2 2B)  [⭐ DIREKOMENDASIKAN UNTUK KAPASITAS ANDA]${NC}"
+    echo -e "  3) Unduh Sahabat-AI 8B Saja (~4.6 GB)"
+    echo -e "  4) Unduh Paket Enterprise Flagship (+ Qwen 2.5 14B) ~25 GB"
+    echo -e "  5) Lewati sekarang (Unduh nanti dengan: python3 download_models.py)"
+fi
+echo -e "------------------------------------------------------------------------------"
+read -r -p "Pilihan Anda [1/2/3/4/5, default: $DEFAULT_CHOICE]: " DOWNLOAD_CHOICE
+DOWNLOAD_CHOICE=${DOWNLOAD_CHOICE:-$DEFAULT_CHOICE}
 
 case "$DOWNLOAD_CHOICE" in
     1)

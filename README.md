@@ -121,12 +121,13 @@ Masukkan TypeSafe Jev API Key: apikey_xxxxxxxxxxxx
 - Jika API key valid, skrip otomatis menyimpannya ke `.env` dan mengaktifkan fitur SaaS.
 - Jika API key tidak valid (HTTP 401/403), sistem memberikan opsi untuk memasukkan ulang atau langsung melanjutkan dalam mode lokal 100% (**Laya**, **OpenJev**, dan **Kev**).
 
-#### 📥 Detail Pengunduhan Model dengan Live Progress:
-Skrip akan menampilkan detail metadata model (Parameter, Kuantisasi, Konteks, Ukuran, Repo HF) dan menjalankan download stream dengan indikator kecepatan `MB/s`, estimasi waktu (`ETA`), dan tabel rangkuman kapasitas disk:
-1. **Unduh Lengkap (~16 GB):** Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B.
-2. **Unduh Cepat (~6.2 GB):** Sahabat-AI 8B + Gemma 2 2B (Direkomendasikan).
-3. **Sahabat-AI 8B Saja (~4.6 GB):** Model utama Bahasa Indonesia.
-4. **Lewati:** Unduh kapan saja nanti via `python3 download_models.py`.
+#### 📥 Deteksi Hardware & Penawaran Model Kelas Berat (Auto-Offering):
+Skrip instalasi memeriksa kapasitas VRAM GPU secara otomatis. Jika terdeteksi server Anda memiliki VRAM melimpah (>=20 GB: A10G/L4/RTX 3090/4090/A100 atau Multi-GPU), sistem secara otomatis menawarkan dan merekomendasikan **Paket Enterprise Flagship (+ Qwen 2.5 14B)** untuk pengujian kelas berat lanjutan:
+1. **Unduh Paket Enterprise Flagship (+ Qwen 2.5 14B) ~25 GB:** Direkomendasikan untuk GPU VRAM >=20 GB (A10G/L4/RTX 3090/4090/A100).
+2. **Unduh Lengkap (~16 GB):** Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B (Direkomendasikan untuk GPU 12–16 GB: Tesla T4).
+3. **Unduh Cepat (~6.2 GB):** Sahabat-AI 8B + Gemma 2 2B (Direkomendasikan untuk GPU hemat VRAM / uji cepat).
+4. **Sahabat-AI 8B Saja (~4.6 GB):** Model utama Bahasa Indonesia.
+5. **Lewati:** Unduh kapan saja nanti via `python3 download_models.py --models auto`.
 
 #### 🔬 Diagnostik Otomatis Pemuatan Model & Alokasi VRAM (`verify_models.py`):
 Di akhir instalasi, skrip otomatis memuat dan menguji setiap model pada CUDA GPU untuk memastikan kesiapan:

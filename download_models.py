@@ -167,8 +167,8 @@ def main():
     parser.add_argument(
         "--models",
         type=str,
-        default="all",
-        help="Pilihan model: 'all', 'quick' (Sahabat-AI + Gemma 2B), 'enterprise' (+ Qwen 14B), atau nama model spesifik"
+        default="auto",
+        help="Pilihan model: 'auto' (deteksi VRAM otomatis & tawarkan model besar), 'all', 'quick', 'enterprise', atau nama spesifik"
     )
     parser.add_argument(
         "--dest",
@@ -183,20 +183,34 @@ def main():
     print(f"📁 Direktori Target: {dest}\n")
 
     # Detect hardware profile and give recommendations
+    hw = {}
     try:
         from gpu_manager import get_hardware_profile
         hw = get_hardware_profile()
         print(f"💻 GPU Terdeteksi : {hw['primary_device']} ({hw['total_vram_all_gpus_gb']} GB VRAM Total | Bebas: {hw['free_vram_all_gpus_gb']} GB)")
         print(f"🏷️  Tier Hardware : {hw['tier']}")
         if hw["total_vram_all_gpus_gb"] >= 20.0:
-            print("💡 Rekomendasi GPU Tinggi: GPU Anda mendukung model 14B (Qwen 2.5 14B) dan konteks panjang hingga 8K-16K tokens!")
+            print("🚀 Rekomendasi GPU Flagship: VRAM melimpah! Server Anda SANGAT MAMPU menjalankan model 14B (Qwen 2.5 14B) untuk pengujian kelas berat.")
+        elif hw["total_vram_all_gpus_gb"] >= 12.0:
+            print("💡 Rekomendasi GPU Server: Model 8B/9B (Sahabat-AI 8B, Qwen 7B, Gemma 9B, Gemma 2B) optimal untuk GPU ini.")
         else:
-            print("💡 Rekomendasi: Model 8B/9B (Sahabat-AI, Qwen 7B, Gemma 9B, Gemma 2B) optimal untuk GPU ini.")
+            print("💡 Rekomendasi Hemat VRAM: Model 2B/8B (Sahabat-AI 8B + Gemma 2 2B) optimal.")
         print("-" * 80 + "\n")
     except Exception:
         pass
 
-    if args.models.lower() == "all":
+    if args.models.lower() == "auto":
+        vram = hw.get("total_vram_all_gpus_gb", 0.0)
+        if vram >= 20.0:
+            print(f"🚀 [Auto-Offering] Terdeteksi {vram} GB VRAM! Menawarkan & memilih paket Enterprise Flagship (+ Qwen 2.5 14B) untuk benchmark kelas berat.\n")
+            selected = ["sahabatai", "qwen", "gemma", "gemma-2b", "qwen-14b"]
+        elif vram >= 12.0:
+            print(f"💡 [Auto-Offering] Terdeteksi {vram} GB VRAM. Menawarkan & memilih 4 model kelas berat lengkap (Sahabat-AI, Qwen 7B, Gemma 9B, Gemma 2B).\n")
+            selected = ["sahabatai", "qwen", "gemma", "gemma-2b"]
+        else:
+            print(f"ℹ️  [Auto-Offering] Terdeteksi {vram} GB VRAM. Menawarkan paket cepat (Sahabat-AI + Gemma 2B).\n")
+            selected = ["sahabatai", "gemma-2b"]
+    elif args.models.lower() == "all":
         selected = ["sahabatai", "qwen", "gemma", "gemma-2b"]
     elif args.models.lower() == "enterprise":
         selected = ["sahabatai", "qwen", "gemma", "gemma-2b", "qwen-14b"]
