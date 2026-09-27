@@ -248,17 +248,13 @@ def verify_jev_cloud():
         return False
 
 def main():
-    print("="*75)
-    print("🏛️  VERIFIKASI & DIAGNOSTIK PEMUATAN MODEL (SYSTEM 1 & SYSTEM 2)")
-    print("="*75)
-
-    if torch.cuda.is_available():
-        gpu_name = torch.cuda.get_device_name(0)
-        tot_gb, free_gb = get_vram_total_free()
-        print(f"💻 Akselerator GPU : {gpu_name}")
-        print(f"📊 Kapasitas VRAM  : Total {tot_gb} GB | Bebas {free_gb} GB")
-    else:
-        print("⚠️  CUDA tidak terdeteksi. Berjalan di CPU.")
+    try:
+        from gpu_manager import print_hardware_summary
+        print_hardware_summary()
+    except Exception:
+        print("="*75)
+        print("🏛️  VERIFIKASI & DIAGNOSTIK PEMUATAN MODEL (SYSTEM 1 & SYSTEM 2)")
+        print("="*75)
 
     v_laya = verify_laya()
     v_openjev = verify_openjev()

@@ -83,7 +83,7 @@
         </a>
         <div id="gpuStatusBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-950/40 border border-purple-800/50 text-xs">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-purple-200 font-medium">GPU: Tesla T4 (15.6 GB)</span>
+          <span id="topHeaderGpuBadge" class="text-purple-200 font-medium">GPU: Auto-Detecting...</span>
         </div>
       </div>
     </div>
@@ -1992,6 +1992,21 @@
         document.getElementById('nvtopGpuUtilText').innerText = `${gpuPct.toFixed(0)}%`;
         document.getElementById('nvtopGpuUtilBar').style.width = `${gpuPct}%`;
         document.getElementById('nvtopGpuLoadLabel').innerText = gpuPct > 20 ? 'Active Compute' : 'Idle';
+
+        if (d.device_name) {
+          const badge = document.getElementById('nvtopDeviceBadge');
+          if (badge) badge.innerText = `${d.device_name} (Compute ${d.compute_capability || 'CUDA'})`;
+          const topBadge = document.getElementById('topHeaderGpuBadge');
+          if (topBadge) topBadge.innerText = `GPU: ${d.device_name} (${(d.mem_total_mb / 1024).toFixed(1)} GB)`;
+        }
+        if (d.driver_version) {
+          const el = document.getElementById('nvtopDriverText');
+          if (el) el.innerText = d.driver_version;
+        }
+        if (d.cuda_version) {
+          const el = document.getElementById('nvtopCudaText');
+          if (el) el.innerText = d.cuda_version;
+        }
 
         const usedGb = (d.mem_used_mb / 1024).toFixed(2);
         const totalGb = (d.mem_total_mb / 1024).toFixed(2);

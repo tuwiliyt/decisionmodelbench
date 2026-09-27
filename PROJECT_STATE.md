@@ -15,16 +15,23 @@
 
 ---
 
-## 2. Lingkungan Hardware & Konfigurasi Server
-- **Hardware GPU:** NVIDIA Tesla T4 (15.6 GB VRAM, Compute 7.5, Pasif Server Fan)
-- **Driver & CUDA:** Driver 580.82 | CUDA 13.0
+## 2. Lingkungan Hardware & Konfigurasi Server (Dukungan Universal GPU)
+- **Hardware Saat Ini:** NVIDIA Tesla T4 (15.6 GB VRAM, Compute 7.5, Pasif Server Fan)
+- **Skalabilitas Hardware Universal (`gpu_manager.py`):**
+  - **Single & Multi-GPU:** Mendeteksi otomatis jumlah GPU (`device_count`). Jika server memiliki 2+ GPU (misal 2x T4, 2x A100, 4x RTX 4090), sistem otomatis menghitung rasio sharding layer (`tensor_split`).
+  - **Tier GPU Adaptif:**
+    - Standard Accelerator (12–18 GB: Tesla T4, RTX 3080/4070) -> Context 2,048 tokens.
+    - Workstation Pro (20–32 GB: A10G, L4, RTX 3090/4090) -> Context 4,096 tokens, mendukung Qwen 14B & unblocked CLM-8B.
+    - Enterprise Ultra-VRAM (>= 36 GB: A100 40G/80G, H100) -> Context 8,192–16,384 tokens, FP16 precision unlocked.
+  - **Flash Attention 2.0:** Auto-enabled jika Compute Capability >= 7.5.
+- **Driver & CUDA:** Driver 580.82 | CUDA 12.8 / 13.0
 - **Python Environment:** Python 3.10+ / 3.13 (`torch.cuda.is_available() == True`)
 - **Backend Server:** FastAPI (`app_server.py`) berjalan di port `7860`.
 - **Public Tunnel:** Cloudflare Tunnel (`cloudflared tunnel --url http://localhost:7860`).
 - **Alokasi VRAM GPU Saat Aktif:**
   - Base System 1 (Laya + OpenJev + Kev): ~4.37 GB VRAM
   - VRAM Bebas untuk LLM Kelas Berat: ~10.5 GB VRAM
-  - Hot-swap mechanism: `HeavyweightLLMManager` melakukan unallocation CUDA (`del self.llm; gc.collect(); torch.cuda.empty_cache()`) dengan aman sebelum memuat model 7B/8B/9B lain, menjamin **Zero CUDA OOM**.
+  - Hot-swap mechanism: `HeavyweightLLMManager` melakukan unallocation CUDA (`del self.llm; gc.collect(); torch.cuda.empty_cache()`) dengan aman sebelum memuat model 7B/8B/9B/14B lain, menjamin **Zero CUDA OOM**.
 
 ---
 

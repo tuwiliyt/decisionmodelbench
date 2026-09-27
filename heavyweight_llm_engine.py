@@ -86,13 +86,29 @@ MODELS_CATALOG = {
         "vram_mb": 1700,
         "format": "gemma",
         "stop": ["<end_of_turn>"]
+    },
+    "qwen-14b": {
+        "id": "qwen-14b",
+        "name": "Qwen 2.5 14B Instruct",
+        "org": "Alibaba Cloud",
+        "parameters": "14.7B",
+        "quantization": "Q4_K_M GGUF",
+        "model_path": resolve_model_path("Qwen2.5-14B-Instruct-Q4_K_M.gguf"),
+        "badge_color": "blue",
+        "description": "Flagship 14.7B Heavyweight untuk GPU VRAM besar (16GB-80GB: A10G, L4, RTX 3090/4090, A100). Penalaran tingkat tinggi dan konteks panjang Bahasa Indonesia.",
+        "typical_speed_tps": "20 - 26 t/s",
+        "vram_mb": 9200,
+        "format": "chatml",
+        "stop": ["<|im_end|>", "<|endoftext|>"]
     }
 }
 
 class HeavyweightLLMManager:
-    def __init__(self, default_model: str = "sahabatai", n_ctx: int = 2048):
+    def __init__(self, default_model: str = "sahabatai", n_ctx: int = None):
         self.catalog = MODELS_CATALOG
-        self.n_ctx = n_ctx
+        from gpu_manager import get_hardware_profile
+        hw = get_hardware_profile()
+        self.n_ctx = n_ctx or hw["recommended_ctx"]
         self.active_model_id = None
         self.llm = None
         self.default_model = default_model
@@ -129,17 +145,19 @@ class HeavyweightLLMManager:
             torch.cuda.empty_cache()
             time.sleep(0.3)
             
-        print(f"Loading {mdata['name']} ({mdata['parameters']}) on CUDA GPU from {path}...")
+        from gpu_manager import get_llama_init_kwargs, get_hardware_profile
+        hw = get_hardware_profile()
+        init_kwargs = get_llama_init_kwargs(requested_ctx=self.n_ctx, model_size_gb=mdata.get("vram_mb", 4800)/1024)
+
+        print(f"Loading {mdata['name']} ({mdata['parameters']}) on {hw['primary_device']} ({hw['tier']})...")
         t0 = time.perf_counter()
         self.llm = Llama(
             model_path=path,
-            n_gpu_layers=-1, # 100% CUDA offload
-            n_ctx=self.n_ctx,
-            verbose=False
+            **init_kwargs
         )
         load_sec = round(time.perf_counter() - t0, 2)
         self.active_model_id = mid
-        print(f"✓ {mdata['name']} ready in {load_sec}s with 100% CUDA GPU offload.")
+        print(f"✓ {mdata['name']} ready in {load_sec}s with {hw['primary_device']} GPU acceleration (ctx={self.n_ctx}).")
         return self.llm, mdata
 
     def format_prompt(self, model_id: str, user_prompt: str, system_prompt: str = None) -> str:

@@ -247,15 +247,22 @@ def run_interactive_menu():
     print("  2) Qwen 2.5 7B Instruct (Alibaba Cloud)")
     print("  3) Gemma 2 9B Instruct (Google DeepMind)")
     print("  4) Gemma 2 2B Instruct (Ultra-Speed)")
-    llm_choice = input("Pilihan LLM [1-4, default 1]: ").strip() or "1"
-    llm_map = {"1": "sahabatai", "2": "qwen", "3": "gemma", "4": "gemma-2b"}
+    llm_choice = input("Pilihan LLM [1-5, default 1]: ").strip() or "1"
+    llm_map = {"1": "sahabatai", "2": "qwen", "3": "gemma", "4": "gemma-2b", "5": "qwen-14b"}
     llm_key = llm_map.get(llm_choice, "sahabatai")
 
     scenario = SCENARIOS[sc_key]
     print(f"\n🚀 Menjalankan benchmark: {scenario['title']}")
     print(f"   Decision Model : {dec_key.upper()}")
     print(f"   LLM Model      : {llm_key.upper()}")
-    print("   Sedang mengevaluasi di GPU Tesla T4...\n")
+    
+    try:
+        from gpu_manager import get_hardware_profile
+        hw = get_hardware_profile()
+        dev_str = f"{hw['primary_device']} ({hw['tier']})"
+    except Exception:
+        dev_str = "Akselerator GPU"
+    print(f"   Sedang mengevaluasi di {dev_str}...\n")
 
     try:
         data = query_server(dec_key, llm_key, scenario["state"], scenario["questions"])
@@ -272,7 +279,7 @@ def main():
     parser.add_argument("--compare", action="store_true", help="Jalankan uji komparasi satu skenario")
     parser.add_argument("--scenario", type=str, default="marunda", choices=["marunda", "scam", "phk", "faq"], help="Pilih skenario pengujian")
     parser.add_argument("--decision", type=str, default="laya", choices=["laya", "jev", "openjev", "kev"], help="Pilih model decision")
-    parser.add_argument("--llm", type=str, default="sahabatai", choices=["sahabatai", "qwen", "gemma", "gemma-2b"], help="Pilih model LLM")
+    parser.add_argument("--llm", type=str, default="sahabatai", choices=["sahabatai", "qwen", "gemma", "gemma-2b", "qwen-14b"], help="Pilih model LLM")
     parser.add_argument("--all-presets", action="store_true", help="Jalankan semua 4 skenario secara berurutan")
     parser.add_argument("--matrix", action="store_true", help="Tampilkan tabel matriks arsitektur komparasi menyeluruh")
     parser.add_argument("--interactive", action="store_true", help="Buka menu CLI interaktif")

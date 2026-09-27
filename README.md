@@ -253,14 +253,21 @@ Terminal akan memberikan URL publik seperti: `https://xxxx-xxxx.trycloudflare.co
 | **Kev-0.8B** | 0.8B | Qwen 2.5 LoRA Ensemble | Local GPU CUDA | **~1.1 - 1.4 s** |
 
 ### 2. Foundation LLM Kelas Berat (System 2 - Penalaran & Narasi)
-| Model | Parameter | Organisasi | Kuantisasi | Kecepatan Inferensi | VRAM |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Sahabat-AI 8B Instruct** | 8.03B | GoTo & Indosat | Q4_K_M GGUF | ~28 - 32 token/detik | ~4.8 GB |
-| **Qwen 2.5 7B Instruct** | 7.61B | Alibaba Cloud | Q4_K_M GGUF | ~30 - 35 token/detik | ~4.6 GB |
-| **Gemma 2 9B Instruct** | 9.24B | Google DeepMind | Q4_K_M GGUF | ~24 - 28 token/detik | ~5.6 GB |
-| **Gemma 2 2B Instruct** | 2.61B | Google DeepMind | Q4_K_M GGUF | ~50 - 65 token/detik | ~1.7 GB |
+| Model | Parameter | Organisasi | Kuantisasi | Kecepatan Inferensi | VRAM Minimum | Rekomendasi Hardware |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Sahabat-AI 8B Instruct** | 8.03B | GoTo & Indosat | Q4_K_M GGUF | ~28 - 32 t/s | ~4.8 GB | Tesla T4 / RTX 3080/4070 (12–16 GB) |
+| **Qwen 2.5 7B Instruct** | 7.61B | Alibaba Cloud | Q4_K_M GGUF | ~30 - 35 t/s | ~4.6 GB | Tesla T4 / RTX 3080/4070 (12–16 GB) |
+| **Gemma 2 9B Instruct** | 9.24B | Google DeepMind | Q4_K_M GGUF | ~24 - 28 t/s | ~5.6 GB | Tesla T4 / RTX 3080/4070 (16 GB) |
+| **Gemma 2 2B Instruct** | 2.61B | Google DeepMind | Q4_K_M GGUF | ~50 - 65 t/s | ~1.7 GB | Hemat VRAM (GPU 4–8 GB) |
+| **Qwen 2.5 14B Instruct** | 14.7B | Alibaba Cloud | Q4_K_M GGUF | ~20 - 26 t/s | ~9.2 GB | **Workstation/Server (24–80 GB: A10G, L4, RTX 3090/4090, A100)** |
 
-*Catatan: Sistem menggunakan hot-swapping VRAM dinamis dengan pembersihan cache CUDA otomatis, memastikan zero CUDA OOM pada GPU 16 GB seperti Tesla T4.*
+### 🚀 Skalabilitas Otomatis Lintas Generasi & Kapasitas GPU:
+Sistem ini dilengkapi modul `gpu_manager.py` yang secara dinamis mengenali spesifikasi GPU server tanpa perlu konfigurasi manual:
+- **Auto-Detect GPU Tier:** Mengenali otomatis apakah server menggunakan GPU standar (Tesla T4 16GB), Pro Workstation (RTX 3090/4090, A10G, L4 24GB), atau Enterprise Ultra-VRAM (A100 40G/80G, H100).
+- **Auto Context Scaling:** Menyesuaikan panjang konteks secara dinamis dari `2,048` tokens pada GPU 16GB, hingga `4,096`–`8,192` tokens pada GPU 24GB, dan `16,384` tokens pada GPU 80GB.
+- **Multi-GPU Auto Sharding (Tensor Split):** Jika terdeteksi 2 GPU atau lebih (misal: 2x T4, 2x A100, 4x RTX 4090), sistem otomatis membagi layer model secara proporsional (*proportional tensor-split*) di seluruh GPU yang tersedia.
+- **Flash Attention 2.0:** Mengaktifkan optimasi Flash Attention otomatis pada GPU dengan Compute Capability ≥ 7.5 (Turing, Ampere, Ada Lovelace, Hopper), memangkas konsumsi VRAM KV-cache hingga 50% dan meningkatkan kecepatan inferensi.
+- **Unlocking CLM-8B:** Pada GPU dengan sisa VRAM bebas ≥ 16 GB, model dual-encoder CLM-8B otomatis terbuka dan dapat dievaluasi secara penuh.
 
 ---
 
@@ -269,6 +276,7 @@ Terminal akan memberikan URL publik seperti: `https://xxxx-xxxx.trycloudflare.co
 ```text
 decisionmodelbench/
 ├── app_server.py                     # Server FastAPI (Endpoint API, Hot-swap Engine, REST)
+├── gpu_manager.py                    # Detektor hardware dinamis, Multi-GPU scaler & auto-tuner
 ├── benchmark_headless.py             # Perkakas CLI benchmark headless (Rich/Tabulate UI)
 ├── download_models.py                # Skrip pengunduh otomatis model GGUF dari Hugging Face
 ├── setup.sh                          # Skrip otomatisasi instalasi & konfigurasi interaktif

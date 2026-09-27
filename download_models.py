@@ -60,6 +60,18 @@ MODELS_INFO = {
         "context_window": "8,192 tokens",
         "size": "1.59 GB",
         "description": "Ultra Lightweight & High TPS (Ideal untuk latensi sub-detik)"
+    },
+    "qwen-14b": {
+        "name": "Qwen 2.5 14B Instruct",
+        "org": "Alibaba Cloud Flagship",
+        "repo_id": "bartowski/Qwen2.5-14B-Instruct-GGUF",
+        "filename": "Qwen2.5-14B-Instruct-Q4_K_M.gguf",
+        "target_filename": "Qwen2.5-14B-Instruct-Q4_K_M.gguf",
+        "parameters": "14.7B",
+        "quantization": "Q4_K_M",
+        "context_window": "32,768 tokens",
+        "size": "9.00 GB",
+        "description": "Flagship 14.7B Heavyweight untuk GPU VRAM besar (16GB-80GB: A10G, L4, RTX 3090/4090, A100). Penalaran tingkat lanjut & analisis mendalam."
     }
 }
 
@@ -156,7 +168,7 @@ def main():
         "--models",
         type=str,
         default="all",
-        help="Pilihan model: 'all', 'quick' (Sahabat-AI + Gemma 2B), atau nama spesifik ('sahabatai', 'qwen', 'gemma', 'gemma-2b')"
+        help="Pilihan model: 'all', 'quick' (Sahabat-AI + Gemma 2B), 'enterprise' (+ Qwen 14B), atau nama model spesifik"
     )
     parser.add_argument(
         "--dest",
@@ -170,15 +182,31 @@ def main():
     dest = os.path.abspath(args.dest)
     print(f"📁 Direktori Target: {dest}\n")
 
+    # Detect hardware profile and give recommendations
+    try:
+        from gpu_manager import get_hardware_profile
+        hw = get_hardware_profile()
+        print(f"💻 GPU Terdeteksi : {hw['primary_device']} ({hw['total_vram_all_gpus_gb']} GB VRAM Total | Bebas: {hw['free_vram_all_gpus_gb']} GB)")
+        print(f"🏷️  Tier Hardware : {hw['tier']}")
+        if hw["total_vram_all_gpus_gb"] >= 20.0:
+            print("💡 Rekomendasi GPU Tinggi: GPU Anda mendukung model 14B (Qwen 2.5 14B) dan konteks panjang hingga 8K-16K tokens!")
+        else:
+            print("💡 Rekomendasi: Model 8B/9B (Sahabat-AI, Qwen 7B, Gemma 9B, Gemma 2B) optimal untuk GPU ini.")
+        print("-" * 80 + "\n")
+    except Exception:
+        pass
+
     if args.models.lower() == "all":
-        selected = list(MODELS_INFO.keys())
+        selected = ["sahabatai", "qwen", "gemma", "gemma-2b"]
+    elif args.models.lower() == "enterprise":
+        selected = ["sahabatai", "qwen", "gemma", "gemma-2b", "qwen-14b"]
     elif args.models.lower() == "quick":
         selected = ["sahabatai", "gemma-2b"]
     else:
         selected = [m.strip().lower() for m in args.models.split(",") if m.strip().lower() in MODELS_INFO]
 
     if not selected:
-        print("❌ Pilihan model tidak valid. Pilih: 'all', 'quick', atau nama model ('sahabatai', 'qwen', 'gemma', 'gemma-2b').")
+        print("❌ Pilihan model tidak valid. Pilih: 'all', 'quick', 'enterprise', atau nama model spesifik.")
         sys.exit(1)
 
     print(f"📋 Antrean Unduhan: {', '.join([MODELS_INFO[k]['name'] for k in selected])}")

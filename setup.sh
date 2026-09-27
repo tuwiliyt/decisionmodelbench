@@ -29,17 +29,7 @@ echo -e "${BOLD}${CYAN}=========================================================
 # 1. Hardware & GPU Detection
 # ------------------------------------------------------------------------------
 echo -e "${BOLD}${YELLOW}🔍 [1/6] Memeriksa Perangkat Keras & Akselerator GPU...${NC}"
-if command -v nvidia-smi &> /dev/null; then
-    GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader | head -n 1)
-    GPU_VRAM=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader | head -n 1)
-    GPU_DRIVER=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -n 1)
-    echo -e "  • Perangkat GPU   : ${GREEN}$GPU_NAME${NC}"
-    echo -e "  • Total VRAM      : ${GREEN}$GPU_VRAM${NC}"
-    echo -e "  • Driver NVIDIA   : ${GREEN}$GPU_DRIVER${NC}"
-    echo -e "  ${GREEN}✓ GPU Terdeteksi & Siap untuk Akselerasi CUDA 100% Layer Offload.${NC}"
-else
-    echo -e "  ${YELLOW}⚠️  nvidia-smi tidak ditemukan. Model akan berjalan di CPU (kecepatan terbatas).${NC}"
-fi
+python3 gpu_manager.py
 
 # ------------------------------------------------------------------------------
 # 2. Python Environment Check
@@ -168,17 +158,18 @@ echo -e "${BOLD}${CYAN}=========================================================
 echo -e "${BOLD}${CYAN}📥 [5/6] PENGUNDUHAN MODEL LLM KELAS BERAT (GGUF 4-BIT QUANTIZED)${NC}"
 echo -e "${BOLD}${CYAN}==============================================================================${NC}"
 echo -e "Pilih paket pengunduhan model LLM System 2:"
-echo -e "  1) Unduh Lengkap (~16 GB: Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B)"
+echo -e "  1) Unduh Lengkap (~16 GB: Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B) [Standar]"
 echo -e "  2) Unduh Cepat (~6.2 GB: Sahabat-AI 8B + Gemma 2 2B) [Rekomendasi Uji Cepat]"
 echo -e "  3) Unduh Sahabat-AI 8B Saja (~4.6 GB)"
-echo -e "  4) Lewati sekarang (Unduh nanti dengan: python3 download_models.py)"
+echo -e "  4) Unduh Paket Enterprise Flagship (+ Qwen 2.5 14B) ~25 GB [Rekomendasi GPU 24GB-80GB: A10G/L4/RTX 3090/4090/A100]"
+echo -e "  5) Lewati sekarang (Unduh nanti dengan: python3 download_models.py)"
 echo -e "------------------------------------------------------------------------------"
-read -r -p "Pilihan Anda [1/2/3/4, default: 2]: " DOWNLOAD_CHOICE
+read -r -p "Pilihan Anda [1/2/3/4/5, default: 2]: " DOWNLOAD_CHOICE
 DOWNLOAD_CHOICE=${DOWNLOAD_CHOICE:-2}
 
 case "$DOWNLOAD_CHOICE" in
     1)
-        echo -e "${CYAN}Mengunduh seluruh 4 model kelas berat...${NC}"
+        echo -e "${CYAN}Mengunduh seluruh 4 model kelas berat standar...${NC}"
         python3 download_models.py --models all
         ;;
     2)
@@ -188,6 +179,10 @@ case "$DOWNLOAD_CHOICE" in
     3)
         echo -e "${CYAN}Mengunduh Sahabat-AI 8B Instruct...${NC}"
         python3 download_models.py --models sahabatai
+        ;;
+    4)
+        echo -e "${CYAN}Mengunduh paket Enterprise Flagship (+ Qwen 14B)...${NC}"
+        python3 download_models.py --models enterprise
         ;;
     *)
         echo -e "${YELLOW}Unduhan model dilewati. Anda dapat mengunduh kapan saja dengan:${NC}"
