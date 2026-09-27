@@ -119,28 +119,39 @@ Pengujian nyata end-to-end pada cluster **2x NVIDIA Tesla T4 GPU** membandingkan
 
 ## 🛡️ Arena Air Defense AI (Iron Dome Pertahanan Udara 5 Kota Paralel)
 
-Sebagai simulasi taktis pertahanan kedaulatan udara (*Tactical Air Defense C-RAM / Iron Dome*), DecisionModelBench mempertandingkan kemampuan AI mempertahankan **5 kota besar di Indonesia secara paralel** dari ancaman proyektil jatuh dari atmosfer dengan tingkat kesulitan progresif (*wave difficulty escalation*):
+Sebagai simulasi taktis pertahanan kedaulatan udara (*Tactical Air Defense C-RAM / Iron Dome*), DecisionModelBench mempertandingkan kemampuan AI mempertahankan **5 kota besar di Indonesia secara paralel** dari ancaman proyektil jatuh dari atmosfer dengan kondisi fisika realistik:
 
 * **Kota Jakarta:** Dilindungi oleh 🟢 **Laya Multilingual (421M GPU)** (~55 ms / 18.2 Hz)
-* **Kota Surabaya:** Dilindungi oleh 🔵 **OpenJev (0.5B GPU Logit)** (~210 ms / 4.8 Hz)
-* **Kota Bandung:** Dilindungi oleh 🟣 **TypeSafe Jev (Cloud SaaS)** (~160 ms / 6.2 Hz)
+* **Kota Surabaya:** Dilindungi oleh 🔵 **OpenJev (0.5B GPU Local Logits)** (~210 ms / 4.8 Hz)
+* **Kota Bandung:** Dilindungi oleh 🟣 **TypeSafe JEV (Cloud Decision API SaaS)** (~160 ms / 6.2 Hz) ★ *Cloud System One*
 * **Kota Medan:** Dilindungi oleh 🟡 **Kev-0.8B (Local Ensemble)** (~950 ms / 1.1 Hz)
-* **Kota Nusantara (IKN):** Dilindungi oleh 🔴 **Heavyweight LLM (Sahabat-AI 8B)** (~2,500 ms / 0.4 Hz)
+* **Kota Nusantara (IKN):** Dilindungi oleh 🔴 **Heavyweight LLM (Pilihan Dinamis: Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, Gemma 2 2B)** (~1,100 – 2,800 ms)
 
-### Karakteristik Taktis Pengujian:
-1. **Spektrum Sasaran Heterogen:**
-   - **🔥 Sasaran Ancaman (Wajib Ditembak):** Rudal balistik supersonik (🚀), meteorit jatuh ke daratan (☄️), dan drone kamikaze militer (🛸).
-   - **🛡️ Objek Aman (Dilarang Ditembak):** Pesawat komersil sipil (✈️ *Garuda, Lion, Citilink* dengan kode transponder IFF aktif), kawanan burung biologis (🦅), dan puing angkasa yang meleset keluar atmosfer (🌠).
-2. **Eskalasi Gelombang Progresif (Tingkat Kesulitan Meningkat):**
-   - *Wave 1 (Recon):* Kecepatan proyektil normal, ancaman sporadis.
-   - *Wave 3 (Supersonic Salvo):* Kecepatan bertambah +50%, rudal menukik tajam.
-   - *Wave 5 (Saturation Swarm):* Kecepatan hipersonik, saturasi belasan proyektil bersamaan dengan waktu hantaman (*time-to-impact*) < 2.5 detik!
-3. **Rekap Taktis Berkala (Periodic SITREP):**
-   - Setiap gelombang selesai (atau setiap interval waktu), sistem menampilkan rekap komprehensif:
-     * Rudal Berhasil Ditangkis di Udara (*Intercepted*)
-     * Rudal Lolos & Menghantam Kota (*Ground Impacts & Structural Damage*)
-     * Pesawat Komersil Selamat vs Korban Salah Tembak (*Zero Friendly Fire*)
-     * Biaya Token Komputasi ($0 vs Ribuan Token LLM)
+### Karakteristik Taktis & Fisika Real-Life:
+1. **Fisika Beban Tembakan Riil (*Real-Life Battery Load Mechanics*):**
+   - **Kapasitas Magazin Pod:** Setiap baterai pertahanan dibatasi 20 rudal pencegat (*standard 20-canister pod Iron Dome Tamir / C-RAM*).
+   - **Interval Salvo Ripple:** Penembakan dibatasi jeda pelepasan minimal agar magazin tidak langsung habis dalam 1 milidetik.
+   - **Siklus Cooldown Reload:** Saat amunisi habis (`0/20`), baterai memasuki status *RELOADING POD* selama ~3.5 detik. Pada jendela kerentanan ini, kota tidak dapat menembak dan rentan hancur jika diserbu kawanan saturasi (*swarm bombardment*).
+2. **Kalkulasi Kerusakan Integritas Kota Riil (*Threat-Specific Structural Damage*):**
+   - 🚀 **Rudal Balistik Hipersonik:** Kerusakan **-35% HP** (hulu ledak penetrator berdaya ledak tinggi).
+   - ☄️ **Meteorit Kinetic Impak:** Kerusakan **-45% HP** (hantaman energi kinetik berkecepatan tinggi membentuk kawah).
+   - 🛸 **Drone Kamikaze:** Kerusakan **-12% HP** (hulu ledak taktis terarah).
+   - 💥 **Serpihan Ledakan Rendah (*Collateral Shrapnel*):** Kerusakan **-3% HP** bila pencegatan terjadi terlalu dekat dengan daratan (<3 km).
+3. **Pilihan Model LLM Fleksibel (System 2):**
+   - Tersedia selector interaktif di Kota 5 (Nusantara / IKN) untuk memilih model LLM yang ingin diuji:
+     * **Sahabat-AI 8B Instruct:** Sovereign Indonesian LLM (~2500ms lag, 36 tok)
+     * **Qwen 2.5 7B Instruct:** High-Reasoning LLM (~2200ms lag, 36 tok)
+     * **Gemma 2 9B Instruct:** Google DeepMind (~2800ms lag, 36 tok)
+     * **Gemma 2 2B Instruct:** Lightweight Edge LLM (~1100ms lag, 32 tok)
+4. **Integrasi & Penonjolan TypeSafe JEV Cloud API:**
+   - Kota 3 (Bandung) menonjolkan arsitektur **TypeSafe JEV Cloud Decision API (System 1)**.
+   - Tombol **⚡ Uji Probe JEV Live** untuk mengirimkan telemetri radar darurat ke endpoint live `https://api.typesafe.ai/v1/systemone` dan melihat respons deterministik milidetik tanpa membebani GPU lokal.
+5. **Penyempurnaan Animasi Taktis Canvas:**
+   - Lintasan parabola lengkung kendali proporsional (*proportional navigation curved arc*).
+   - Jejak partikel asap putih di belakang roket pencegat yang meluncur ke angkasa.
+   - Gelombang kejut cincin flak (*mid-air expanding shockwave*) saat terjadi benturan.
+   - Pesawat komersial dengan jejak uap jet ganda (*dual condensation contrails*) dan lampu navigasi sayap berkedip merah/hijau.
+   - Kolom asap hitam mengepul dan kobaran api di gedung kota yang mengalami hantaman.
 
 ---
 
@@ -150,18 +161,21 @@ Sebagai simulasi taktis pertahanan kedaulatan udara (*Tactical Air Defense C-RAM
 Buka di browser saat server aktif:
 * **URL Langsung:** `http://localhost:7860/air_defense` atau `http://localhost:7860/iron_dome`
 * **Tab Mode 8 Dashboard:** Kunjungi `http://localhost:7860/` lalu pilih tab `[🛡️ Mode 8: Air Defense Iron Dome]`
-* **Fitur:** 5 kanvas radar kota berdampingan, animasi jejak asap rudal, efek ledakan partikel di udara, hantaman darat, sirine bahaya udara, dan modal rekap SITREP berkala.
+* **Fitur:** 5 kanvas radar berputar, indikator amunisi pod 20 rudal, selector model LLM Kota 5, modal probe live TypeSafe JEV API, kalkulasi damage visual, dan modal rekap SITREP berkala.
 
 #### 2. Mode Terminal Headless CLI (Rich Tactical Radar Table)
 ```bash
 # Jalankan simulasi pertahanan udara 60 ticks (default)
 python3 play_air_defense.py
 
-# Simulasi cepat 30 ticks
-python3 play_air_defense.py --ticks 30 --speed fast
+# Simulasi cepat 30 ticks dengan model LLM Qwen 2.5 7B
+python3 play_air_defense.py --ticks 30 --speed fast --llm qwen
 
-# Uji 1 probe radar lock live ke backend GPU
-python3 play_air_defense.py --api
+# Uji 1 probe radar lock live ke TypeSafe JEV Cloud API
+python3 play_air_defense.py --probe jev
+
+# Uji probe radar lock ke Laya Multilingual GPU
+python3 play_air_defense.py --probe laya
 ```
 
 ---
