@@ -61,7 +61,7 @@ SCENARIOS = {
         "state": "Halo selamat siang CS, saya mau tanya apakah kantor cabang di Jakarta Selatan buka pelayanan nasabah pada hari Sabtu dan Minggu? Terima kasih infonya.",
         "questions": {
             "is_threat_or_urgent": {"type": "noul", "instructions": "Apakah pesan bernada komplain keras atau ancaman?"},
-            "issue_category": {"type": "choice", "instructions": "Klasifikasi kebutuhan?", "criteria": {"komplain_kritis": "Komplain pelayanan cabang", "permohonan_bantuan": "Booking janji temu", "informasi_rutin": "Informasi jam operasional kantor"}},
+            "issue_category": {"type": "choice", "instructions": "Klasifikasi kebutuhan?", "criteria": {"komplain_kritis": "Komplain marah kendala pelayanan", "permohonan_bantuan": "Booking jadwal konsultasi", "informasi_rutin": "Pertanyaan rutin jam buka kantor dan operasional cabang"}},
             "urgency_level": {"type": "score", "instructions": "Tingkat urgensi", "criteria": ["rendah", "sedang", "tinggi", "kritis"]}
         }
     }
