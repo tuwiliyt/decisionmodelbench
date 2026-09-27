@@ -23,8 +23,7 @@
 \author{Richie~O.~Sumual
 \thanks{Richie O. Sumual is with Advanced Agentic AI \& Distributed Systems Research, Jakarta, Indonesia (e-mail: richie.sumual@research.org).}}
 
-\markboth{IEEE Transactions on Cybernetics / IEEE Transactions on Computational Social Systems,~Vol.~XX, No.~X, September~2026}%
-{Sumual: The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading}
+\markboth{Independent Research Report --- Richie O. Sumual (Research Project \#2, September~2026)}{Sumual: The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading}%
 
 \IEEEtitleabstractindextext{%
 \begin{abstract}
@@ -100,16 +99,25 @@ An agent initiates state perception at timestamp $t_0$, sampling state $S_0 = S(
 
 The true state of the environment at actuation timestamp $t_{\text{act}}$ is:
 \begin{equation}
-S(t_{\text{act}}) = S_0 + \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\begin{aligned}
+S(t_{\text{act}}) &= S_0 + \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau \\
+&\quad + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\end{aligned}
 \end{equation}
 The \textbf{State-Decision Drift Vector} $\mathbf{\delta}_S(\Delta t)$ is defined as the Euclidean difference between the assumed decision state $S_0$ and the actual actuation state $S(t_{\text{act}})$:
 \begin{equation}
-\mathbf{\delta}_S(\Delta t) = S(t_{\text{act}}) - S_0 = \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\begin{aligned}
+\mathbf{\delta}_S(\Delta t) &= S(t_{\text{act}}) - S_0 \\
+&= \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\end{aligned}
 \end{equation}
 
 The expected square drift magnitude evaluates to:
 \begin{equation}
-\mathbb{E}\left[\|\mathbf{\delta}_S(\Delta t)\|^2\right] = \left\|\int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau\right\|^2 + \int_{t_0}^{t_0 + \Delta t} \text{Tr}\left(\mathbf{\Sigma}(S(\tau)) \mathbf{\Sigma}(S(\tau))^T\right) d\tau
+\begin{aligned}
+\mathbb{E}\left[\|\mathbf{\delta}_S(\Delta t)\|^2\right] &= \left\|\int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau\right\|^2 \\
+&\quad + \int_{t_0}^{t_0 + \Delta t} \text{Tr}\left(\mathbf{\Sigma}(S(\tau)) \mathbf{\Sigma}(S(\tau))^T\right) d\tau
+\end{aligned}
 \end{equation}
 Under localized constant drift $\|f(S, u)\| \approx v_{\text{drift}}$ and isotropic diffusion $\mathbf{\Sigma} = \sigma \mathbf{I}$, this simplifies to:
 \begin{equation}
@@ -187,7 +195,10 @@ The algorithmic trading arena simulates an electronic crypto-asset order book (B
     \item \textbf{Technical Indicators:} Continuous streaming calculation of $\text{EMA}_9(t)$, $\text{EMA}_{21}(t)$, $\text{RSI}_{14}(t)$, and Level-2 Order Book Imbalance $I_{\text{book}} = \frac{V_{\text{bid}} - V_{\text{ask}}}{V_{\text{bid}} + V_{\text{ask}}} \times 100\%$.
     \item \textbf{Latency-Slippage Coupling:} Fill prices incorporate the analytical latency slippage function derived in Section~III-B:
     \begin{equation}
-    \text{Slippage}(\Delta t) = \min\left(0.035, \, 0.00025 \times \sqrt{\max\left(1.0, \, \frac{\Delta t}{50.0}\right)}\right)
+    \begin{aligned}
+    \text{Slippage}(\Delta t) &= \min \Big( 0.035, \\
+    &\quad 0.00025 \times \sqrt{\max\left(1.0, \, \frac{\Delta t}{50.0}\right)} \Big)
+    \end{aligned}
     \end{equation}
     For buy orders, $P_{\text{fill}} = P_{\text{signal}} \times (1 + \text{Slippage})$; for sell orders, $P_{\text{fill}} = P_{\text{signal}} \times (1 - \text{Slippage})$.
 \end{itemize}
@@ -348,7 +359,10 @@ This apparent paradox is explained by the fundamental divergence in computationa
 \begin{itemize}
     \item \textbf{Local Autoregressive LLM (8B):}
     \begin{equation}
-    \text{Latency} = \sum_{i=1}^{N} \frac{2 \cdot |\Theta|_{\text{LLM}}}{\text{Memory Bandwidth}} \approx N \times \frac{2 \times 4.5 \text{ GB}}{240 \text{ GB/s}} \approx N \times 37.5 \text{ ms}
+    \begin{aligned}
+    \text{Latency} &= \sum_{i=1}^{N} \frac{2 \cdot |\Theta|_{\text{LLM}}}{\text{Memory Bandwidth}} \\
+    &\approx N \times \frac{2 \times 4.5 \text{ GB}}{240 \text{ GB/s}} \approx N \times 37.5 \text{ ms}
+    \end{aligned}
     \end{equation}
     For $N = 60$ tokens, local GPU latency strictly exceeds $2,250 \text{ ms}$, entirely governed by the hardware memory bus.
     \item \textbf{Remote Decision Model (JEV API):}

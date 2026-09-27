@@ -23,8 +23,7 @@
 \author{Richie~O.~Sumual
 \thanks{Richie O. Sumual adalah peneliti pada Advanced Agentic AI \& Distributed Systems Research, Jakarta, Indonesia (e-mail: richie.sumual@research.org).}}
 
-\markboth{IEEE Transactions on Cybernetics / Jurnal Nasional Rekayasa Sistem Siber-Fisik,~Vol.~XX, No.~X, September~2026}%
-{Sumual: Kekeliruan Autoregresi dalam Sistem Siber-Fisik Kritis-Waktu dan Perdagangan Algoritmik}
+\markboth{Riset Mandiri --- Richie O. Sumual (Riset Mandiri Ke-2, September~2026)}{Sumual: Kekeliruan Autoregresi dalam Sistem Siber-Fisik Kritis-Waktu dan Perdagangan Algoritmik}%
 
 \IEEEtitleabstractindextext{%
 \begin{abstract}
@@ -100,16 +99,25 @@ Agen memulai persepsi status pada $t_0$, mencuplik $S_0 = S(t_0)$. Kebijakan $\p
 
 Status riil lingkungan saat aksi tiba pada $t_{\text{act}}$ adalah:
 \begin{equation}
-S(t_{\text{act}}) = S_0 + \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\begin{aligned}
+S(t_{\text{act}}) &= S_0 + \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau \\
+&\quad + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\end{aligned}
 \end{equation}
 Kami mendefinisikan \textbf{Vektor Pergeseran Status-Keputusan (\textit{State-Decision Drift Vector})} $\mathbf{\delta}_S(\Delta t)$ sebagai:
 \begin{equation}
-\mathbf{\delta}_S(\Delta t) = S(t_{\text{act}}) - S_0 = \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\begin{aligned}
+\mathbf{\delta}_S(\Delta t) &= S(t_{\text{act}}) - S_0 \\
+&= \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\end{aligned}
 \end{equation}
 
 Nilai ekspektasi kuadrat pergeseran dievaluasi sebagai:
 \begin{equation}
-\mathbb{E}\left[\|\mathbf{\delta}_S(\Delta t)\|^2\right] = \left\|\int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau\right\|^2 + \int_{t_0}^{t_0 + \Delta t} \text{Tr}\left(\mathbf{\Sigma} \mathbf{\Sigma}^T\right) d\tau
+\begin{aligned}
+\mathbb{E}\left[\|\mathbf{\delta}_S(\Delta t)\|^2\right] &= \left\|\int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau\right\|^2 \\
+&\quad + \int_{t_0}^{t_0 + \Delta t} \text{Tr}\left(\mathbf{\Sigma} \mathbf{\Sigma}^T\right) d\tau
+\end{aligned}
 \end{equation}
 Berdasarkan aproksimasi drift konstan $\|f(S, u)\| \approx v_{\text{drift}}$ dan difusi isotropik $\mathbf{\Sigma} = \sigma \mathbf{I}$, relasi ini disederhanakan menjadi:
 \begin{equation}
@@ -187,7 +195,10 @@ Simulasi finansial memodelkan buku pesanan aset kripto likuid (BTC/USDT spot) de
     \item \textbf{Indikator Streaming:} Kalkulasi bergerak untuk $\text{EMA}_9(t)$, $\text{EMA}_{21}(t)$, $\text{RSI}_{14}(t)$, dan Ketidakseimbangan Buku Pesanan $I_{\text{book}} = \frac{V_{\text{bid}} - V_{\text{ask}}}{V_{\text{bid}} + V_{\text{ask}}} \times 100\%$.
     \item \textbf{Kopling Slippage:} Harga eksekusi mengaplikasikan formula pergeseran kuadratik Bagian~III-B:
     \begin{equation}
-    \text{Slippage}(\Delta t) = \min\left(0,035, \, 0,00025 \times \sqrt{\max\left(1,0, \, \frac{\Delta t}{50,0}\right)}\right)
+    \begin{aligned}
+    \text{Slippage}(\Delta t) &= \min \Big( 0{,}035, \\
+    &\quad 0{,}00025 \times \sqrt{\max\left(1{,}0, \, \frac{\Delta t}{50{,}0}\right)} \Big)
+    \end{aligned}
     \end{equation}
     Untuk beli: $P_{\text{fill}} = P_{\text{signal}} \times (1 + \text{Slippage})$; untuk jual: $P_{\text{fill}} = P_{\text{signal}} \times (1 - \text{Slippage})$.
 \end{itemize}
@@ -338,7 +349,10 @@ Divergensi komputasi menjelaskan mengapa API cloud TypeSafe JEV System One ($\si
 \begin{itemize}
     \item \textbf{LLM Autoregresif Lokal (8B):}
     \begin{equation}
-    \text{Latensi} = \sum_{i=1}^{N} \frac{2 \cdot |\Theta|_{\text{LLM}}}{\text{Lebar Pita Memori}} \approx N \times \frac{2 \times 4,5 \text{ GB}}{240 \text{ GB/s}} \approx N \times 37,5 \text{ ms}
+    \begin{aligned}
+    \text{Latensi} &= \sum_{i=1}^{N} \frac{2 \cdot |\Theta|_{\text{LLM}}}{\text{Lebar Pita Memori}} \\
+    &\approx N \times \frac{2 \times 4{,}5 \text{ GB}}{240 \text{ GB/s}} \approx N \times 37{,}5 \text{ ms}
+    \end{aligned}
     \end{equation}
     Untuk $N = 60$ token, latensi lokal melampaui $2.250 \text{ ms}$, terkunci oleh kecepatan bus memori GPU.
     \item \textbf{Model Keputusan Cloud (JEV API):}
