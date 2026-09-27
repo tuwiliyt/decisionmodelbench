@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ Arena Trading Cepat AI (High-Frequency Trading & Dummy Balance)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #050811;
+      background-image: 
+        radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    .glass-card {
+      background: rgba(13, 20, 36, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .terminal-box {
+      background: #030712;
+      border: 1px solid #1e293b;
+      box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.6);
+    }
+    .price-flash-up {
+      animation: flashGreen 0.4s ease;
+    }
+    .price-flash-down {
+      animation: flashRed 0.4s ease;
+    }
+    @keyframes flashGreen {
+      0% { color: #34d399; background: rgba(52, 211, 153, 0.2); }
+      100% { color: inherit; background: transparent; }
+    }
+    @keyframes flashRed {
+      0% { color: #f87171; background: rgba(248, 113, 113, 0.2); }
+      100% { color: inherit; background: transparent; }
+    }
+    .ladder-bar-bid {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.02) 100%);
+    }
+    .ladder-bar-ask {
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.02) 100%);
+    }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased text-slate-200">
+
+  <!-- Header Section -->
+  <header class="border-b border-slate-800/80 sticky top-0 z-50 glass-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-cyan-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 font-bold text-white text-xl">
+          📈
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-white via-emerald-200 to-cyan-400 bg-clip-text text-transparent">
+              Arena Simulasi Trading Cepat AI (Saldo Dummy $10,000)
+            </h1>
+            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              High-Frequency Scalper vs Autoregressive LLM
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Pembuktian Empiris: Latensi Sub-100ms & Nol Slippage (System 1) vs Keterlambatan 2.5s (System 2)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="/breakout" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1.5">
+          <span>🎮</span> Breakout Arcade
+        </a>
+        <a href="/" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:opacity-90 transition shadow-lg shadow-purple-500/20 flex items-center gap-1.5">
+          <span>🏛️</span> Dashboard Utama
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Market Ticker & Control Bar -->
+  <div class="border-b border-slate-800/80 bg-slate-950/70 py-3.5 sticky top-20 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- Live Price & Regime -->
+      <div class="flex items-center gap-4">
+        <div>
+          <span class="text-[10px] text-slate-400 uppercase font-mono font-bold tracking-wider">Pasar: BTC/USDT Spot</span>
+          <div class="flex items-center gap-2.5">
+            <span id="marketPriceText" class="text-2xl font-mono font-black text-white px-2 py-0.5 rounded transition">$65,000.00</span>
+            <span id="marketChangeBadge" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">+0.00%</span>
+          </div>
+        </div>
+        <div class="h-8 w-px bg-slate-800 hidden sm:block"></div>
+        <div class="hidden sm:block">
+          <span class="text-[10px] text-slate-400 uppercase font-mono">Regime Pasar</span>
+          <div>
+            <span id="regimeBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span id="regimeText">NORMAL MARKET</span>
+            </span>
+          </div>
+        </div>
+        <div class="h-8 w-px bg-slate-800 hidden md:block"></div>
+        <div class="hidden md:flex items-center gap-3 text-xs font-mono">
+          <div><span class="text-slate-500 text-[10px]">EMA(9):</span> <strong id="valEma9" class="text-cyan-300">$65,000</strong></div>
+          <div><span class="text-slate-500 text-[10px]">EMA(21):</span> <strong id="valEma21" class="text-purple-300">$65,000</strong></div>
+          <div><span class="text-slate-500 text-[10px]">RSI(14):</span> <strong id="valRsi" class="text-amber-300">50.0</strong></div>
+        </div>
+      </div>
+
+      <!-- Control Buttons -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btnToggleSim" onclick="toggleSimulation()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5">
+          <span id="btnSimIcon">▶️</span>
+          <span id="btnSimText">Mulai Trading Otomatis</span>
+        </button>
+        <button onclick="resetSimulation()" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700 flex items-center gap-1">
+          <span>🔄</span> Reset ($10k)
+        </button>
+
+        <!-- Speed Selector -->
+        <div class="flex items-center p-1 rounded-xl bg-slate-900 border border-slate-800">
+          <button onclick="setSimSpeed(1000, '1x')" id="spd-1x" class="spd-btn active px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-800 text-white transition">1x</button>
+          <button onclick="setSimSpeed(350, '3x')" id="spd-3x" class="spd-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-slate-400 hover:text-white transition">3x</button>
+          <button onclick="setSimSpeed(100, '10x')" id="spd-10x" class="spd-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-slate-400 hover:text-white transition">10x Turbo</button>
+        </div>
+
+        <!-- Regime Selector -->
+        <select id="selectRegime" onchange="changeRegimeManual(this.value)" class="bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-300 font-mono focus:outline-none">
+          <option value="NORMAL">Normal Walk</option>
+          <option value="BULL_RUN">🚀 Bull Breakout</option>
+          <option value="FLASH_CRASH">📉 Flash Crash</option>
+          <option value="SIDEWAYS">↔️ Sideways Chop</option>
+          <option value="WHIPSAW">⚡ Whipsaw Volatilitas</option>
+        </select>
+
+        <!-- Sound Button -->
+        <button onclick="toggleAudio()" id="btnAudio" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition text-xs">
+          🔊
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- TOP SECTION: CHART & ORDER BOOK LADDER -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Interactive Candlestick & Indicator Chart (2 Cols) -->
+      <div class="lg:col-span-2 glass-card rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-base">📊</span>
+            <h3 class="text-sm font-bold text-white">Live K-Line Candlestick & Indikator Teknis</h3>
+            <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-slate-800 text-cyan-300">1-Detik Bar</span>
+          </div>
+          <div class="flex items-center gap-3 text-[11px] font-mono">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> EMA(9)</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-400"></span> EMA(21)</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> ▲ Beli</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-400"></span> ▼ Jual</span>
+          </div>
+        </div>
+
+        <!-- Canvas Chart -->
+        <div class="relative w-full h-[320px] bg-slate-950/90 rounded-xl overflow-hidden border border-slate-800">
+          <canvas id="tradingCanvas" class="w-full h-full"></canvas>
+          <div id="chartOverlaySignal" class="absolute top-3 left-3 pointer-events-none hidden px-3 py-1.5 rounded-lg bg-emerald-950/90 border border-emerald-700 text-xs font-mono font-bold text-emerald-300 animate-bounce">
+            ▲ LAYA: BUY SIGNAL FILLED @ $65,120.00
+          </div>
+        </div>
+
+        <!-- Lower Sub-panel: RSI & Order Book Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+          <!-- RSI Gauge -->
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-between text-xs font-mono">
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase">RSI(14) Momentum:</span>
+              <div id="rsiBarText" class="font-bold text-amber-300">50.0 (Netral)</div>
+            </div>
+            <div class="w-36 bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
+              <div id="rsiBarFill" class="bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-400 h-2.5 rounded-full transition-all duration-200" style="width: 50%"></div>
+            </div>
+          </div>
+
+          <!-- Order Book Imbalance -->
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80 space-y-1 text-xs font-mono">
+            <div class="flex justify-between text-[10px]">
+              <span class="text-emerald-400 font-bold">BID: <span id="imbalanceBidText">50%</span></span>
+              <span class="text-slate-400 font-bold">Order Book Imbalance</span>
+              <span class="text-rose-400 font-bold">ASK: <span id="imbalanceAskText">50%</span></span>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2.5 flex overflow-hidden border border-slate-800">
+              <div id="barBidImbalance" class="bg-emerald-500 h-full transition-all duration-200" style="width: 50%"></div>
+              <div id="barAskImbalance" class="bg-rose-500 h-full transition-all duration-200" style="width: 50%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Order Book Depth Ladder (1 Col) -->
+      <div class="glass-card rounded-2xl p-5 space-y-3 flex flex-col justify-between">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-base">📑</span>
+            <h3 class="text-sm font-bold text-white">Live Order Book (L2 Depth)</h3>
+          </div>
+          <span class="text-[10px] font-mono text-slate-400">Spread: <strong id="spreadText" class="text-slate-200">$0.10</strong></span>
+        </div>
+
+        <!-- Asks (Red / Selling) -->
+        <div class="space-y-1 font-mono text-[11px]">
+          <div class="text-[10px] text-slate-500 flex justify-between uppercase pb-1 border-b border-slate-800">
+            <span>Harga (USDT)</span>
+            <span>Ukuran (BTC)</span>
+            <span>Total Depth</span>
+          </div>
+          <div id="orderBookAsks" class="space-y-0.5">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Current Mid Price Banner -->
+        <div class="py-2 px-3 rounded-lg bg-slate-900/90 border border-slate-800 flex items-center justify-between font-mono text-xs">
+          <span class="text-slate-400 text-[10px]">MID PRICE:</span>
+          <span id="ladderMidPrice" class="font-bold text-emerald-400 text-sm">$65,000.00</span>
+          <span id="ladderDirection" class="text-emerald-400">▲</span>
+        </div>
+
+        <!-- Bids (Green / Buying) -->
+        <div id="orderBookBids" class="space-y-0.5 font-mono text-[11px]">
+          <!-- Populated via JS -->
+        </div>
+
+        <!-- Action / Slippage Warning -->
+        <div class="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-300/90 leading-tight">
+          ⚡ <strong>Aturan Slippage:</strong> Model sub-100ms mengeksekusi harga persis saat sinyal terbit. Model dengan latensi 2.5s (LLM) terkena penalti pergeseran harga pasar.
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDDLE SECTION: 5 MODELS PARALLEL PORTFOLIO ARENA -->
+    <div class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>⚔️</span> Arena Portofolio 5 Model Paralel (Saldo Dummy Awal: $10,000 USD)
+          </h2>
+          <p class="text-xs text-slate-400">Semua model mengamati tick harga yang sama dan mengeksekusi order sesuai latensi arsitektur aslinya</p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="text-slate-400">Total Transaksi Selesai:</span>
+          <strong id="totalArenaTrades" class="text-emerald-400">0</strong>
+        </div>
+      </div>
+
+      <!-- 5 Parallel Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+
+        <!-- CARD 1: LAYA MULTILINGUAL (421M GPU) -->
+        <div class="glass-card rounded-2xl p-4 border border-emerald-500/40 space-y-3 relative overflow-hidden flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">System 1 • Scalper</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">~55 ms</span>
+            </div>
+            <div>
+              <div class="text-base font-extrabold text-white flex items-center gap-1.5">
+                <span>🟢</span> Laya (421M)
+              </div>
+              <div class="text-[11px] text-slate-400">ModernBERT RLCD GPU</div>
+            </div>
+            <!-- Equity -->
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Total Equity:</div>
+              <div id="eq-laya" class="text-xl font-mono font-black text-emerald-400">$10,000.00</div>
+              <div class="flex justify-between text-[11px] font-mono">
+                <span class="text-slate-400">P&L:</span>
+                <span id="pnl-laya" class="text-emerald-300 font-bold">+$0.00 (0.0%)</span>
+              </div>
+            </div>
+            <!-- Metrics -->
+            <div class="space-y-1 text-[11px] font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Saldo Kas:</span>
+                <span id="cash-laya" class="text-slate-300">$10,000.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Posisi BTC:</span>
+                <span id="pos-laya" class="text-cyan-300">0.0000 BTC</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Win Rate:</span>
+                <span id="wr-laya" class="text-emerald-300 font-bold">0.0% (0 trade)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Max Drawdown:</span>
+                <span id="dd-laya" class="text-rose-400 font-mono">0.0%</span>
+              </div>
+              <div class="flex justify-between pt-1 border-t border-slate-800/80 text-emerald-400">
+                <span>Token Terbuang:</span>
+                <strong class="text-emerald-300">0 tokens (100% Hemat)</strong>
+              </div>
+            </div>
+          </div>
+          <!-- Last Action Pill -->
+          <div id="act-pill-laya" class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-center font-mono text-xs font-bold text-slate-400">
+            HOLD (Menunggu)
+          </div>
+        </div>
+
+        <!-- CARD 2: OPENJEV (0.5B GPU) -->
+        <div class="glass-card rounded-2xl p-4 border border-cyan-500/40 space-y-3 relative overflow-hidden flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400">System 1 • Logit</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">~210 ms</span>
+            </div>
+            <div>
+              <div class="text-base font-extrabold text-white flex items-center gap-1.5">
+                <span>🔵</span> OpenJev (0.5B)
+              </div>
+              <div class="text-[11px] text-slate-400">Qwen2.5 Logit Scorer GPU 1</div>
+            </div>
+            <!-- Equity -->
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Total Equity:</div>
+              <div id="eq-openjev" class="text-xl font-mono font-black text-cyan-400">$10,000.00</div>
+              <div class="flex justify-between text-[11px] font-mono">
+                <span class="text-slate-400">P&L:</span>
+                <span id="pnl-openjev" class="text-cyan-300 font-bold">+$0.00 (0.0%)</span>
+              </div>
+            </div>
+            <!-- Metrics -->
+            <div class="space-y-1 text-[11px] font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Saldo Kas:</span>
+                <span id="cash-openjev" class="text-slate-300">$10,000.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Posisi BTC:</span>
+                <span id="pos-openjev" class="text-cyan-300">0.0000 BTC</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Win Rate:</span>
+                <span id="wr-openjev" class="text-cyan-300 font-bold">0.0% (0 trade)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Max Drawdown:</span>
+                <span id="dd-openjev" class="text-rose-400 font-mono">0.0%</span>
+              </div>
+              <div class="flex justify-between pt-1 border-t border-slate-800/80 text-cyan-400">
+                <span>Token Terbuang:</span>
+                <strong class="text-cyan-300">0 tokens</strong>
+              </div>
+            </div>
+          </div>
+          <!-- Last Action Pill -->
+          <div id="act-pill-openjev" class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-center font-mono text-xs font-bold text-slate-400">
+            HOLD (Menunggu)
+          </div>
+        </div>
+
+        <!-- CARD 3: TYPESAFE JEV (CLOUD SAAS) -->
+        <div class="glass-card rounded-2xl p-4 border border-purple-500/40 space-y-3 relative overflow-hidden flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-purple-400">System 1 • Cloud</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">~160 ms</span>
+            </div>
+            <div>
+              <div class="text-base font-extrabold text-white flex items-center gap-1.5">
+                <span>🟣</span> TypeSafe Jev
+              </div>
+              <div class="text-[11px] text-slate-400">Cloud Decision SaaS</div>
+            </div>
+            <!-- Equity -->
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Total Equity:</div>
+              <div id="eq-jev" class="text-xl font-mono font-black text-purple-400">$10,000.00</div>
+              <div class="flex justify-between text-[11px] font-mono">
+                <span class="text-slate-400">P&L:</span>
+                <span id="pnl-jev" class="text-purple-300 font-bold">+$0.00 (0.0%)</span>
+              </div>
+            </div>
+            <!-- Metrics -->
+            <div class="space-y-1 text-[11px] font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Saldo Kas:</span>
+                <span id="cash-jev" class="text-slate-300">$10,000.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Posisi BTC:</span>
+                <span id="pos-jev" class="text-cyan-300">0.0000 BTC</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Win Rate:</span>
+                <span id="wr-jev" class="text-purple-300 font-bold">0.0% (0 trade)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Max Drawdown:</span>
+                <span id="dd-jev" class="text-rose-400 font-mono">0.0%</span>
+              </div>
+              <div class="flex justify-between pt-1 border-t border-slate-800/80 text-purple-400">
+                <span>Token Terbuang:</span>
+                <strong class="text-purple-300">0 tokens</strong>
+              </div>
+            </div>
+          </div>
+          <!-- Last Action Pill -->
+          <div id="act-pill-jev" class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-center font-mono text-xs font-bold text-slate-400">
+            HOLD (Menunggu)
+          </div>
+        </div>
+
+        <!-- CARD 4: KEV-0.8B (LOCAL ENSEMBLE) -->
+        <div class="glass-card rounded-2xl p-4 border border-amber-500/40 space-y-3 relative overflow-hidden flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">System 1 • Ensemble</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">~950 ms</span>
+            </div>
+            <div>
+              <div class="text-base font-extrabold text-white flex items-center gap-1.5">
+                <span>🟡</span> Kev-0.8B
+              </div>
+              <div class="text-[11px] text-slate-400">LoRA Ensemble Local GPU</div>
+            </div>
+            <!-- Equity -->
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Total Equity:</div>
+              <div id="eq-kev" class="text-xl font-mono font-black text-amber-400">$10,000.00</div>
+              <div class="flex justify-between text-[11px] font-mono">
+                <span class="text-slate-400">P&L:</span>
+                <span id="pnl-kev" class="text-amber-300 font-bold">+$0.00 (0.0%)</span>
+              </div>
+            </div>
+            <!-- Metrics -->
+            <div class="space-y-1 text-[11px] font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Saldo Kas:</span>
+                <span id="cash-kev" class="text-slate-300">$10,000.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Posisi BTC:</span>
+                <span id="pos-kev" class="text-cyan-300">0.0000 BTC</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Win Rate:</span>
+                <span id="wr-kev" class="text-amber-300 font-bold">0.0% (0 trade)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Max Drawdown:</span>
+                <span id="dd-kev" class="text-rose-400 font-mono">0.0%</span>
+              </div>
+              <div class="flex justify-between pt-1 border-t border-slate-800/80 text-amber-400">
+                <span>Token Terbuang:</span>
+                <strong class="text-amber-300">0 tokens</strong>
+              </div>
+            </div>
+          </div>
+          <!-- Last Action Pill -->
+          <div id="act-pill-kev" class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-center font-mono text-xs font-bold text-slate-400">
+            HOLD (Menunggu)
+          </div>
+        </div>
+
+        <!-- CARD 5: HEAVYWEIGHT LLM (SAHABAT-AI 8B) -->
+        <div class="glass-card rounded-2xl p-4 border border-rose-500/40 space-y-3 relative overflow-hidden flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-rose-400">System 2 • High Lag</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">~2,500 ms</span>
+            </div>
+            <div>
+              <div class="text-base font-extrabold text-white flex items-center gap-1.5">
+                <span>🔴</span> Sahabat-AI 8B
+              </div>
+              <div class="text-[11px] text-rose-300/80">Generative Autoregressive</div>
+            </div>
+            <!-- Equity -->
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Total Equity:</div>
+              <div id="eq-sahabatai" class="text-xl font-mono font-black text-rose-400">$10,000.00</div>
+              <div class="flex justify-between text-[11px] font-mono">
+                <span class="text-slate-400">P&L:</span>
+                <span id="pnl-sahabatai" class="text-rose-300 font-bold">+$0.00 (0.0%)</span>
+              </div>
+            </div>
+            <!-- Metrics -->
+            <div class="space-y-1 text-[11px] font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Saldo Kas:</span>
+                <span id="cash-sahabatai" class="text-slate-300">$10,000.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Posisi BTC:</span>
+                <span id="pos-sahabatai" class="text-cyan-300">0.0000 BTC</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Win Rate:</span>
+                <span id="wr-sahabatai" class="text-rose-300 font-bold">0.0% (0 trade)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Max Drawdown:</span>
+                <span id="dd-sahabatai" class="text-rose-400 font-mono">0.0%</span>
+              </div>
+              <div class="flex justify-between pt-1 border-t border-slate-800/80 text-rose-400">
+                <span>Token Terbuang:</span>
+                <strong id="tok-sahabatai" class="text-rose-300">0 tokens</strong>
+              </div>
+            </div>
+          </div>
+          <!-- Last Action Pill -->
+          <div id="act-pill-sahabatai" class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-center font-mono text-xs font-bold text-rose-400">
+            HOLD (Decision Lag ~2.5s)
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BOTTOM SECTION: LIVE EXECUTION FEED & ARCHITECTURAL DEEP DIVE -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Real-Time Trade Execution Feed (2 Cols) -->
+      <div class="lg:col-span-2 glass-card rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-base">📜</span>
+            <h3 class="text-sm font-bold text-white">Live Execution Feed (Riwayat Transaksi AI)</h3>
+          </div>
+          <span class="text-[10px] font-mono text-slate-500">Auto-scrolling stream</span>
+        </div>
+
+        <div class="overflow-x-auto max-h-[220px] overflow-y-auto">
+          <table class="w-full text-left font-mono text-xs">
+            <thead>
+              <tr class="text-slate-500 border-b border-slate-800 text-[11px]">
+                <th class="pb-2">Waktu</th>
+                <th class="pb-2">Model AI</th>
+                <th class="pb-2">Aksi</th>
+                <th class="pb-2">Harga Eksekusi</th>
+                <th class="pb-2">Slippage</th>
+                <th class="pb-2">Realisasi P&L</th>
+                <th class="pb-2">Token</th>
+              </tr>
+            </thead>
+            <tbody id="tradeFeedBody" class="divide-y divide-slate-900 text-slate-300 text-[11px]">
+              <tr>
+                <td colspan="7" class="py-4 text-center text-slate-500 italic">
+                  Belum ada transaksi. Klik "Mulai Trading Otomatis" untuk memulai simulasi.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Architectural Deep Dive Card (1 Col) -->
+      <div class="glass-card rounded-2xl p-5 space-y-3 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2 border-b border-slate-800/80 pb-3">
+            <span class="text-base">💡</span>
+            <h3 class="text-sm font-bold text-white">Mengapa Decision Model Menang Mutlak?</h3>
+          </div>
+          <ul class="text-xs text-slate-300 space-y-2.5 mt-3 leading-relaxed">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">1.</span>
+              <span><strong>Sub-100ms vs Order Book Slippage:</strong> Sinyal teknikal hanya bertahan beberapa milidetik. Laya mengeksekusi harga saat itu juga tanpa selisih harga rugi.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-cyan-400 font-bold">2.</span>
+              <span><strong>Nol Biaya Token:</strong> 10 transaksi per detik = 36.000 transaksi/jam. Decision Model berbiaya <strong>$0 token</strong>, sementara LLM murni membakar ratusan dolar kuota API.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-bold">3.</span>
+              <span><strong>Zero Hallucination:</strong> Output Softmax terkalibrasi ke dalam aksi pasti (`BUY`, `SELL`, `HOLD`) tanpa risiko rusak struktur sintaks JSON saat volatilitas gila.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400">
+          🏛️ <strong>Sinergi Two-Tier Brain:</strong> Gunakan Decision Model (System 1) untuk eksekusi order kilat sub-detik, dan simpan LLM Kelas Berat (System 2) untuk membaca sentimen makro berita global.
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Interactive JavaScript Simulation Script -->
+  <script>
+    // Audio Context for Retro SFX
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type, duration, gainVal = 0.05) {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playBuySound() {
+      playTone(587.33, 'triangle', 0.1, 0.05); // D5
+      setTimeout(() => playTone(880.00, 'triangle', 0.15, 0.05), 80); // A5
+    }
+
+    function playSellSound(isProfit) {
+      if (isProfit) {
+        playTone(523.25, 'sine', 0.08, 0.05); // C5
+        setTimeout(() => playTone(659.25, 'sine', 0.08, 0.05), 60); // E5
+        setTimeout(() => playTone(1046.50, 'sine', 0.2, 0.07), 120); // C6 (Ka-ching)
+      } else {
+        playTone(330, 'sawtooth', 0.15, 0.04);
+        setTimeout(() => playTone(220, 'sawtooth', 0.25, 0.04), 100);
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('btnAudio').innerText = audioEnabled ? '🔊' : '🔇';
+    }
+
+    // Market Simulator State
+    let isRunning = false;
+    let simInterval = null;
+    let tickSpeedMs = 1000;
+    let currentPrice = 65000.0;
+    let oldPrice = 65000.0;
+    let ema9 = 65000.0;
+    let ema21 = 65000.0;
+    let rsi = 50.0;
+    let gains = [];
+    let losses = [];
+    let bidPct = 52.0;
+    let askPct = 48.0;
+    let spread = 0.10;
+    let currentRegime = 'NORMAL';
+    let regimeTicksLeft = 40;
+    let totalArenaTradesCount = 0;
+
+    // Candle Buffer
+    const MAX_CANDLES = 40;
+    let candles = [];
+
+    // Portfolios
+    const INITIAL_CASH = 10000.0;
+    const portfolios = {
+      'laya': {
+        name: 'Laya (421M GPU)',
+        color: '#10b981',
+        latencyMs: 55,
+        tokenCost: 0,
+        cash: INITIAL_CASH,
+        posQty: 0.0,
+        avgPrice: 0.0,
+        realizedPnl: 0.0,
+        trades: 0,
+        winTrades: 0,
+        tokens: 0,
+        peakEq: INITIAL_CASH,
+        maxDd: 0.0,
+        lastAct: 'HOLD'
+      },
+      'openjev': {
+        name: 'OpenJev (0.5B GPU)',
+        color: '#06b6d4',
+        latencyMs: 210,
+        tokenCost: 0,
+        cash: INITIAL_CASH,
+        posQty: 0.0,
+        avgPrice: 0.0,
+        realizedPnl: 0.0,
+        trades: 0,
+        winTrades: 0,
+        tokens: 0,
+        peakEq: INITIAL_CASH,
+        maxDd: 0.0,
+        lastAct: 'HOLD'
+      },
+      'jev': {
+        name: 'TypeSafe Jev (Cloud)',
+        color: '#a855f7',
+        latencyMs: 160,
+        tokenCost: 0,
+        cash: INITIAL_CASH,
+        posQty: 0.0,
+        avgPrice: 0.0,
+        realizedPnl: 0.0,
+        trades: 0,
+        winTrades: 0,
+        tokens: 0,
+        peakEq: INITIAL_CASH,
+        maxDd: 0.0,
+        lastAct: 'HOLD'
+      },
+      'kev': {
+        name: 'Kev-0.8B (Local)',
+        color: '#f59e0b',
+        latencyMs: 950,
+        tokenCost: 0,
+        cash: INITIAL_CASH,
+        posQty: 0.0,
+        avgPrice: 0.0,
+        realizedPnl: 0.0,
+        trades: 0,
+        winTrades: 0,
+        tokens: 0,
+        peakEq: INITIAL_CASH,
+        maxDd: 0.0,
+        lastAct: 'HOLD'
+      },
+      'sahabatai': {
+        name: 'Sahabat-AI 8B (LLM)',
+        color: '#f43f5e',
+        latencyMs: 2500,
+        tokenCost: 32,
+        cash: INITIAL_CASH,
+        posQty: 0.0,
+        avgPrice: 0.0,
+        realizedPnl: 0.0,
+        trades: 0,
+        winTrades: 0,
+        tokens: 0,
+        peakEq: INITIAL_CASH,
+        maxDd: 0.0,
+        lastAct: 'HOLD'
+      }
+    };
+
+    // Pre-populate candles
+    for (let i = 0; i < 25; i++) {
+      const p = 64800 + (Math.sin(i * 0.4) * 150) + (Math.random() * 40);
+      candles.push({
+        open: p - 10,
+        high: p + 25,
+        low: p - 20,
+        close: p,
+        ema9: p,
+        ema21: p
+      });
+    }
+
+    // Canvas Chart Rendering
+    const canvas = document.getElementById('tradingCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function drawChart() {
+      const rect = canvas.getBoundingClientRect();
+      const W = rect.width;
+      const H = rect.height;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Grid lines
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      for (let y = 30; y < H; y += 45) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+
+      if (candles.length === 0) return;
+
+      // Min/Max price for scaling
+      let minP = Infinity;
+      let maxP = -Infinity;
+      candles.forEach(c => {
+        if (c.low < minP) minP = c.low;
+        if (c.high > maxP) maxP = c.high;
+      });
+      const pad = (maxP - minP) * 0.1 || 10;
+      minP -= pad;
+      maxP += pad;
+
+      const candleW = Math.max(4, (W - 80) / candles.length - 3);
+
+      function toY(val) {
+        return H - 20 - ((val - minP) / (maxP - minP)) * (H - 40);
+      }
+
+      // Draw Candlesticks
+      candles.forEach((c, i) => {
+        const x = 20 + i * (candleW + 3);
+        const yOpen = toY(c.open);
+        const yClose = toY(c.close);
+        const yHigh = toY(c.high);
+        const yLow = toY(c.low);
+
+        const isGreen = c.close >= c.open;
+        ctx.fillStyle = isGreen ? '#10b981' : '#f43f5e';
+        ctx.strokeStyle = isGreen ? '#10b981' : '#f43f5e';
+
+        // High-low wick
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x + candleW / 2, yHigh);
+        ctx.lineTo(x + candleW / 2, yLow);
+        ctx.stroke();
+
+        // Body
+        const topY = Math.min(yOpen, yClose);
+        const bodyH = Math.max(2, Math.abs(yClose - yOpen));
+        ctx.fillRect(x, topY, candleW, bodyH);
+      });
+
+      // Draw EMA-9 line (Cyan)
+      ctx.strokeStyle = '#06b6d4';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      candles.forEach((c, i) => {
+        const x = 20 + i * (candleW + 3) + candleW / 2;
+        const y = toY(c.ema9);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Draw EMA-21 line (Purple)
+      ctx.strokeStyle = '#a855f7';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      candles.forEach((c, i) => {
+        const x = 20 + i * (candleW + 3) + candleW / 2;
+        const y = toY(c.ema21);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Price labels on right edge
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px JetBrains Mono';
+      ctx.textAlign = 'right';
+      ctx.fillText('$' + maxP.toFixed(1), W - 8, 25);
+      ctx.fillText('$' + minP.toFixed(1), W - 8, H - 25);
+      ctx.fillStyle = '#34d399';
+      ctx.fillText('$' + currentPrice.toFixed(2), W - 8, toY(currentPrice));
+    }
+
+    // Step Market Simulation
+    function stepMarket() {
+      oldPrice = currentPrice;
+      regimeTicksLeft--;
+
+      if (regimeTicksLeft <= 0) {
+        const regimes = ['NORMAL', 'BULL_RUN', 'SIDEWAYS', 'FLASH_CRASH', 'WHIPSAW'];
+        const weights = [0.45, 0.22, 0.20, 0.07, 0.06];
+        let r = Math.random();
+        let acc = 0;
+        for (let i = 0; i < regimes.length; i++) {
+          acc += weights[i];
+          if (r <= acc) {
+            currentRegime = regimes[i];
+            break;
+          }
+        }
+        regimeTicksLeft = Math.floor(Math.random() * 35) + 20;
+        document.getElementById('selectRegime').value = currentRegime;
+      }
+
+      let drift = 0.0;
+      let vol = 0.0012;
+
+      if (currentRegime === 'BULL_RUN') {
+        drift = 0.0028;
+        vol = 0.0020;
+      } else if (currentRegime === 'FLASH_CRASH') {
+        drift = -0.0055;
+        vol = 0.0040;
+      } else if (currentRegime === 'SIDEWAYS') {
+        drift = -0.0008 * ((currentPrice - 65000) / 65000);
+        vol = 0.0006;
+      } else if (currentRegime === 'WHIPSAW') {
+        vol = 0.0050;
+      }
+
+      // Box-Muller standard normal
+      let u = 0, v = 0;
+      while(u === 0) u = Math.random();
+      while(v === 0) v = Math.random();
+      const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+
+      const pctChange = drift + (vol * z);
+      currentPrice = Math.max(1000, currentPrice * (1.0 + pctChange));
+
+      // High / Low for candle
+      spread = Math.max(0.05, Math.min(0.50, Math.random() * 0.25 * (currentPrice / 65000)));
+      const high = Math.max(oldPrice, currentPrice) + (Math.abs(z) * spread * 2.0);
+      const low = Math.min(oldPrice, currentPrice) - (Math.abs(z) * spread * 2.0);
+
+      // EMA-9 & EMA-21
+      const k9 = 2.0 / (9.0 + 1.0);
+      const k21 = 2.0 / (21.0 + 1.0);
+      ema9 = (currentPrice * k9) + (ema9 * (1.0 - k9));
+      ema21 = (currentPrice * k21) + (ema21 * (1.0 - k21));
+
+      // RSI-14
+      const diff = currentPrice - oldPrice;
+      gains.push(Math.max(0, diff));
+      losses.push(Math.max(0, -diff));
+      if (gains.length > 14) {
+        gains.shift();
+        losses.shift();
+      }
+      const avgGain = gains.reduce((a, b) => a + b, 0) / Math.max(1, gains.length);
+      const avgLoss = losses.reduce((a, b) => a + b, 0) / Math.max(1, losses.length);
+      if (avgLoss === 0) {
+        rsi = avgGain > 0 ? 100 : 50;
+      } else {
+        const rs = avgGain / avgLoss;
+        rsi = 100 - (100 / (1 + rs));
+      }
+
+      // Order Book Imbalance
+      let baseBid = 50.0;
+      if (currentRegime === 'BULL_RUN') baseBid = 70.0;
+      else if (currentRegime === 'FLASH_CRASH') baseBid = 26.0;
+      else if (pctChange > 0) baseBid = 56.0;
+      else baseBid = 44.0;
+
+      bidPct = Math.max(10, Math.min(90, baseBid + (z * 4)));
+      askPct = 100.0 - bidPct;
+
+      // Push candle
+      candles.push({
+        open: oldPrice,
+        high: high,
+        low: low,
+        close: currentPrice,
+        ema9: ema9,
+        ema21: ema21
+      });
+      if (candles.length > MAX_CANDLES) {
+        candles.shift();
+      }
+
+      // Update UI Tickers
+      updateTickerUI();
+      drawChart();
+      updateOrderBookUI();
+
+      // Execute AI Trading for all 5 models
+      evaluateAllModels();
+    }
+
+    function updateTickerUI() {
+      const priceEl = document.getElementById('marketPriceText');
+      const changeEl = document.getElementById('marketChangeBadge');
+      const prevPrice = parseFloat(priceEl.innerText.replace('$', '').replace(/,/g, '')) || currentPrice;
+
+      priceEl.innerText = '$' + currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (currentPrice > prevPrice) {
+        priceEl.classList.remove('price-flash-down');
+        priceEl.classList.add('price-flash-up');
+        setTimeout(() => priceEl.classList.remove('price-flash-up'), 400);
+      } else if (currentPrice < prevPrice) {
+        priceEl.classList.remove('price-flash-up');
+        priceEl.classList.add('price-flash-down');
+        setTimeout(() => priceEl.classList.remove('price-flash-down'), 400);
+      }
+
+      const totalReturnPct = ((currentPrice - 65000) / 65000) * 100;
+      changeEl.innerText = (totalReturnPct >= 0 ? '+' : '') + totalReturnPct.toFixed(2) + '%';
+      if (totalReturnPct >= 0) {
+        changeEl.className = 'text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800';
+      } else {
+        changeEl.className = 'text-xs font-mono font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800';
+      }
+
+      document.getElementById('regimeText').innerText = currentRegime.replace('_', ' ');
+      document.getElementById('valEma9').innerText = '$' + ema9.toFixed(1);
+      document.getElementById('valEma21').innerText = '$' + ema21.toFixed(1);
+      document.getElementById('valRsi').innerText = rsi.toFixed(1);
+
+      document.getElementById('rsiBarText').innerText = rsi.toFixed(1) + (rsi > 70 ? ' (Jenuh Beli)' : (rsi < 30 ? ' (Jenuh Jual)' : ' (Netral)'));
+      document.getElementById('rsiBarFill').style.width = rsi.toFixed(1) + '%';
+
+      document.getElementById('imbalanceBidText').innerText = bidPct.toFixed(0) + '%';
+      document.getElementById('imbalanceAskText').innerText = askPct.toFixed(0) + '%';
+      document.getElementById('barBidImbalance').style.width = bidPct.toFixed(0) + '%';
+      document.getElementById('barAskImbalance').style.width = askPct.toFixed(0) + '%';
+
+      document.getElementById('spreadText').innerText = '$' + spread.toFixed(2);
+      document.getElementById('ladderMidPrice').innerText = '$' + currentPrice.toFixed(2);
+      document.getElementById('ladderDirection').innerText = currentPrice >= oldPrice ? '▲' : '▼';
+      document.getElementById('ladderDirection').className = currentPrice >= oldPrice ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+    }
+
+    function updateOrderBookUI() {
+      const asksContainer = document.getElementById('orderBookAsks');
+      const bidsContainer = document.getElementById('orderBookBids');
+      let asksHtml = '';
+      let bidsHtml = '';
+
+      for (let i = 4; i >= 1; i--) {
+        const askP = currentPrice + (i * spread * 2.2);
+        const askVol = (0.35 + Math.random() * 1.8 * (askPct / 50)).toFixed(3);
+        const widthPct = Math.min(100, askVol * 35);
+        asksHtml += `
+          <div class="relative flex justify-between py-0.5 px-2 rounded ladder-bar-ask">
+            <span class="text-rose-400 font-bold">${askP.toFixed(2)}</span>
+            <span class="text-slate-300">${askVol}</span>
+            <span class="text-slate-500">${(askP * askVol).toFixed(0)}</span>
+          </div>
+        `;
+      }
+
+      for (let i = 1; i <= 4; i++) {
+        const bidP = currentPrice - (i * spread * 2.2);
+        const bidVol = (0.35 + Math.random() * 1.8 * (bidPct / 50)).toFixed(3);
+        const widthPct = Math.min(100, bidVol * 35);
+        bidsHtml += `
+          <div class="relative flex justify-between py-0.5 px-2 rounded ladder-bar-bid">
+            <span class="text-emerald-400 font-bold">${bidP.toFixed(2)}</span>
+            <span class="text-slate-300">${bidVol}</span>
+            <span class="text-slate-500">${(bidP * bidVol).toFixed(0)}</span>
+          </div>
+        `;
+      }
+
+      asksContainer.innerHTML = asksHtml;
+      bidsContainer.innerHTML = bidsHtml;
+    }
+
+    // AI Execution Logic for All 5 Models
+    function evaluateAllModels() {
+      const modelKeys = ['laya', 'openjev', 'jev', 'kev', 'sahabatai'];
+
+      modelKeys.forEach(m => {
+        const p = portfolios[m];
+        const hasPos = p.posQty > 0.0001;
+        let action = 'HOLD';
+
+        // High-Frequency Scalper Rules
+        if (ema9 > ema21 && rsi < 68 && bidPct > 54 && !hasPos) {
+          action = 'BUY';
+        } else if (rsi < 28 && bidPct > 48 && !hasPos) {
+          action = 'BUY';
+        } else if ((ema9 < ema21 || rsi > 74 || currentRegime === 'FLASH_CRASH') && hasPos) {
+          action = 'SELL';
+        } else if (hasPos && ((currentPrice - p.avgPrice) * p.posQty > (p.cash * 0.045))) {
+          action = 'SELL'; // Take Profit
+        } else if (hasPos && ((currentPrice - p.avgPrice) * p.posQty < -(p.cash * 0.025))) {
+          action = 'SELL'; // Stop Loss
+        }
+
+        // Apply realistic slippage penalty based on latency:
+        // Laya (55ms) -> 0.01%
+        // Sahabat-AI (2500ms) -> 0.45% - 1.2%
+        const latRatio = Math.max(1.0, p.latencyMs / 50.0);
+        const slippagePct = Math.min(0.035, 0.00025 * Math.sqrt(latRatio));
+
+        if (action === 'BUY') {
+          const fillPrice = currentPrice * (1.0 + slippagePct);
+          const allocCash = p.cash * 0.40;
+          if (allocCash > 100) {
+            const qty = allocCash / fillPrice;
+            const newTotalQty = p.posQty + qty;
+            p.avgPrice = ((p.posQty * p.avgPrice) + (qty * fillPrice)) / newTotalQty;
+            p.posQty = newTotalQty;
+            p.cash -= allocCash;
+            p.trades++;
+            p.tokens += p.tokenCost;
+            p.lastAct = `BUY @ $${fillPrice.toFixed(1)}`;
+
+            totalArenaTradesCount++;
+            addTradeFeedRow(p.name, 'BUY', fillPrice, slippagePct, 0, p.tokenCost);
+            if (m === 'laya') {
+              playBuySound();
+              showSignalBanner(`▲ LAYA: BUY ORDER FILLED @ $${fillPrice.toFixed(2)} (Slippage: ${(slippagePct * 100).toFixed(2)}%)`);
+            }
+          }
+        } else if (action === 'SELL' && hasPos) {
+          const fillPrice = currentPrice * (1.0 - slippagePct);
+          const proceeds = p.posQty * fillPrice;
+          const tradePnl = (fillPrice - p.avgPrice) * p.posQty;
+          p.cash += proceeds;
+          p.realizedPnl += tradePnl;
+          p.trades++;
+          p.tokens += p.tokenCost;
+          if (tradePnl > 0) p.winTrades++;
+          p.lastAct = `SELL @ $${fillPrice.toFixed(1)} (${tradePnl >= 0 ? '+' : ''}$${tradePnl.toFixed(1)})`;
+
+          totalArenaTradesCount++;
+          addTradeFeedRow(p.name, 'SELL', fillPrice, slippagePct, tradePnl, p.tokenCost);
+          if (m === 'laya') playSellSound(tradePnl > 0);
+
+          p.posQty = 0.0;
+          p.avgPrice = 0.0;
+        }
+
+        // Equity update
+        const eq = p.cash + (p.posQty * currentPrice);
+        if (eq > p.peakEq) p.peakEq = eq;
+        const dd = ((p.peakEq - eq) / p.peakEq) * 100;
+        if (dd > p.maxDd) p.maxDd = dd;
+
+        updatePortfolioCardUI(m);
+      });
+
+      document.getElementById('totalArenaTrades').innerText = totalArenaTradesCount;
+    }
+
+    function updatePortfolioCardUI(m) {
+      const p = portfolios[m];
+      const eq = p.cash + (p.posQty * currentPrice);
+      const totalPnl = eq - INITIAL_CASH;
+      const roiPct = (totalPnl / INITIAL_CASH) * 100;
+      const wr = p.trades > 0 ? ((p.winTrades / p.trades) * 100).toFixed(1) : '0.0';
+
+      const eqEl = document.getElementById('eq-' + m);
+      const pnlEl = document.getElementById('pnl-' + m);
+      const cashEl = document.getElementById('cash-' + m);
+      const posEl = document.getElementById('pos-' + m);
+      const wrEl = document.getElementById('wr-' + m);
+      const ddEl = document.getElementById('dd-' + m);
+      const actPill = document.getElementById('act-pill-' + m);
+
+      if (eqEl) eqEl.innerText = '$' + eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (pnlEl) {
+        pnlEl.innerText = `${totalPnl >= 0 ? '+' : ''}$${totalPnl.toFixed(2)} (${roiPct.toFixed(2)}%)`;
+        pnlEl.className = totalPnl >= 0 ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+      }
+      if (cashEl) cashEl.innerText = '$' + p.cash.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (posEl) posEl.innerText = p.posQty > 0.0001 ? `${p.posQty.toFixed(4)} BTC` : 'FLAT';
+      if (wrEl) wrEl.innerText = `${wr}% (${p.trades} trade)`;
+      if (ddEl) ddEl.innerText = p.maxDd.toFixed(2) + '%';
+      if (m === 'sahabatai') {
+        const tokEl = document.getElementById('tok-sahabatai');
+        if (tokEl) tokEl.innerText = p.tokens.toLocaleString() + ' tokens terbuang';
+      }
+
+      if (actPill) {
+        actPill.innerText = p.lastAct;
+        if (p.lastAct.startsWith('BUY')) {
+          actPill.className = 'p-2 rounded-lg bg-emerald-950/80 border border-emerald-700 text-center font-mono text-xs font-bold text-emerald-300';
+        } else if (p.lastAct.startsWith('SELL')) {
+          actPill.className = 'p-2 rounded-lg bg-rose-950/80 border border-rose-700 text-center font-mono text-xs font-bold text-rose-300';
+        } else {
+          actPill.className = 'p-2 rounded-lg bg-slate-900 border border-slate-800 text-center font-mono text-xs font-bold text-slate-400';
+        }
+      }
+    }
+
+    function addTradeFeedRow(modelName, type, price, slippage, pnl, tokens) {
+      const tbody = document.getElementById('tradeFeedBody');
+      const timeStr = new Date().toLocaleTimeString('id-ID');
+      const typeBadge = type === 'BUY' ? 
+        '<span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">BUY</span>' : 
+        '<span class="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">SELL</span>';
+
+      const pnlText = type === 'SELL' ? 
+        `<span class="${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span>` : 
+        '<span class="text-slate-500">-</span>';
+
+      const rowHtml = `
+        <tr class="hover:bg-slate-900/60 transition">
+          <td class="py-1.5 text-slate-400">${timeStr}</td>
+          <td class="py-1.5 font-bold text-slate-200">${modelName}</td>
+          <td class="py-1.5">${typeBadge}</td>
+          <td class="py-1.5 font-bold text-white">$${price.toFixed(2)}</td>
+          <td class="py-1.5 text-amber-300">${(slippage * 100).toFixed(2)}%</td>
+          <td class="py-1.5">${pnlText}</td>
+          <td class="py-1.5 ${tokens > 0 ? 'text-rose-400 font-bold' : 'text-slate-500'}">${tokens}</td>
+        </tr>
+      `;
+
+      if (tbody.children.length === 1 && tbody.children[0].innerText.includes('Belum ada')) {
+        tbody.innerHTML = '';
+      }
+      tbody.insertAdjacentHTML('afterbegin', rowHtml);
+      if (tbody.children.length > 25) {
+        tbody.removeChild(tbody.lastChild);
+      }
+    }
+
+    function showSignalBanner(text) {
+      const banner = document.getElementById('chartOverlaySignal');
+      banner.innerText = text;
+      banner.classList.remove('hidden');
+      setTimeout(() => banner.classList.add('hidden'), 2500);
+    }
+
+    function toggleSimulation() {
+      isRunning = !isRunning;
+      const btn = document.getElementById('btnToggleSim');
+      const icon = document.getElementById('btnSimIcon');
+      const txt = document.getElementById('btnSimText');
+
+      if (isRunning) {
+        simInterval = setInterval(stepMarket, tickSpeedMs);
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition shadow-lg shadow-amber-600/30 flex items-center gap-1.5';
+        icon.innerText = '⏸️';
+        txt.innerText = 'Jeda Trading';
+      } else {
+        clearInterval(simInterval);
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5';
+        icon.innerText = '▶️';
+        txt.innerText = 'Lanjutkan Trading';
+      }
+    }
+
+    function setSimSpeed(ms, label) {
+      tickSpeedMs = ms;
+      document.querySelectorAll('.spd-btn').forEach(b => {
+        b.classList.remove('active', 'bg-slate-800', 'text-white');
+        b.classList.add('text-slate-400');
+      });
+      const activeBtn = document.getElementById('spd-' + label);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-400');
+        activeBtn.classList.add('active', 'bg-slate-800', 'text-white');
+      }
+      if (isRunning) {
+        clearInterval(simInterval);
+        simInterval = setInterval(stepMarket, tickSpeedMs);
+      }
+    }
+
+    function changeRegimeManual(regime) {
+      currentRegime = regime;
+      regimeTicksLeft = 50;
+      updateTickerUI();
+    }
+
+    function resetSimulation() {
+      if (isRunning) toggleSimulation();
+      currentPrice = 65000.0;
+      oldPrice = 65000.0;
+      ema9 = 65000.0;
+      ema21 = 65000.0;
+      rsi = 50.0;
+      gains = [];
+      losses = [];
+      candles = [];
+      totalArenaTradesCount = 0;
+
+      for (let i = 0; i < 25; i++) {
+        const p = 64800 + (Math.sin(i * 0.4) * 150) + (Math.random() * 40);
+        candles.push({
+          open: p - 10,
+          high: p + 25,
+          low: p - 20,
+          close: p,
+          ema9: p,
+          ema21: p
+        });
+      }
+
+      Object.keys(portfolios).forEach(m => {
+        const p = portfolios[m];
+        p.cash = INITIAL_CASH;
+        p.posQty = 0.0;
+        p.avgPrice = 0.0;
+        p.realizedPnl = 0.0;
+        p.trades = 0;
+        p.winTrades = 0;
+        p.tokens = 0;
+        p.peakEq = INITIAL_CASH;
+        p.maxDd = 0.0;
+        p.lastAct = 'HOLD';
+        updatePortfolioCardUI(m);
+      });
+
+      document.getElementById('tradeFeedBody').innerHTML = `
+        <tr>
+          <td colspan="7" class="py-4 text-center text-slate-500 italic">
+            Saldo telah direset ke $10,000 USD. Klik "Mulai Trading Otomatis" untuk memulai simulasi.
+          </td>
+        </tr>
+      `;
+      document.getElementById('totalArenaTrades').innerText = '0';
+      updateTickerUI();
+      drawChart();
+      updateOrderBookUI();
+    }
+
+    // Initial render
+    updateTickerUI();
+    drawChart();
+    updateOrderBookUI();
+    Object.keys(portfolios).forEach(updatePortfolioCardUI);
+  </script>
+</body>
+</html>

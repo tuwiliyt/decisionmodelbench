@@ -22,12 +22,13 @@ Repository ini menyajikan pembuktian empiris, baik melalui **Antarmuka Web Inter
 2. [🔄 Perbandingan Alur Eksekusi Kueri](#-perbandingan-alur-eksekusi-kueri)
 3. [📊 Hasil Uji Empiris Nyata (Benchmark Empiric Proof)](#-hasil-uji-empiris-nyata-benchmark-empiric-proof)
 4. [📈 Matriks Komparasi Seluruh Spektrum Model](#-matriks-komparasi-seluruh-spektrum-model)
-5. [🎮 Arena Brick Breaker / Breakout AI (Adu Refleks Paralel)](#-arena-brick-breaker--breakout-ai-adu-refleks-paralel)
-6. [🖥️ Tutorial Uji Perbandingan Headless (CLI Terminal)](#️-tutorial-uji-perbandingan-headless-cli-terminal)
-7. [🌐 Tutorial Web Dashboard & Live Monitor GPU (nvtop Style)](#-tutorial-web-dashboard--live-monitor-gpu-nvtop-style)
-8. [🚀 Panduan Instalasi Lengkap dari Server Kosong](#-panduan-instalasi-lengkap-dari-server-kosong)
-9. [📦 Katalog Model & Spesifikasi Hardware](#-katalog-model--spesifikasi-hardware)
-10. [📁 Struktur File Repository](#-struktur-file-repository)
+5. [⚡ Arena Trading Cepat AI (High-Frequency Trading & Saldo Dummy $10k)](#-arena-trading-cepat-ai-high-frequency-trading--saldo-dummy-10k)
+6. [🎮 Arena Brick Breaker / Breakout AI (Adu Refleks Paralel)](#-arena-brick-breaker--breakout-ai-adu-refleks-paralel)
+7. [🖥️ Tutorial Uji Perbandingan Headless (CLI Terminal)](#️-tutorial-uji-perbandingan-headless-cli-terminal)
+8. [🌐 Tutorial Web Dashboard & Live Monitor GPU (nvtop Style)](#-tutorial-web-dashboard--live-monitor-gpu-nvtop-style)
+9. [🚀 Panduan Instalasi Lengkap dari Server Kosong](#-panduan-instalasi-lengkap-dari-server-kosong)
+10. [📦 Katalog Model & Spesifikasi Hardware](#-katalog-model--spesifikasi-hardware)
+11. [📁 Struktur File Repository](#-struktur-file-repository)
 
 ---
 
@@ -112,6 +113,46 @@ Pengujian nyata end-to-end pada cluster **2x NVIDIA Tesla T4 GPU** membandingkan
 | **Penghematan Token** | 0% (Boros Kuota) | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** |
 | **Overhead VRAM GPU** | 0 MB (Hanya LLM) | ~950 MB | **0 MB (Offloaded Cloud)** | ~1,100 MB | ~1,600 MB | Membutuhkan >=16GB |
 | **Throughput Concurrency**| ~0.2 – 0.3 req/s | **~15 – 20 req/s** | **~50+ req/s (Cloud)** | ~5 – 8 req/s | ~1 req/s | N/A |
+
+---
+
+## ⚡ Arena Trading Cepat AI (High-Frequency Trading & Saldo Dummy $10k)
+
+Untuk memvalidasi keunggulan Decision Model pada sektor finansial kuantitatif (*algorithmic scalping / high-frequency execution*), platform menyediakan **Arena Simulasi Trading Cepat Real-Time** dengan modal saldo dummy **$10,000 USD** (Rp 150.000.000) per model:
+
+1. 🟢 **Laya Multilingual (421M ModernBERT CUDA):** Scalper ultra-refleks **~55 ms (18.2 Hz)**, 0 tokens, 0% slippage.
+2. 🔵 **OpenJev (0.5B Qwen 2.5 Logit Scorer GPU 1):** Momentum trader **~210 ms (4.8 Hz)**, 0 tokens.
+3. 🟣 **TypeSafe Jev (Cloud SaaS Decision Model):** Cloud algorithmic trader **~160 ms (6.2 Hz)**, 0 tokens.
+4. 🟡 **Kev-0.8B (Local LoRA Ensemble CUDA):** Trend follower **~950 ms (1.1 Hz)**, 0 tokens.
+5. 🔴 **Heavyweight LLM (Sahabat-AI 8B Instruct):** Keterlambatan fatal (*Decision Lag*) **~2,500 ms (0.4 Hz)**, pembakaran ~32 token per order, dan penalti *slippage* parah.
+
+### Mengapa Decision Model Menang Mutlak di Trading Cepat?
+* **Hukum Fisika Pasar (Order Execution Window):** Sinyal teknikal (misal: *Golden Cross*, *Order Book Imbalance 74% Bid*) hanya bertahan beberapa ratus milidetik sebelum harga bergeser.
+* **Refleks Sub-100ms:** Laya dan Decision Model mengeksekusi order instan dengan selisih harga nol (*Zero Slippage*).
+* **Bencana Keterlambatan LLM 2.5 Detik:** LLM membutuhkan ~2.5 detik untuk menghasilkan kalimat rekomendasi. Pada saat order tiba di pasar, harga telah naik/turun signifikan sehingga model selalu membeli di pucuk (*fomo*) atau cut-loss terlambat di dasar jurang.
+* **Efisiensi Nol Biaya Token:** 10 tick per detik = 36.000 eksekusi per jam. Decision Model berbiaya **0 token ($0)**, sementara LLM murni membakar ratusan ribu token dalam hitungan menit.
+
+---
+
+### Cara Menjalankan Arena Trading Cepat:
+
+#### 1. Mode Web Interaktif (K-Line Candlestick & Order Book Ladder)
+Buka di browser saat server aktif:
+* **URL Langsung:** `http://localhost:7860/trading` atau `http://localhost:7860/fast_trading`
+* **Tab Mode 7 Dashboard:** Kunjungi `http://localhost:7860/` lalu pilih tab `[📈 Mode 7: Fast Trading AI]`
+* **Fitur:** Grafik K-Line Candlestick 1-detik, moving averages EMA(9) dan EMA(21), RSI(14) oscillator, Order Book Depth Ladder (L2 Bids & Asks), kartu portofolio 5 model live side-by-side, selector regime pasar (*Bull Run*, *Flash Crash*, *Sideways Chop*, *Whipsaw*), slider kecepatan (*1x*, *3x*, *10x Turbo HFT*), dan efek suara retro (*Audio SFX*).
+
+#### 2. Mode Terminal Headless CLI (Rich Live Ticker & Portfolio Ladder)
+```bash
+# Jalankan simulasi trading 60 ticks (default)
+python3 play_fast_trading.py
+
+# Simulasi cepat 30 ticks dengan mode market crash
+python3 play_fast_trading.py --ticks 30 --speed fast --regime FLASH_CRASH
+
+# Uji satu probe API trading live ke backend FastAPI server
+python3 play_fast_trading.py --api
+```
 
 ---
 
@@ -299,6 +340,9 @@ decisionmodelbench/
 ├── heavyweight_llm_dashboard.html    # Antarmuka web utama: Arena Komparasi & Dual-GPU nvtop
 ├── brick_breaker_arena.html          # Web Arena Retro Arcade 5-kanvas simulasi paralel
 ├── play_brick_breaker.py             # CLI Terminal Rich ASCII Brick Breaker 5-model paralel
+├── trading_engine.py                 # Core HFT Trading Engine, Latency Slippage, & Portfolio Tracker
+├── fast_trading_arena.html           # Web Arena Simulasi Trading Cepat K-Line Candlestick & Order Book
+├── play_fast_trading.py              # CLI Terminal Rich ASCII Trading Ticker & P&L Arena
 ├── generate_dashboard.py             # Generator antarmuka web playground kelas ringan (HTML)
 ├── benchmark_dashboard.html          # Antarmuka web playground single-question (System 1)
 ├── test_jev.py                       # Skrip uji konektivitas TypeSafe Jev API

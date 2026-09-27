@@ -28,6 +28,9 @@ from kev.serve import Server
 from openjev_engine import OpenJevScorer
 from sahabatai_engine import SahabatAIEngine
 from heavyweight_llm_engine import HeavyweightLLMManager, MODELS_CATALOG
+from trading_engine import TradingArena, MarketTick
+
+global_trading_arena = TradingArena(initial_cash=10000.0)
 
 def load_jev_api_key():
     key = os.environ.get("JEV_API_KEY", "").strip()
@@ -939,6 +942,42 @@ def breakout_decision(payload: BreakoutDecisionPayload):
         "latency_ms": lat_ms,
         "tokens_generated": tokens_used
     }
+
+# =====================================================================
+# FAST TRADING AI ARENA API & WEB ROUTES ($10,000 DUMMY BALANCE)
+# =====================================================================
+
+@app.get("/api/trading/tick")
+def get_trading_tick():
+    tick = global_trading_arena.market.step()
+    ports_summary = {
+        m: p.to_dict(tick.price) for m, p in global_trading_arena.portfolios.items()
+    }
+    return {
+        "tick": tick.to_dict(),
+        "portfolios": ports_summary
+    }
+
+@app.post("/api/trading/reset")
+def reset_trading_arena():
+    global_trading_arena.reset()
+    return {"status": "success", "message": "Trading Arena portfolio balances reset to $10,000.00 USD"}
+
+@app.post("/api/trading/regime")
+def set_trading_regime(payload: Dict[str, Any]):
+    regime = payload.get("regime", "NORMAL")
+    duration = int(payload.get("duration", 50))
+    global_trading_arena.market.set_regime(regime, duration=duration)
+    return {"status": "success", "regime": regime}
+
+@app.get("/trading")
+@app.get("/fast_trading")
+def serve_fast_trading_arena():
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    arena_path = os.path.join(_dir, "fast_trading_arena.html")
+    if os.path.exists(arena_path):
+        return FileResponse(arena_path)
+    return HTMLResponse("<h1>Fast Trading Arena HTML not found</h1>")
 
 @app.get("/brick_breaker")
 @app.get("/breakout")
