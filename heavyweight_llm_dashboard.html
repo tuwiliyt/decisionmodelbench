@@ -78,11 +78,14 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <a href="/trading" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-600 text-white hover:from-emerald-400 hover:to-cyan-500 transition shadow-lg shadow-emerald-500/20 border border-emerald-400/30 flex items-center gap-1.5">
-          <span>⚡</span> Trading AI ($10k Dummy)
+        <a href="/air_defense" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-rose-600 to-amber-600 text-white hover:from-rose-500 hover:to-amber-500 transition shadow-lg shadow-rose-500/20 border border-rose-400/30 flex items-center gap-1.5">
+          <span>🛡️</span> Air Defense (Iron Dome)
+        </a>
+        <a href="/trading" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1.5">
+          <span>⚡</span> Trading AI
         </a>
         <a href="/breakout" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1.5">
-          <span>🎮</span> Breakout Arcade
+          <span>🎮</span> Breakout
         </a>
         <a href="/playground" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700">
           ⚡ Playground
@@ -363,6 +366,9 @@
       </button>
       <button onclick="switchTab('tab-trading')" id="btn-tab-trading" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:text-white transition flex items-center gap-2">
         <span>📈</span> Mode 7: Fast Trading AI (Saldo Dummy $10k)
+      </button>
+      <button onclick="switchTab('tab-airdefense')" id="btn-tab-airdefense" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:text-white transition flex items-center gap-2">
+        <span>🛡️</span> Mode 8: Air Defense Iron Dome (5 Kota)
       </button>
     </div>
 
@@ -1431,6 +1437,31 @@
 
         <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-950" style="height: 880px;">
           <iframe src="/trading" class="w-full h-full border-0" title="Fast Trading Parallel Arena"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 8: AIR DEFENSE IRON DOME (5 CITIES PARALLEL) -->
+    <div id="tab-airdefense" class="tab-content hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>🛡️</span> Arena Air Defense AI: Iron Dome Pertahanan Udara 5 Kota Paralel
+            </h3>
+            <p class="text-xs text-slate-400">
+              Uji ketahanan milidetik menembak rudal & meteorit menukik vs perlindungan pesawat komersil sipil dengan eskalasi gelombang & rekap SITREP berkala
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="/air_defense" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition flex items-center gap-1.5 shadow">
+              <span>⛶</span> Buka di Tab Baru (Layar Penuh)
+            </a>
+          </div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-950" style="height: 880px;">
+          <iframe src="/air_defense" class="w-full h-full border-0" title="Air Defense Tactical Arena"></iframe>
         </div>
       </div>
     </div>

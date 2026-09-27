@@ -29,8 +29,10 @@ from openjev_engine import OpenJevScorer
 from sahabatai_engine import SahabatAIEngine
 from heavyweight_llm_engine import HeavyweightLLMManager, MODELS_CATALOG
 from trading_engine import TradingArena, MarketTick
+from air_defense_engine import AirDefenseArena
 
 global_trading_arena = TradingArena(initial_cash=10000.0)
+global_air_defense_arena = AirDefenseArena()
 
 def load_jev_api_key():
     key = os.environ.get("JEV_API_KEY", "").strip()
@@ -978,6 +980,35 @@ def serve_fast_trading_arena():
     if os.path.exists(arena_path):
         return FileResponse(arena_path)
     return HTMLResponse("<h1>Fast Trading Arena HTML not found</h1>")
+
+# =====================================================================
+# AIR DEFENSE TACTICAL AI ARENA (IRON DOME 5 CITIES PARALLEL)
+# =====================================================================
+
+@app.get("/api/air_defense/tick")
+def get_air_defense_tick():
+    return global_air_defense_arena.step()
+
+@app.post("/api/air_defense/reset")
+def reset_air_defense_arena():
+    global_air_defense_arena.reset()
+    return {"status": "success", "message": "Air Defense Arena reset to Wave 1"}
+
+@app.get("/api/air_defense/sitrep")
+def get_air_defense_sitrep():
+    return {
+        "current_sitrep": global_air_defense_arena.generate_sitrep(),
+        "history": global_air_defense_arena.sitrep_history
+    }
+
+@app.get("/air_defense")
+@app.get("/iron_dome")
+def serve_air_defense_arena():
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    arena_path = os.path.join(_dir, "air_defense_arena.html")
+    if os.path.exists(arena_path):
+        return FileResponse(arena_path)
+    return HTMLResponse("<h1>Air Defense Arena HTML not found</h1>")
 
 @app.get("/brick_breaker")
 @app.get("/breakout")

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ Arena Air Defense AI: Iron Dome Pertahanan Udara Paralel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #030712;
+      background-image: 
+        radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.07) 0px, transparent 60%),
+        radial-gradient(at 100% 100%, rgba(244, 63, 94, 0.05) 0px, transparent 60%);
+      background-attachment: fixed;
+    }
+    .glass-card {
+      background: rgba(10, 15, 30, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .radar-canvas {
+      background: radial-gradient(circle at 50% 100%, #06151f 0%, #02060d 100%);
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
+    }
+    .crt-scanlines {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.05); }
+    }
+    .alert-pulse {
+      animation: pulseAlert 1s infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased text-slate-200">
+
+  <!-- Header Section -->
+  <header class="border-b border-slate-800/80 sticky top-0 z-50 glass-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 via-amber-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-rose-500/20 font-bold text-white text-xl">
+          🛡️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-white via-rose-200 to-amber-400 bg-clip-text text-transparent">
+              Arena Air Defense AI: Iron Dome Milidetik (5 Kota Paralel)
+            </h1>
+            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              Sistem Taktis C-RAM
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Deteksi Rudal & Meteorit Menukik vs Perlindungan Pesawat Komersil Sipil • Tingkat Kesulitan Progresif</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="/trading" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1.5">
+          <span>⚡</span> Trading AI
+        </a>
+        <a href="/breakout" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1.5">
+          <span>🎮</span> Breakout
+        </a>
+        <a href="/" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:opacity-90 transition shadow-lg shadow-purple-500/20 flex items-center gap-1.5">
+          <span>🏛️</span> Dashboard
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tactical HUD & Controls -->
+  <div class="border-b border-slate-800/80 bg-slate-950/80 py-3.5 sticky top-20 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      <!-- Threat Status & Wave Tracker -->
+      <div class="flex items-center gap-4">
+        <div>
+          <span class="text-[10px] text-slate-400 uppercase font-mono font-bold">Status Pertahanan Udara</span>
+          <div class="flex items-center gap-2">
+            <span id="threatStatusBadge" class="text-sm font-mono font-black px-2.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 alert-pulse">
+              DEFCON 1: AIR RAID ACTIVE
+            </span>
+            <span id="waveBadge" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">
+              WAVE 1 (Recon & Infiltration)
+            </span>
+          </div>
+        </div>
+        <div class="h-8 w-px bg-slate-800 hidden sm:block"></div>
+        <div class="hidden sm:block">
+          <span class="text-[10px] text-slate-400 uppercase font-mono">Hitung Mundur Rekap SITREP</span>
+          <div class="w-36 bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800 mt-1">
+            <div id="sitrepCountdownBar" class="bg-gradient-to-r from-amber-500 to-rose-500 h-2.5 rounded-full transition-all duration-300" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls & Actions -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btnToggleDefense" onclick="toggleAirDefense()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition shadow-lg shadow-rose-600/30 flex items-center gap-1.5">
+          <span id="btnDefenseIcon">🚀</span>
+          <span id="btnDefenseText">Mulai Pertahanan Udara</span>
+        </button>
+        <button onclick="resetAirDefense()" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700 flex items-center gap-1">
+          <span>🔄</span> Reset
+        </button>
+        <button onclick="triggerImmediateSITREP()" class="px-3 py-2 rounded-xl text-xs font-bold bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 transition flex items-center gap-1">
+          <span>📊</span> Rekap Sekarang
+        </button>
+        <!-- Sound Toggle -->
+        <button onclick="toggleAudio()" id="btnAudio" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition text-xs">
+          🔊
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main Multi-City Sky Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Threat Legend Banner -->
+    <div class="glass-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+      <div class="flex items-center gap-2">
+        <span class="text-rose-400 font-bold">🔥 SASARAN ANCAMAN (WAJIB DITEMBAK):</span>
+        <span class="px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">🚀 Rudal Hipersonik</span>
+        <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">☄️ Meteorit Bahaya</span>
+        <span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">🛸 Drone Kamikaze</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-emerald-400 font-bold">🛡️ OBJEK AMAN (DILARANG DITEMBAK):</span>
+        <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">✈️ Pesawat Sipil (Garuda/Lion)</span>
+        <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">🦅 Kawanan Burung</span>
+      </div>
+    </div>
+
+    <!-- 5 Parallel Air Defense City Boards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+
+      <!-- CITY 1: JAKARTA - LAYA MULTILINGUAL (421M GPU) -->
+      <div class="glass-card rounded-2xl p-3 space-y-2 border border-emerald-500/40 relative flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-emerald-400 font-bold uppercase">Baterai Alpha • Jakarta</span>
+            <span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">~55 ms</span>
+          </div>
+          <div class="text-sm font-extrabold text-white">Laya (421M GPU)</div>
+          <div class="text-[10px] text-slate-400">Refleks Intercept 18.2 Hz • 0 Tokens</div>
+
+          <!-- City Dome Canvas -->
+          <div class="relative w-full h-[290px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-laya" class="w-full h-full"></canvas>
+          </div>
+
+          <!-- City Shield HP -->
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-laya" class="text-emerald-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-laya" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Ditangkis: <strong id="kill-laya" class="text-emerald-300 font-bold">0</strong></span>
+              <span>Lolos: <strong id="hit-laya" class="text-rose-400">0</strong></span>
+              <span>Sipil: <strong id="civ-laya" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-emerald-950/40 border border-emerald-800/50 text-center font-mono text-[10px] text-emerald-300">
+          Token: 0 | Pertahanan Optimal
+        </div>
+      </div>
+
+      <!-- CITY 2: SURABAYA - OPENJEV (0.5B GPU) -->
+      <div class="glass-card rounded-2xl p-3 space-y-2 border border-cyan-500/40 relative flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-cyan-400 font-bold uppercase">Baterai Bravo • Surabaya</span>
+            <span class="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold">~210 ms</span>
+          </div>
+          <div class="text-sm font-extrabold text-white">OpenJev (0.5B GPU)</div>
+          <div class="text-[10px] text-slate-400">Logit Scorer GPU 1 • 0 Tokens</div>
+
+          <div class="relative w-full h-[290px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-openjev" class="w-full h-full"></canvas>
+          </div>
+
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-openjev" class="text-cyan-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-openjev" class="bg-cyan-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Ditangkis: <strong id="kill-openjev" class="text-cyan-300 font-bold">0</strong></span>
+              <span>Lolos: <strong id="hit-openjev" class="text-rose-400">0</strong></span>
+              <span>Sipil: <strong id="civ-openjev" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-cyan-950/40 border border-cyan-800/50 text-center font-mono text-[10px] text-cyan-300">
+          Token: 0 | Pertahanan Stabil
+        </div>
+      </div>
+
+      <!-- CITY 3: BANDUNG - TYPESAFE JEV (CLOUD SAAS) -->
+      <div class="glass-card rounded-2xl p-3 space-y-2 border border-purple-500/40 relative flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-purple-400 font-bold uppercase">Baterai Charlie • Bandung</span>
+            <span class="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 font-bold">~160 ms</span>
+          </div>
+          <div class="text-sm font-extrabold text-white">TypeSafe Jev (Cloud)</div>
+          <div class="text-[10px] text-slate-400">Cloud Decision SaaS • 0 Tokens</div>
+
+          <div class="relative w-full h-[290px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-jev" class="w-full h-full"></canvas>
+          </div>
+
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-jev" class="text-purple-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-jev" class="bg-purple-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Ditangkis: <strong id="kill-jev" class="text-purple-300 font-bold">0</strong></span>
+              <span>Lolos: <strong id="hit-jev" class="text-rose-400">0</strong></span>
+              <span>Sipil: <strong id="civ-jev" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-purple-950/40 border border-purple-800/50 text-center font-mono text-[10px] text-purple-300">
+          Token: 0 | Offloaded ke Cloud
+        </div>
+      </div>
+
+      <!-- CITY 4: MEDAN - KEV-0.8B (LOCAL ENSEMBLE) -->
+      <div class="glass-card rounded-2xl p-3 space-y-2 border border-amber-500/40 relative flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-amber-400 font-bold uppercase">Baterai Delta • Medan</span>
+            <span class="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-bold">~950 ms</span>
+          </div>
+          <div class="text-sm font-extrabold text-white">Kev-0.8B (Local)</div>
+          <div class="text-[10px] text-slate-400">LoRA Ensemble Local • 0 Tokens</div>
+
+          <div class="relative w-full h-[290px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-kev" class="w-full h-full"></canvas>
+          </div>
+
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-kev" class="text-amber-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-kev" class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Ditangkis: <strong id="kill-kev" class="text-amber-300 font-bold">0</strong></span>
+              <span>Lolos: <strong id="hit-kev" class="text-rose-400">0</strong></span>
+              <span>Sipil: <strong id="civ-kev" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-center font-mono text-[10px] text-amber-300">
+          Token: 0 | Reaksi Sedang
+        </div>
+      </div>
+
+      <!-- CITY 5: NUSANTARA (IKN) - SAHABAT-AI 8B (HEAVYWEIGHT LLM) -->
+      <div class="glass-card rounded-2xl p-3 space-y-2 border border-rose-500/40 relative flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-rose-400 font-bold uppercase">Baterai Echo • Nusantara (IKN)</span>
+            <span class="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">~2,500 ms</span>
+          </div>
+          <div class="text-sm font-extrabold text-white">Sahabat-AI 8B (LLM)</div>
+          <div class="text-[10px] text-rose-300/80">Decision Lag 2.5s • Boros Token</div>
+
+          <div class="relative w-full h-[290px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-sahabatai" class="w-full h-full"></canvas>
+          </div>
+
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-sahabatai" class="text-rose-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-sahabatai" class="bg-rose-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Ditangkis: <strong id="kill-sahabatai" class="text-slate-300 font-bold">0</strong></span>
+              <span>Lolos: <strong id="hit-sahabatai" class="text-rose-400 font-bold">0</strong></span>
+              <span>Sipil: <strong id="civ-sahabatai" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-rose-950/40 border border-rose-800/50 text-center font-mono text-[10px] text-rose-300">
+          Token: <span id="tok-sahabatai">0</span> | Bahaya Kehancuran!
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PERIODIC SITREP RECAP SECTION (REKAP BERKALA SERANGAN & KERUSAKAN) -->
+    <div id="sitrepSection" class="glass-card rounded-2xl p-6 border border-amber-500/40 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-3 h-3 rounded-full bg-amber-400 animate-ping"></div>
+          <h2 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <span>📊</span> SITREP REKAP BERKALA: Hasil Pertahanan Udara Tiap Kota
+          </h2>
+        </div>
+        <span id="sitrepWaveLabel" class="text-xs font-mono font-bold px-3 py-1 rounded bg-amber-950 text-amber-300 border border-amber-800">
+          Laporan Rekap: Wave 1 Selesai
+        </span>
+      </div>
+
+      <!-- SITREP Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-mono text-xs">
+          <thead>
+            <tr class="text-slate-400 border-b border-slate-800 pb-2">
+              <th class="pb-2">Kota Pertahanan</th>
+              <th class="pb-2">Model AI</th>
+              <th class="pb-2">Latensi Reaksi</th>
+              <th class="pb-2 text-center">Integritas Kota</th>
+              <th class="pb-2 text-center">Rudal Ditangkis</th>
+              <th class="pb-2 text-center">Hantaman Kota (Lolos)</th>
+              <th class="pb-2 text-center">Pesawat Sipil Selamat</th>
+              <th class="pb-2 text-right">Token Terbuang</th>
+              <th class="pb-2 text-right">Status Kota</th>
+            </tr>
+          </thead>
+          <tbody id="sitrepTableBody" class="divide-y divide-slate-900 text-slate-300">
+            <!-- Dynamically populated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+        💡 <strong>Analisis Taktis:</strong> Karena rudal hipersonik memiliki waktu terbang kurang dari 3.5 detik, <strong>Decision Model (System 1: Laya ~55ms)</strong> berhasil meluncurkan interceptor jauh sebelum rudal mendekati tanah. Sebaliknya, <strong>Heavyweight LLM (System 2: Sahabat-AI ~2.5s)</strong> mengalami *Decision Lag*, menyebabkan interceptor baru meluncur saat rudal telah meledak di kota!
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Interactive JavaScript Air Defense Loop -->
+  <script>
+    // Audio Context for Air Raid SFX
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type, duration, gainVal = 0.05) {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playAirRaidSiren() {
+      playTone(440, 'sawtooth', 0.4, 0.06);
+      setTimeout(() => playTone(650, 'sawtooth', 0.4, 0.06), 250);
+    }
+
+    function playExplosionSound() {
+      playTone(120, 'square', 0.35, 0.08);
+      setTimeout(() => playTone(80, 'sawtooth', 0.5, 0.08), 50);
+    }
+
+    function playLaunchSound() {
+      playTone(700, 'sine', 0.15, 0.04);
+      setTimeout(() => playTone(1200, 'sine', 0.2, 0.04), 50);
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('btnAudio').innerText = audioEnabled ? '🔊' : '🔇';
+    }
+
+    // Simulation Engine State
+    let isRunning = false;
+    let simInterval = null;
+    let wave = 1;
+    let waveTick = 0;
+    const TICKS_PER_WAVE = 100;
+    let objCounter = 0;
+
+    // Cities State
+    const models = ['laya', 'openjev', 'jev', 'kev', 'sahabatai'];
+    const citiesData = {
+      'laya': { name: 'Jakarta', label: 'Laya (421M GPU)', latencyMs: 55, tokenCost: 0, hp: 100, kills: 0, hits: 0, civSafe: 0, tokens: 0, interceptors: [] },
+      'openjev': { name: 'Surabaya', label: 'OpenJev (0.5B GPU)', latencyMs: 210, tokenCost: 0, hp: 100, kills: 0, hits: 0, civSafe: 0, tokens: 0, interceptors: [] },
+      'jev': { name: 'Bandung', label: 'TypeSafe Jev (Cloud)', latencyMs: 160, tokenCost: 0, hp: 100, kills: 0, hits: 0, civSafe: 0, tokens: 0, interceptors: [] },
+      'kev': { name: 'Medan', label: 'Kev-0.8B (Local)', latencyMs: 950, tokenCost: 0, hp: 100, kills: 0, hits: 0, civSafe: 0, tokens: 0, interceptors: [] },
+      'sahabatai': { name: 'Nusantara (IKN)', label: 'Sahabat-AI 8B (LLM)', latencyMs: 2500, tokenCost: 36, hp: 100, kills: 0, hits: 0, civSafe: 0, tokens: 0, interceptors: [] }
+    };
+
+    let skyObjects = [];
+    let particleExplosions = [];
+
+    // Setup Canvases
+    const canvases = {};
+    const contexts = {};
+
+    models.forEach(m => {
+      const c = document.getElementById('canvas-' + m);
+      canvases[m] = c;
+      contexts[m] = c.getContext('2d');
+      c.width = 240;
+      c.height = 290;
+    });
+
+    // Spawn sky object
+    function spawnObject() {
+      objCounter++;
+      const speedMult = 1.0 + (wave - 1) * 0.25;
+      const hostileProb = Math.min(0.92, 0.60 + (wave - 1) * 0.08);
+      const isHostile = Math.random() < hostileProb;
+
+      const x = Math.random() * 180 + 30;
+      const y = -15;
+      const targetX = 120 + (Math.random() * 60 - 30);
+      const targetY = 275;
+
+      if (isHostile) {
+        const typeChoice = Math.random() < 0.6 ? 'MISSILE' : (Math.random() < 0.6 ? 'METEOR' : 'DRONE');
+        const speed = (Math.random() * 1.5 + 2.0) * speedMult;
+        const angle = Math.atan2(targetY - y, targetX - x);
+        const vx = speed * Math.cos(angle);
+        const vy = speed * Math.sin(angle);
+
+        return {
+          id: objCounter,
+          type: typeChoice,
+          isHostile: true,
+          x: x,
+          y: y,
+          vx: vx,
+          vy: vy,
+          targetX: targetX,
+          speed: speed,
+          destroyed: false,
+          impacted: false
+        };
+      } else {
+        const isAirliner = Math.random() < 0.7;
+        const typeChoice = isAirliner ? 'AIRLINER' : 'BIRD';
+        const vx = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 0.5 + 0.8);
+        const vy = Math.random() * 0.15 + 0.05;
+        const startX = vx > 0 ? 10 : 230;
+        const callsigns = ['GA-402', 'JT-610', 'QG-801', 'PK-LUV', 'SQ-77'];
+        const callsign = callsigns[Math.floor(Math.random() * callsigns.length)];
+
+        return {
+          id: objCounter,
+          type: typeChoice,
+          isHostile: false,
+          x: startX,
+          y: Math.random() * 70 + 40,
+          vx: vx,
+          vy: vy,
+          callsign: callsign,
+          destroyed: false,
+          impacted: false
+        };
+      }
+    }
+
+    // Main Engine Tick
+    function engineTick() {
+      waveTick++;
+
+      // Wave Escalation
+      if (waveTick >= TICKS_PER_WAVE) {
+        wave++;
+        waveTick = 0;
+        playAirRaidSiren();
+        updateSITREPReport();
+      }
+
+      // Update countdown bar
+      const pctLeft = ((TICKS_PER_WAVE - waveTick) / TICKS_PER_WAVE) * 100;
+      document.getElementById('sitrepCountdownBar').style.width = pctLeft + '%';
+      document.getElementById('waveBadge').innerText = `WAVE ${wave} (${getWaveName(wave)})`;
+
+      // Spawn rate increases with wave
+      const spawnRate = Math.max(3, Math.floor(14 - wave * 2));
+      if (waveTick % spawnRate === 0) {
+        skyObjects.push(spawnObject());
+      }
+
+      // Move sky objects
+      skyObjects.forEach(obj => {
+        if (obj.destroyed || obj.impacted) return;
+        obj.x += obj.vx;
+        obj.y += obj.vy;
+
+        if (obj.y >= 270) {
+          if (obj.isHostile) {
+            obj.impacted = true;
+            createExplosion(obj.x, 275, true);
+          } else {
+            obj.destroyed = true; // Escaped safely
+          }
+        }
+      });
+
+      // Update each city
+      models.forEach(m => {
+        const city = citiesData[m];
+
+        // Process AI fire interceptor
+        skyObjects.forEach(obj => {
+          if (obj.destroyed || obj.impacted) return;
+
+          if (obj.isHostile && !obj['assigned_' + m]) {
+            obj['assigned_' + m] = true;
+            city.tokens += city.tokenCost;
+            // Delay before interceptor is ready to launch
+            const delayTicks = Math.floor(city.latencyMs / 60);
+            city.interceptors.push({
+              x: 120,
+              y: 270,
+              targetId: obj.id,
+              delay: delayTicks,
+              speed: 7.5,
+              active: true
+            });
+            if (m === 'laya') playLaunchSound();
+          } else if (!obj.isHostile && obj.y > 230 && !obj['counted_civ_' + m]) {
+            obj['counted_civ_' + m] = true;
+            city.civSafe++;
+          }
+        });
+
+        // Move interceptors
+        city.interceptors.forEach(inc => {
+          if (!inc.active) return;
+          if (inc.delay > 0) {
+            inc.delay--;
+            return;
+          }
+
+          const target = skyObjects.find(o => o.id === inc.targetId);
+          if (!target || target.destroyed || target.impacted) {
+            inc.active = false;
+            return;
+          }
+
+          const dx = target.x - inc.x;
+          const dy = target.y - inc.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+
+          if (dist < 12) {
+            inc.active = false;
+            target.destroyed = true;
+            city.kills++;
+            createExplosion(target.x, target.y, false);
+            playExplosionSound();
+          } else {
+            inc.x += (dx / dist) * inc.speed;
+            inc.y += (dy / dist) * inc.speed;
+          }
+        });
+
+        // Damage city if hostile impacts
+        skyObjects.forEach(obj => {
+          if (obj.impacted && !obj['hit_applied_' + m]) {
+            obj['hit_applied_' + m] = true;
+            city.hits++;
+            city.hp = Math.max(0, city.hp - 18);
+          }
+        });
+
+        // Render Canvas
+        renderCityCanvas(m);
+        updateCityUI(m);
+      });
+
+      // Update particle explosions
+      updateParticles();
+
+      // Clean up dead objects
+      skyObjects = skyObjects.filter(o => !(o.destroyed && o.y > 320));
+    }
+
+    function getWaveName(w) {
+      if (w === 1) return 'Recon & Infiltration';
+      if (w === 2) return 'Tactical Escalation';
+      if (w === 3) return 'Supersonic Missile Salvo';
+      if (w === 4) return 'Saturation Hypersonic Swarm';
+      return 'CATACLYSMIC SATURATION BOMBARDMENT';
+    }
+
+    function createExplosion(x, y, isGround) {
+      for (let i = 0; i < 16; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 3 + 1;
+        particleExplosions.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          life: 1.0,
+          color: isGround ? '#f43f5e' : (Math.random() < 0.5 ? '#f59e0b' : '#38bdf8'),
+          size: Math.random() * 3 + 1.5
+        });
+      }
+    }
+
+    function updateParticles() {
+      particleExplosions.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.05;
+      });
+      particleExplosions = particleExplosions.filter(p => p.life > 0);
+    }
+
+    // Render 1 Canvas Board
+    function renderCityCanvas(m) {
+      const c = canvases[m];
+      const ctx = contexts[m];
+      const city = citiesData[m];
+      const W = c.width;
+      const H = c.height;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Radar scanline circle
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.15)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(120, 275, 80, Math.PI, 0);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(120, 275, 160, Math.PI, 0);
+      ctx.stroke();
+
+      // City Dome Shield at bottom
+      ctx.fillStyle = city.hp > 40 ? 'rgba(6, 182, 212, 0.15)' : 'rgba(244, 63, 94, 0.25)';
+      ctx.strokeStyle = city.hp > 40 ? '#06b6d4' : '#f43f5e';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(120, 275, 65, Math.PI, 0);
+      ctx.fill();
+      ctx.stroke();
+
+      // City buildings silhouettes
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(50, 260, 25, 25);
+      ctx.fillRect(80, 245, 30, 40);
+      ctx.fillRect(115, 235, 22, 50);
+      ctx.fillRect(142, 250, 28, 35);
+      ctx.fillRect(175, 262, 20, 23);
+
+      // Launcher Base
+      ctx.fillStyle = '#10b981';
+      ctx.fillRect(116, 270, 8, 10);
+
+      // Draw Sky Objects
+      skyObjects.forEach(obj => {
+        if (obj.destroyed || obj.impacted) return;
+
+        if (obj.type === 'MISSILE') {
+          // Red Missile with tail
+          ctx.strokeStyle = '#f43f5e';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(obj.x, obj.y);
+          ctx.lineTo(obj.x - obj.vx * 3, obj.y - obj.vy * 3);
+          ctx.stroke();
+          ctx.fillStyle = '#ffedd5';
+          ctx.fillRect(obj.x - 2, obj.y - 2, 4, 4);
+        } else if (obj.type === 'METEOR') {
+          // Orange Meteor with flame
+          ctx.fillStyle = '#f97316';
+          ctx.beginPath();
+          ctx.arc(obj.x, obj.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(251, 146, 60, 0.4)';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(obj.x, obj.y);
+          ctx.lineTo(obj.x - obj.vx * 4, obj.y - obj.vy * 4);
+          ctx.stroke();
+        } else if (obj.type === 'DRONE') {
+          // Cyan Drone
+          ctx.fillStyle = '#a855f7';
+          ctx.fillRect(obj.x - 3, obj.y - 3, 6, 6);
+        } else if (obj.type === 'AIRLINER') {
+          // Commercial airliner (Blue jet with callsign)
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(obj.x - 6, obj.y - 2, 12, 4);
+          ctx.fillRect(obj.x - 2, obj.y - 6, 4, 12);
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '8px JetBrains Mono';
+          ctx.fillText(obj.callsign, obj.x - 12, obj.y - 7);
+        } else if (obj.type === 'BIRD') {
+          // Green Bio bird
+          ctx.fillStyle = '#4ade80';
+          ctx.beginPath();
+          ctx.arc(obj.x, obj.y, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Draw Interceptors
+      city.interceptors.forEach(inc => {
+        if (!inc.active || inc.delay > 0) return;
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(inc.x, inc.y);
+        ctx.lineTo(inc.x, inc.y + 6);
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(inc.x - 1.5, inc.y - 1.5, 3, 3);
+      });
+
+      // Draw Explosions
+      particleExplosions.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        ctx.globalAlpha = 1.0;
+      });
+    }
+
+    function updateCityUI(m) {
+      const city = citiesData[m];
+      document.getElementById('hp-' + m).innerText = city.hp.toFixed(0) + '%';
+      document.getElementById('hp-bar-' + m).style.width = city.hp + '%';
+
+      if (city.hp < 40) {
+        document.getElementById('hp-bar-' + m).className = 'bg-rose-600 h-full rounded-full transition-all duration-300';
+      } else if (city.hp < 70) {
+        document.getElementById('hp-bar-' + m).className = 'bg-amber-500 h-full rounded-full transition-all duration-300';
+      }
+
+      document.getElementById('kill-' + m).innerText = city.kills;
+      document.getElementById('hit-' + m).innerText = city.hits;
+      document.getElementById('civ-' + m).innerText = city.civSafe;
+
+      if (m === 'sahabatai') {
+        document.getElementById('tok-sahabatai').innerText = city.tokens;
+      }
+    }
+
+    // Periodic SITREP Report Generator
+    function updateSITREPReport() {
+      const tbody = document.getElementById('sitrepTableBody');
+      document.getElementById('sitrepWaveLabel').innerText = `Laporan Rekap: Wave ${wave - 1} Selesai`;
+
+      let rows = '';
+      models.forEach(m => {
+        const c = citiesData[m];
+        const statusText = c.hp > 60 ? 
+          '<span class="text-emerald-400 font-bold">OPERASIONAL AMAN</span>' : 
+          (c.hp > 0 ? '<span class="text-amber-400 font-bold">RUSAK PARAH</span>' : '<span class="text-rose-500 font-bold">KOTA HANCUR</span>');
+
+        const hpColor = c.hp > 60 ? 'text-emerald-400' : (c.hp > 0 ? 'text-amber-400' : 'text-rose-500 font-bold');
+
+        rows += `
+          <tr class="hover:bg-slate-900/60 transition">
+            <td class="py-2 font-bold text-white">${c.name}</td>
+            <td class="py-2 text-slate-300">${c.label}</td>
+            <td class="py-2 text-cyan-400 font-mono">~${c.latencyMs} ms</td>
+            <td class="py-2 text-center font-bold ${hpColor}">${c.hp.toFixed(0)}%</td>
+            <td class="py-2 text-center text-emerald-400 font-bold">${c.kills} rudal</td>
+            <td class="py-2 text-center text-rose-400 font-bold">${c.hits} hantaman</td>
+            <td class="py-2 text-center text-cyan-300 font-bold">${c.civSafe} selamat</td>
+            <td class="py-2 text-right ${c.tokens > 0 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}">${c.tokens}</td>
+            <td class="py-2 text-right">${statusText}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = rows;
+    }
+
+    function toggleAirDefense() {
+      isRunning = !isRunning;
+      const btn = document.getElementById('btnToggleDefense');
+      const icon = document.getElementById('btnDefenseIcon');
+      const txt = document.getElementById('btnDefenseText');
+
+      if (isRunning) {
+        initAudio();
+        simInterval = setInterval(engineTick, 100);
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition shadow-lg shadow-amber-600/30 flex items-center gap-1.5';
+        icon.innerText = '⏸️';
+        txt.innerText = 'Jeda Pertahanan';
+        playAirRaidSiren();
+      } else {
+        clearInterval(simInterval);
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition shadow-lg shadow-rose-600/30 flex items-center gap-1.5';
+        icon.innerText = '🚀';
+        txt.innerText = 'Lanjutkan Pertahanan';
+      }
+    }
+
+    function resetAirDefense() {
+      if (isRunning) toggleAirDefense();
+      wave = 1;
+      waveTick = 0;
+      objCounter = 0;
+      skyObjects = [];
+      particleExplosions = [];
+
+      models.forEach(m => {
+        const c = citiesData[m];
+        c.hp = 100;
+        c.kills = 0;
+        c.hits = 0;
+        c.civSafe = 0;
+        c.tokens = 0;
+        c.interceptors = [];
+        updateCityUI(m);
+        renderCityCanvas(m);
+      });
+
+      document.getElementById('waveBadge').innerText = 'WAVE 1 (Recon & Infiltration)';
+      document.getElementById('sitrepCountdownBar').style.width = '100%';
+      updateSITREPReport();
+    }
+
+    function triggerImmediateSITREP() {
+      updateSITREPReport();
+      const el = document.getElementById('sitrepSection');
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Initial render
+    models.forEach(m => {
+      renderCityCanvas(m);
+      updateCityUI(m);
+    });
+    updateSITREPReport();
+  </script>
+</body>
+</html>

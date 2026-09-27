@@ -22,13 +22,14 @@ Repository ini menyajikan pembuktian empiris, baik melalui **Antarmuka Web Inter
 2. [🔄 Perbandingan Alur Eksekusi Kueri](#-perbandingan-alur-eksekusi-kueri)
 3. [📊 Hasil Uji Empiris Nyata (Benchmark Empiric Proof)](#-hasil-uji-empiris-nyata-benchmark-empiric-proof)
 4. [📈 Matriks Komparasi Seluruh Spektrum Model](#-matriks-komparasi-seluruh-spektrum-model)
-5. [⚡ Arena Trading Cepat AI (High-Frequency Trading & Saldo Dummy $10k)](#-arena-trading-cepat-ai-high-frequency-trading--saldo-dummy-10k)
-6. [🎮 Arena Brick Breaker / Breakout AI (Adu Refleks Paralel)](#-arena-brick-breaker--breakout-ai-adu-refleks-paralel)
-7. [🖥️ Tutorial Uji Perbandingan Headless (CLI Terminal)](#️-tutorial-uji-perbandingan-headless-cli-terminal)
-8. [🌐 Tutorial Web Dashboard & Live Monitor GPU (nvtop Style)](#-tutorial-web-dashboard--live-monitor-gpu-nvtop-style)
-9. [🚀 Panduan Instalasi Lengkap dari Server Kosong](#-panduan-instalasi-lengkap-dari-server-kosong)
-10. [📦 Katalog Model & Spesifikasi Hardware](#-katalog-model--spesifikasi-hardware)
-11. [📁 Struktur File Repository](#-struktur-file-repository)
+5. [🛡️ Arena Air Defense AI (Iron Dome Pertahanan Udara 5 Kota Paralel)](#-arena-air-defense-ai-iron-dome-pertahanan-udara-5-kota-paralel)
+6. [⚡ Arena Trading Cepat AI (High-Frequency Trading & Saldo Dummy $10k)](#-arena-trading-cepat-ai-high-frequency-trading--saldo-dummy-10k)
+7. [🎮 Arena Brick Breaker / Breakout AI (Adu Refleks Paralel)](#-arena-brick-breaker--breakout-ai-adu-refleks-paralel)
+8. [🖥️ Tutorial Uji Perbandingan Headless (CLI Terminal)](#️-tutorial-uji-perbandingan-headless-cli-terminal)
+9. [🌐 Tutorial Web Dashboard & Live Monitor GPU (nvtop Style)](#-tutorial-web-dashboard--live-monitor-gpu-nvtop-style)
+10. [🚀 Panduan Instalasi Lengkap dari Server Kosong](#-panduan-instalasi-lengkap-dari-server-kosong)
+11. [📦 Katalog Model & Spesifikasi Hardware](#-katalog-model--spesifikasi-hardware)
+12. [📁 Struktur File Repository](#-struktur-file-repository)
 
 ---
 
@@ -113,6 +114,55 @@ Pengujian nyata end-to-end pada cluster **2x NVIDIA Tesla T4 GPU** membandingkan
 | **Penghematan Token** | 0% (Boros Kuota) | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** | **Hemat 80–90%** |
 | **Overhead VRAM GPU** | 0 MB (Hanya LLM) | ~950 MB | **0 MB (Offloaded Cloud)** | ~1,100 MB | ~1,600 MB | Membutuhkan >=16GB |
 | **Throughput Concurrency**| ~0.2 – 0.3 req/s | **~15 – 20 req/s** | **~50+ req/s (Cloud)** | ~5 – 8 req/s | ~1 req/s | N/A |
+
+---
+
+## 🛡️ Arena Air Defense AI (Iron Dome Pertahanan Udara 5 Kota Paralel)
+
+Sebagai simulasi taktis pertahanan kedaulatan udara (*Tactical Air Defense C-RAM / Iron Dome*), DecisionModelBench mempertandingkan kemampuan AI mempertahankan **5 kota besar di Indonesia secara paralel** dari ancaman proyektil jatuh dari atmosfer dengan tingkat kesulitan progresif (*wave difficulty escalation*):
+
+* **Kota Jakarta:** Dilindungi oleh 🟢 **Laya Multilingual (421M GPU)** (~55 ms / 18.2 Hz)
+* **Kota Surabaya:** Dilindungi oleh 🔵 **OpenJev (0.5B GPU Logit)** (~210 ms / 4.8 Hz)
+* **Kota Bandung:** Dilindungi oleh 🟣 **TypeSafe Jev (Cloud SaaS)** (~160 ms / 6.2 Hz)
+* **Kota Medan:** Dilindungi oleh 🟡 **Kev-0.8B (Local Ensemble)** (~950 ms / 1.1 Hz)
+* **Kota Nusantara (IKN):** Dilindungi oleh 🔴 **Heavyweight LLM (Sahabat-AI 8B)** (~2,500 ms / 0.4 Hz)
+
+### Karakteristik Taktis Pengujian:
+1. **Spektrum Sasaran Heterogen:**
+   - **🔥 Sasaran Ancaman (Wajib Ditembak):** Rudal balistik supersonik (🚀), meteorit jatuh ke daratan (☄️), dan drone kamikaze militer (🛸).
+   - **🛡️ Objek Aman (Dilarang Ditembak):** Pesawat komersil sipil (✈️ *Garuda, Lion, Citilink* dengan kode transponder IFF aktif), kawanan burung biologis (🦅), dan puing angkasa yang meleset keluar atmosfer (🌠).
+2. **Eskalasi Gelombang Progresif (Tingkat Kesulitan Meningkat):**
+   - *Wave 1 (Recon):* Kecepatan proyektil normal, ancaman sporadis.
+   - *Wave 3 (Supersonic Salvo):* Kecepatan bertambah +50%, rudal menukik tajam.
+   - *Wave 5 (Saturation Swarm):* Kecepatan hipersonik, saturasi belasan proyektil bersamaan dengan waktu hantaman (*time-to-impact*) < 2.5 detik!
+3. **Rekap Taktis Berkala (Periodic SITREP):**
+   - Setiap gelombang selesai (atau setiap interval waktu), sistem menampilkan rekap komprehensif:
+     * Rudal Berhasil Ditangkis di Udara (*Intercepted*)
+     * Rudal Lolos & Menghantam Kota (*Ground Impacts & Structural Damage*)
+     * Pesawat Komersil Selamat vs Korban Salah Tembak (*Zero Friendly Fire*)
+     * Biaya Token Komputasi ($0 vs Ribuan Token LLM)
+
+---
+
+### Cara Menjalankan Arena Air Defense:
+
+#### 1. Mode Web Interaktif (Radar Command Center 5-Kota Paralel)
+Buka di browser saat server aktif:
+* **URL Langsung:** `http://localhost:7860/air_defense` atau `http://localhost:7860/iron_dome`
+* **Tab Mode 8 Dashboard:** Kunjungi `http://localhost:7860/` lalu pilih tab `[🛡️ Mode 8: Air Defense Iron Dome]`
+* **Fitur:** 5 kanvas radar kota berdampingan, animasi jejak asap rudal, efek ledakan partikel di udara, hantaman darat, sirine bahaya udara, dan modal rekap SITREP berkala.
+
+#### 2. Mode Terminal Headless CLI (Rich Tactical Radar Table)
+```bash
+# Jalankan simulasi pertahanan udara 60 ticks (default)
+python3 play_air_defense.py
+
+# Simulasi cepat 30 ticks
+python3 play_air_defense.py --ticks 30 --speed fast
+
+# Uji 1 probe radar lock live ke backend GPU
+python3 play_air_defense.py --api
+```
 
 ---
 
@@ -343,6 +393,9 @@ decisionmodelbench/
 ├── trading_engine.py                 # Core HFT Trading Engine, Latency Slippage, & Portfolio Tracker
 ├── fast_trading_arena.html           # Web Arena Simulasi Trading Cepat K-Line Candlestick & Order Book
 ├── play_fast_trading.py              # CLI Terminal Rich ASCII Trading Ticker & P&L Arena
+├── air_defense_engine.py             # Core Tactical Air Defense Engine (Waves, Trajectory, SITREP)
+├── air_defense_arena.html            # Web Command Center Radar 5-Kota Iron Dome & SITREP
+├── play_air_defense.py               # CLI Terminal Rich ASCII Air Defense Radar & Waves
 ├── generate_dashboard.py             # Generator antarmuka web playground kelas ringan (HTML)
 ├── benchmark_dashboard.html          # Antarmuka web playground single-question (System 1)
 ├── test_jev.py                       # Skrip uji konektivitas TypeSafe Jev API
