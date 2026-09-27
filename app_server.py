@@ -116,69 +116,134 @@ def sanitize_questions(questions: dict) -> dict:
 
 def get_vram_info():
     if not torch.cuda.is_available():
-        return {"cuda": False, "total_gb": 0, "free_gb": 0, "used_gb": 0, "name": "CPU"}
-    free_bytes, total_bytes = torch.cuda.mem_get_info()
+        return {"cuda": False, "total_gb": 0, "free_gb": 0, "used_gb": 0, "name": "CPU", "device_count": 0, "devices": []}
+    cnt = torch.cuda.device_count()
+    total_b = 0
+    free_b = 0
+    devices = []
+    for i in range(cnt):
+        try:
+            fb, tb = torch.cuda.mem_get_info(i)
+            free_b += fb
+            total_b += tb
+            devices.append({
+                "index": i,
+                "name": torch.cuda.get_device_name(i),
+                "total_gb": round(tb / 1e9, 2),
+                "free_gb": round(fb / 1e9, 2),
+                "used_gb": round((tb - fb) / 1e9, 2)
+            })
+        except Exception:
+            pass
+    if not devices:
+        fb, tb = torch.cuda.mem_get_info()
+        return {
+            "cuda": True,
+            "device_count": 1,
+            "total_gb": round(tb / 1e9, 2),
+            "free_gb": round(fb / 1e9, 2),
+            "used_gb": round((tb - fb) / 1e9, 2),
+            "name": torch.cuda.get_device_name(0),
+            "devices": []
+        }
     return {
         "cuda": True,
-        "total_gb": round(total_bytes / 1e9, 2),
-        "free_gb": round(free_bytes / 1e9, 2),
-        "used_gb": round((total_bytes - free_bytes) / 1e9, 2),
-        "name": torch.cuda.get_device_name(0)
+        "device_count": cnt,
+        "total_gb": round(total_b / 1e9, 2),
+        "free_gb": round(free_b / 1e9, 2),
+        "used_gb": round((total_b - free_b) / 1e9, 2),
+        "name": f"{cnt}x {torch.cuda.get_device_name(0)}" if cnt > 1 else torch.cuda.get_device_name(0),
+        "devices": devices
     }
 
 def get_gpu_nvtop_metrics():
     import subprocess
     cmd = [
         'nvidia-smi',
-        '--query-gpu=utilization.gpu,utilization.memory,memory.total,memory.used,memory.free,temperature.gpu,power.draw,power.limit,clocks.current.graphics,clocks.current.memory',
+        '--query-gpu=index,name,utilization.gpu,utilization.memory,memory.total,memory.used,memory.free,temperature.gpu,power.draw,power.limit,clocks.current.graphics,clocks.current.memory',
         '--format=csv,noheader,nounits'
     ]
     try:
         res = subprocess.run(cmd, capture_output=True, text=True, timeout=2)
-        if res.returncode == 0:
-            vals = [v.strip() for v in res.stdout.strip().split(',')]
-            
-            proc_cmd = ['nvidia-smi', '--query-compute-apps=pid,process_name,used_memory', '--format=csv,noheader,nounits']
+        if res.returncode == 0 and res.stdout.strip():
+            gpu_list = []
+            for line in res.stdout.strip().splitlines():
+                if not line.strip():
+                    continue
+                parts = [v.strip() for v in line.split(',')]
+                if len(parts) >= 12:
+                    try:
+                        gpu_list.append({
+                            'index': int(parts[0]),
+                            'name': parts[1],
+                            'gpu_util_pct': float(parts[2]),
+                            'mem_util_pct': float(parts[3]),
+                            'mem_total_mb': float(parts[4]),
+                            'mem_used_mb': float(parts[5]),
+                            'mem_free_mb': float(parts[6]),
+                            'temp_c': float(parts[7]),
+                            'power_draw_w': float(parts[8]),
+                            'power_limit_w': float(parts[9]),
+                            'clock_graphics_mhz': float(parts[10]),
+                            'clock_mem_mhz': float(parts[11])
+                        })
+                    except (ValueError, IndexError):
+                        continue
+
+            proc_cmd = ['nvidia-smi', '--query-compute-apps=gpu_name,pid,process_name,used_memory', '--format=csv,noheader,nounits']
             proc_res = subprocess.run(proc_cmd, capture_output=True, text=True, timeout=2)
             processes = []
             if proc_res.returncode == 0 and proc_res.stdout.strip():
-                for line in proc_res.stdout.strip().split('\n'):
+                for line in proc_res.stdout.strip().splitlines():
+                    if not line.strip():
+                        continue
                     parts = [p.strip() for p in line.split(',')]
-                    if len(parts) >= 3:
+                    if len(parts) >= 4:
                         processes.append({
-                            'pid': parts[0],
-                            'name': parts[1],
-                            'used_mb': float(parts[2]),
+                            'gpu': parts[0],
+                            'pid': parts[1],
+                            'name': parts[2],
+                            'used_mb': float(parts[3]),
                             'type': 'C (CUDA Compute)',
                             'models': 'app_server (Laya, Kev, OpenJev, ' + (heavy_llm_mgr.catalog[heavy_llm_mgr.active_model_id]['name'] if heavy_llm_mgr and heavy_llm_mgr.active_model_id else 'Sahabat-AI / Qwen / Gemma') + ')'
                         })
-            
+
             from gpu_manager import get_hardware_profile
             hw = get_hardware_profile()
             
+            p_gpu = gpu_list[0] if gpu_list else {}
+            tot_mem = sum(g['mem_total_mb'] for g in gpu_list) if gpu_list else p_gpu.get('mem_total_mb', 15360.0)
+            tot_used = sum(g['mem_used_mb'] for g in gpu_list) if gpu_list else p_gpu.get('mem_used_mb', 0.0)
+            tot_free = sum(g['mem_free_mb'] for g in gpu_list) if gpu_list else p_gpu.get('mem_free_mb', 15360.0)
+            avg_util = round(sum(g['gpu_util_pct'] for g in gpu_list) / max(len(gpu_list), 1), 1) if gpu_list else 0.0
+            avg_temp = round(sum(g['temp_c'] for g in gpu_list) / max(len(gpu_list), 1), 1) if gpu_list else 50.0
+            tot_power = round(sum(g['power_draw_w'] for g in gpu_list), 1) if gpu_list else 28.0
+            tot_limit = round(sum(g['power_limit_w'] for g in gpu_list), 1) if gpu_list else 70.0
+
             return {
                 'success': True,
                 'device_name': hw['primary_device'],
                 'driver_version': hw['driver_version'],
                 'cuda_version': hw['cuda_version'],
                 'compute_capability': hw['compute_capability'],
-                'device_count': hw['device_count'],
+                'device_count': len(gpu_list) if gpu_list else hw['device_count'],
                 'tier': hw['tier'],
                 'devices': hw['devices'],
-                'gpu_util_pct': float(vals[0]),
-                'mem_util_pct': float(vals[1]),
-                'mem_total_mb': float(vals[2]),
-                'mem_used_mb': float(vals[3]),
-                'mem_free_mb': float(vals[4]),
-                'temp_c': float(vals[5]),
-                'power_draw_w': float(vals[6]),
-                'power_limit_w': float(vals[7]),
-                'clock_graphics_mhz': float(vals[8]),
-                'clock_mem_mhz': float(vals[9]),
+                'gpus': gpu_list,
+                'gpu_util_pct': avg_util,
+                'mem_util_pct': round((tot_used / max(tot_mem, 1)) * 100, 1),
+                'mem_total_mb': tot_mem,
+                'mem_used_mb': tot_used,
+                'mem_free_mb': tot_free,
+                'temp_c': avg_temp,
+                'power_draw_w': tot_power,
+                'power_limit_w': tot_limit,
+                'clock_graphics_mhz': p_gpu.get('clock_graphics_mhz', 585.0),
+                'clock_mem_mhz': p_gpu.get('clock_mem_mhz', 5000.0),
                 'processes': processes
             }
     except Exception as e:
-        pass
+        print(f"Warning in get_gpu_nvtop_metrics: {e}")
     
     from gpu_manager import get_hardware_profile
     hw = get_hardware_profile()
@@ -192,6 +257,7 @@ def get_gpu_nvtop_metrics():
         'device_count': hw.get('device_count', 1),
         'tier': hw.get('tier', 'Standard Acceleration'),
         'devices': hw.get('devices', []),
+        'gpus': [],
         'gpu_util_pct': 0.0,
         'mem_util_pct': round((vinfo['used_gb'] / max(vinfo['total_gb'], 1)) * 100, 1),
         'mem_total_mb': vinfo['total_gb'] * 1024,
@@ -212,27 +278,32 @@ def load_models():
     print("🚀 Initializing Live Decision Playground Models (5 Models)...")
     print("=" * 60)
     
-    # 1. Laya
-    print("Loading Laya Multilingual...")
+    gpu_count = torch.cuda.device_count() if torch.cuda.is_available() else 0
+    dev_0 = "cuda:0" if gpu_count > 0 else "cpu"
+    dev_1 = "cuda:1" if gpu_count > 1 else dev_0
+    print(f"Hardware Topology: {gpu_count} GPU(s) detected. Primary: {dev_0}, Secondary: {dev_1}")
+    
+    # 1. Laya -> GPU 0
+    print(f"Loading Laya Multilingual on {dev_0}...")
     laya_router = Router()
     laya_router.predict("Halo sistem pemanasan", {"t": {"type": "noul", "instructions": "Tes?"}})
     print("✓ [1/3] Laya loaded and warmed up.")
 
-    # 2. Kev
-    print("Loading Kev-0.8B on CUDA...")
+    # 2. Kev -> GPU 0
+    print(f"Loading Kev-0.8B on {dev_0}...")
     try:
         ck = Checkpoint("jaredpalmer/kev-0.8b")
-        tok, model = ck.load("cuda", LoadOptions(dtype=torch.float16))
-        kev_srv = Server(checkpoint=ck, tok=tok, model=model, device="cuda")
+        tok, model = ck.load(dev_0, LoadOptions(dtype=torch.float16))
+        kev_srv = Server(checkpoint=ck, tok=tok, model=model, device=dev_0)
         print("✓ [2/3] Kev-0.8B loaded.")
     except Exception as e:
         print(f"⚠️ Kev-0.8B could not be initialized ({e}). Continuing with other models...")
         kev_srv = None
 
-    # 3. OpenJev
-    print("Loading OpenJev (Qwen2.5-0.5B Logit Scorer)...")
-    openjev_engine = OpenJevScorer(model_name="Qwen/Qwen2.5-0.5B-Instruct", device="cuda")
-    print("✓ [3/3] OpenJev loaded and verified.")
+    # 3. OpenJev -> GPU 1 (Distributed Multi-GPU Sharding)
+    print(f"Loading OpenJev (Qwen2.5-0.5B Logit Scorer) on {dev_1}...")
+    openjev_engine = OpenJevScorer(model_name="Qwen/Qwen2.5-0.5B-Instruct", device=dev_1)
+    print(f"✓ [3/3] OpenJev loaded and verified on {dev_1}.")
 
     vinfo = get_vram_info()
     print(f"✓ All local GPU models active! VRAM Used: {vinfo['used_gb']} GB / {vinfo['total_gb']} GB")
@@ -520,6 +591,7 @@ class ArchitectureComparisonPayload(BaseModel):
     heavy_model: str = "sahabatai"
     state: str
     questions: Optional[dict] = None
+    max_tokens: int = 80
 
 @app.post("/api/heavyweight/compare_architectures")
 def compare_architectures(payload: ArchitectureComparisonPayload):
@@ -574,10 +646,11 @@ def compare_architectures(payload: ArchitectureComparisonPayload):
     # 2. Branch A (System 2): TANPA JEV / DECISION MODEL (Direct LLM Execution)
     t0_llm = time.perf_counter()
     try:
+        max_tok = payload.max_tokens or 80
         res_llm = mgr.generate(
             model_id=h_mod,
             prompt=f"Pelanggan mengirimkan pesan berikut:\n\"{state}\"\n\nSebagai agen Customer Care senior di Indonesia, berikan respon balasan resmi yang sangat santun, profesional, dan solutif.",
-            max_tokens=250,
+            max_tokens=max_tok,
             temperature=0.2
         )
         lat_llm_ms = round((time.perf_counter() - t0_llm) * 1000, 1)
@@ -706,12 +779,26 @@ def gpu_nvtop_endpoint():
     return get_gpu_nvtop_metrics()
 
 @app.get("/")
-def serve_dashboard():
+@app.get("/heavyweight")
+@app.get("/architectures")
+def serve_heavyweight_dashboard():
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    dashboard_path = os.path.join(_dir, "heavyweight_llm_dashboard.html")
+    if os.path.exists(dashboard_path):
+        return FileResponse(dashboard_path)
+    alt_path = os.path.join(_dir, "benchmark_dashboard.html")
+    if os.path.exists(alt_path):
+        return FileResponse(alt_path)
+    return HTMLResponse("<h1>Dashboard HTML not found</h1>")
+
+@app.get("/playground")
+@app.get("/benchmark")
+def serve_playground_dashboard():
     _dir = os.path.dirname(os.path.abspath(__file__))
     dashboard_path = os.path.join(_dir, "benchmark_dashboard.html")
     if os.path.exists(dashboard_path):
         return FileResponse(dashboard_path)
-    return HTMLResponse("<h1>Dashboard HTML not found</h1>")
+    return HTMLResponse("<h1>Playground HTML not found</h1>")
 
 if __name__ == "__main__":
     import uvicorn

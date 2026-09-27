@@ -60,20 +60,50 @@ def detect_cuda():
 
     return False, "CPU Only (OpenMP Acceleration)"
 
+def ensure_cuda_symlinks():
+    """Ensure libcuda.so and kitware cmake are properly linked on Linux/Kaggle environments."""
+    try:
+        if not os.path.exists("/usr/lib/x86_64-linux-gnu/libcuda.so"):
+            candidates = [
+                "/usr/local/nvidia/lib64/libcuda.so",
+                "/usr/local/nvidia/lib64/libcuda.so.1",
+                "/usr/local/cuda/compat/libcuda.so"
+            ]
+            for c in candidates:
+                if os.path.exists(c):
+                    subprocess.run(["ln", "-sf", c, "/usr/lib/x86_64-linux-gnu/libcuda.so"], check=False)
+                    subprocess.run(["ldconfig"], check=False)
+                    break
+        real_cmake = "/usr/local/lib/python3.12/dist-packages/cmake/data/bin/cmake"
+        if os.path.exists(real_cmake) and not os.path.islink("/usr/local/bin/cmake"):
+            subprocess.run(["ln", "-sf", real_cmake, "/usr/local/bin/cmake"], check=False)
+    except Exception:
+        pass
+
 def format_duration(seconds):
     mins = int(seconds) // 60
     secs = int(seconds) % 60
     return f"{mins:02d}:{secs:02d}"
 
 def execute_build(enable_cuda=True, force=False):
+    ensure_cuda_symlinks()
     cpu_cores = os.cpu_count() or 4
     
     env = os.environ.copy()
     env["CMAKE_BUILD_PARALLEL_LEVEL"] = str(cpu_cores)
     
+    cuda_arch = "75"
+    try:
+        import torch
+        if torch.cuda.is_available():
+            major, minor = torch.cuda.get_device_capability(0)
+            cuda_arch = f"{major}{minor}"
+    except Exception:
+        pass
+
     if enable_cuda:
-        env["CMAKE_ARGS"] = "-DGGML_CUDA=on"
-        mode_desc = "NVIDIA CUDA GPU (-DGGML_CUDA=on)"
+        env["CMAKE_ARGS"] = f"-DGGML_CUDA=on -DCMAKE_CUDA_ARCHITECTURES={cuda_arch}"
+        mode_desc = f"NVIDIA CUDA GPU (-DGGML_CUDA=on -DCMAKE_CUDA_ARCHITECTURES={cuda_arch})"
     else:
         env["CMAKE_ARGS"] = "-DGGML_BLAS=off"
         mode_desc = "Standard CPU / Native OpenMP"
@@ -104,6 +134,7 @@ def execute_build(enable_cuda=True, force=False):
 
     captured_logs = []
     pct_pattern = re.compile(r"\[\s*(\d+)%\]")
+    ninja_pattern = re.compile(r"\[\s*(\d+)/(\d+)\]")
 
     for raw_line in iter(proc.stdout.readline, ''):
         line = raw_line.strip()
@@ -112,25 +143,35 @@ def execute_build(enable_cuda=True, force=False):
         captured_logs.append(line)
         elapsed = format_duration(time.time() - t_start)
 
-        # Detect progress percentage
-        pct_match = pct_pattern.search(line)
-        if pct_match:
-            pct = int(pct_match.group(1))
-            
+        # Detect progress percentage (Make or Ninja format)
+        prog_label = None
+        ninja_match = ninja_pattern.search(line)
+        if ninja_match:
+            curr = int(ninja_match.group(1))
+            total = int(ninja_match.group(2))
+            pct = int((curr / max(total, 1)) * 100)
+            prog_label = f"[{curr}/{total}] [{pct:3d}%]"
+        else:
+            pct_match = pct_pattern.search(line)
+            if pct_match:
+                pct = int(pct_match.group(1))
+                prog_label = f"[{pct:3d}%]"
+
+        if prog_label:
             # Identify compilation object
             if "Building CUDA object" in line or ".cu" in line:
-                target = line.split("Building CUDA object")[-1].strip()
+                target = line.split("Building CUDA object")[-1].strip() if "Building CUDA object" in line else line.split()[-1]
                 target_short = os.path.basename(target)
-                print(f"  {CYAN}[{elapsed}] [{pct:3d}%]{NC} {YELLOW}⚡ Mengompilasi Kernel CUDA:{NC} {target_short}")
-            elif "Building CXX object" in line or "Building C object" in line:
-                target = line.split("object")[-1].strip()
+                print(f"  {CYAN}[{elapsed}] {prog_label}{NC} {YELLOW}⚡ Mengompilasi Kernel CUDA:{NC} {target_short}")
+            elif "Building CXX object" in line or "Building C object" in line or ".cpp" in line or ".c" in line:
+                target = line.split("object")[-1].strip() if "object" in line else line.split()[-1]
                 target_short = os.path.basename(target)
-                print(f"  {CYAN}[{elapsed}] [{pct:3d}%]{NC} {GREEN}🔨 Mengompilasi C/C++:{NC} {target_short}")
-            elif "Linking" in line:
+                print(f"  {CYAN}[{elapsed}] {prog_label}{NC} {GREEN}🔨 Mengompilasi C/C++:{NC} {target_short}")
+            elif "Linking" in line or ".so" in line:
                 target_short = os.path.basename(line.split()[-1])
-                print(f"  {CYAN}[{elapsed}] [{pct:3d}%]{NC} {MAGENTA}🔗 Linking Shared Library:{NC} {target_short}")
+                print(f"  {CYAN}[{elapsed}] {prog_label}{NC} {MAGENTA}🔗 Linking Shared Library:{NC} {target_short}")
             else:
-                print(f"  {CYAN}[{elapsed}] [{pct:3d}%]{NC} {line}")
+                print(f"  {CYAN}[{elapsed}] {prog_label}{NC} {line[:75]}")
             sys.stdout.flush()
             continue
 

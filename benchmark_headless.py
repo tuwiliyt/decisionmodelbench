@@ -204,7 +204,8 @@ def query_server(decision_model: str, heavy_model: str, state: str, questions: d
         "decision_model": decision_model,
         "heavy_model": heavy_model,
         "state": state,
-        "questions": questions
+        "questions": questions,
+        "max_tokens": 80
     }
     req = urllib.request.Request(
         url,
@@ -212,7 +213,7 @@ def query_server(decision_model: str, heavy_model: str, state: str, questions: d
         headers={"Content-Type": "application/json"},
         method="POST"
     )
-    with urllib.request.urlopen(req, timeout=120) as resp:
+    with urllib.request.urlopen(req, timeout=180) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
 def print_result_rich(data: dict):
