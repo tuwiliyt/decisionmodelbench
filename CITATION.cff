@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this benchmark platform, datasets, or reference the scientific papers, please cite as below."
+title: "DecisionModelBench: Empirical Benchmark of Non-Autoregressive Decision Models vs Foundation Large Language Models in Cyber-Physical Systems, Algorithmic Trading, and Civic Emergency Triage"
+authors:
+  - family-names: "Sumual"
+    given-names: "Richie O."
+    affiliation: "PANITA GORONTALO"
+    email: "richie@panita.web.id"
+version: 1.0.0
+date-released: "2026-09-27"
+url: "https://tuwiliyt.github.io/decisionmodelbench/"
+repository-code: "https://github.com/tuwiliyt/decisionmodelbench"
+license: MIT
+keywords:
+  - "cyber-physical systems"
+  - "non-autoregressive models"
+  - "foundation large language models"
+  - "algorithmic trading"
+  - "air defense simulation"
+  - "real-time control"
+  - "latency slippage"
+  - "alpha decay"
+  - "two-tier architecture"
+  - "emergency calling 112"
+  - "intent gating"
+  - "sovereign ai"
+  - "sahabat-ai"
+  - "qwen 2.5"
+  - "gemma 2"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Sumual"
+      given-names: "Richie O."
+      affiliation: "PANITA GORONTALO"
+      email: "richie@panita.web.id"
+  title: "The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading: An Empirical Benchmark of Non-Autoregressive Decision Models versus Foundation Large Language Models"
+  journal: "PANITA GORONTALO Independent Research Reports"
+  year: 2026
+  url: "https://tuwiliyt.github.io/decisionmodelbench/papers/decisionmodelbench-en.html"

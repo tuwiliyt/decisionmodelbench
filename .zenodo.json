@@ -1,0 +1,52 @@
+{
+  "title": "DecisionModelBench: Empirical Benchmark of Non-Autoregressive Decision Models vs Foundation LLMs in Cyber-Physical Systems, Algorithmic Trading, and Civic Emergency Triage",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "<p><strong>DecisionModelBench</strong> is an empirical benchmark platform and scientific research repository evaluating <strong>Non-Autoregressive Decision Models (System 1)</strong> against <strong>Foundation Generative Large Language Models (System 2)</strong> across dual NVIDIA Tesla T4 GPU distributed topologies.</p><p>This deposition contains the complete reproducible experimental codebase, multi-GPU sharding pipelines, simulation engines, dataset results, and two foundational scientific research papers authored by <strong>Richie O. Sumual (PANITA GORONTALO)</strong>:</p><ol><li><strong>Paper 1:</strong> <em>The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading: An Empirical Benchmark of Non-Autoregressive Decision Models versus Foundation Large Language Models</em> (English &amp; Indonesian editions, PDF &amp; LaTeX).</li><li><strong>Paper 2:</strong> <em>Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration</em> (English &amp; Indonesian editions, PDF &amp; LaTeX).</li></ol><h3>Key Empirical Findings</h3><ul><li><strong>Sub-100 ms Reflex Triage:</strong> Compact non-autoregressive models (Laya 421M ModernBERT at 35–55 ms, OpenJev 0.5B at 180–240 ms, TypeSafe JEV at 160 ms) achieve sub-second determinism with 0 output tokens.</li><li><strong>Autoregression Fallacy Demarcation:</strong> Standalone autoregressive LLMs (Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B) incur multi-second memory bandwidth bottlenecks (2,200 ms to 12,680 ms), inducing catastrophic state-decision drift in air defense, -$19.41 P&amp;L slippage in trading, and Erlang-C queue explosions in emergency hotlines.</li><li><strong>Decoupled Two-Tier Architecture:</strong> Demonstrates that decoupling sub-100ms deterministic triage (System 1) from asynchronous conversational deliberation (System 2) resolves statutory SLA violations (&lt;3s in 911/112 dispatch) and saves 80%–100% of GPU compute costs.</li></ul><p>Portal &amp; Interactive Simulations: <a href=\"https://tuwiliyt.github.io/decisionmodelbench/\">https://tuwiliyt.github.io/decisionmodelbench/</a></p>",
+  "creators": [
+    {
+      "name": "Sumual, Richie O.",
+      "affiliation": "PANITA GORONTALO",
+      "email": "richie@panita.web.id"
+    }
+  ],
+  "access_right": "open",
+  "license": "mit",
+  "keywords": [
+    "Cyber-Physical Systems",
+    "Non-Autoregressive Models",
+    "Foundation Large Language Models",
+    "Algorithmic Trading",
+    "Air Defense Simulation",
+    "Real-Time Control",
+    "Latency Slippage",
+    "Alpha Decay",
+    "Two-Tier Architecture",
+    "Emergency Calling 112",
+    "Intent Gating",
+    "Erlang-C Queueing",
+    "Benchmark",
+    "Sovereign AI",
+    "Sahabat-AI",
+    "Qwen 2.5",
+    "Gemma 2",
+    "ModernBERT"
+  ],
+  "communities": [
+    {
+      "identifier": "zenodo"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://tuwiliyt.github.io/decisionmodelbench/",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://github.com/tuwiliyt/decisionmodelbench",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

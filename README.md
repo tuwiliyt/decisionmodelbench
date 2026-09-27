@@ -5,8 +5,12 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-teal.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Multi-GPU](https://img.shields.io/badge/Multi--GPU-Dual%20Tesla%20T4%20Sharding-purple.svg)](https://developer.nvidia.com)
+[![DOI](https://zenodo.org/badge/1389925593.svg)](https://zenodo.org/badge/latestdoi/1389925593)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Portal%20%26%20Papers-blue?logo=github)](https://tuwiliyt.github.io/decisionmodelbench/)
 
 Platform evaluasi dan arena perbandingan komprehensif untuk memvalidasi mengapa **Model Decision (System 1)** wajib digunakan dalam arsitektur AI produksi dibandingkan membebankan seluruh kueri ke **Foundation Large Language Model Generatif Kelas Berat (System 2)** pada infrastruktur GPU lokal (NVIDIA Tesla T4 / A10G / L4 / RTX 3090/4090 / Multi-GPU).
+
+Repository ini juga memuat dua publikasi ilmiah lengkap beserta dataset dan portal web [GitHub Pages](https://tuwiliyt.github.io/decisionmodelbench/).
 
 Repository ini menyajikan pembuktian empiris, baik melalui **Antarmuka Web Interaktif** maupun **Headless CLI Terminal**, dengan hasil nyata:
 - ⚡ **Latensi Triage Instan:** Sub-100 ms vs 3,500–90,000+ ms (**50x hingga 390x+ lebih cepat**).
@@ -18,18 +22,44 @@ Repository ini menyajikan pembuktian empiris, baik melalui **Antarmuka Web Inter
 ---
 
 ## 📑 Daftar Isi
-1. [🏛️ Mengapa Harus Menggunakan Decision Model? (Executive Value Proposition)](#️-mengapa-harus-menggunakan-decision-model-executive-value-proposition)
-2. [🔄 Perbandingan Alur Eksekusi Kueri](#-perbandingan-alur-eksekusi-kueri)
-3. [📊 Hasil Uji Empiris Nyata (Benchmark Empiric Proof)](#-hasil-uji-empiris-nyata-benchmark-empiric-proof)
-4. [📈 Matriks Komparasi Seluruh Spektrum Model](#-matriks-komparasi-seluruh-spektrum-model)
-5. [🛡️ Arena Air Defense AI (Iron Dome Pertahanan Udara 5 Kota Paralel)](#-arena-air-defense-ai-iron-dome-pertahanan-udara-5-kota-paralel)
-6. [⚡ Arena Trading Cepat AI (High-Frequency Trading & Saldo Dummy $10k)](#-arena-trading-cepat-ai-high-frequency-trading--saldo-dummy-10k)
-7. [🎮 Arena Brick Breaker / Breakout AI (Adu Refleks Paralel)](#-arena-brick-breaker--breakout-ai-adu-refleks-paralel)
-8. [🖥️ Tutorial Uji Perbandingan Headless (CLI Terminal)](#️-tutorial-uji-perbandingan-headless-cli-terminal)
-9. [🌐 Tutorial Web Dashboard & Live Monitor GPU (nvtop Style)](#-tutorial-web-dashboard--live-monitor-gpu-nvtop-style)
-10. [🚀 Panduan Instalasi Lengkap dari Server Kosong](#-panduan-instalasi-lengkap-dari-server-kosong)
-11. [📦 Katalog Model & Spesifikasi Hardware](#-katalog-model--spesifikasi-hardware)
-12. [📁 Struktur File Repository](#-struktur-file-repository)
+1. [📑 Publikasi Ilmiah & Naskah Riset (Scientific Papers)](#-publikasi-ilmiah--naskah-riset-scientific-papers)
+2. [🏛️ Mengapa Harus Menggunakan Decision Model? (Executive Value Proposition)](#️-mengapa-harus-menggunakan-decision-model-executive-value-proposition)
+3. [🔄 Perbandingan Alur Eksekusi Kueri](#-perbandingan-alur-eksekusi-kueri)
+4. [📊 Hasil Uji Empiris Nyata (Benchmark Empiric Proof)](#-hasil-uji-empiris-nyata-benchmark-empiric-proof)
+5. [📈 Matriks Komparasi Seluruh Spektrum Model](#-matriks-komparasi-seluruh-spektrum-model)
+6. [🛡️ Arena Air Defense AI (Iron Dome Pertahanan Udara 5 Kota Paralel)](#-arena-air-defense-ai-iron-dome-pertahanan-udara-5-kota-paralel)
+7. [⚡ Arena Trading Cepat AI (High-Frequency Trading & Saldo Dummy $10k)](#-arena-trading-cepat-ai-high-frequency-trading--saldo-dummy-10k)
+8. [🎮 Arena Brick Breaker / Breakout AI (Adu Refleks Paralel)](#-arena-brick-breaker--breakout-ai-adu-refleks-paralel)
+9. [🖥️ Tutorial Uji Perbandingan Headless (CLI Terminal)](#️-tutorial-uji-perbandingan-headless-cli-terminal)
+10. [🌐 Tutorial Web Dashboard & Live Monitor GPU (nvtop Style)](#-tutorial-web-dashboard--live-monitor-gpu-nvtop-style)
+11. [🚀 Panduan Instalasi Lengkap dari Server Kosong](#-panduan-instalasi-lengkap-dari-server-kosong)
+12. [📦 Katalog Model & Spesifikasi Hardware](#-katalog-model--spesifikasi-hardware)
+13. [📁 Struktur File Repository](#-struktur-file-repository)
+14. [📚 Cara Sitasi (Citation)](#-cara-sitasi-citation)
+
+---
+
+## 📑 Publikasi Ilmiah & Naskah Riset (Scientific Papers)
+
+Repository ini memuat 2 manuskrip penelitian ilmiah formal dalam format **IEEE Transactions Standard** (tersedia dalam PDF, LaTeX, Markdown, dan landing page web interaktif yang teroptimasi untuk Google Scholar dan mesin pencari akademik):
+
+### 1. Cyber-Physical Systems & Algorithmic Trading
+> **The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading: An Empirical Benchmark of Non-Autoregressive Decision Models versus Foundation Large Language Models**  
+> *Penulis:* Richie O. Sumual (PANITA GORONTALO)  
+> *Laporan Riset:* PANITA-RR-2026-02-EN  
+> - 📄 **PDF Naskah (English):** [IEEE_Paper_DecisionModelBench_EN.pdf](papers/IEEE_Paper_DecisionModelBench_EN.pdf) | [Web View](https://tuwiliyt.github.io/decisionmodelbench/papers/decisionmodelbench-en.html)
+> - 📄 **PDF Naskah (Indonesia):** [IEEE_Paper_DecisionModelBench_ID.pdf](papers/IEEE_Paper_DecisionModelBench_ID.pdf) | [Web View](https://tuwiliyt.github.io/decisionmodelbench/papers/decisionmodelbench-id.html)
+> - 📐 **Source LaTeX:** [`papers/IEEE_Paper_DecisionModelBench_EN.tex`](papers/IEEE_Paper_DecisionModelBench_EN.tex)
+
+### 2. Public Administration & Municipal Emergency 911/112 Operations
+> **Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration**  
+> *Penulis:* Richie O. Sumual (PANITA GORONTALO)  
+> *Laporan Riset:* PANITA-RR-2026-03-EN  
+> - 📄 **PDF Naskah (English):** [IEEE_Paper_PublicService_CS_EN.pdf](papers/IEEE_Paper_PublicService_CS_EN.pdf) | [Web View](https://tuwiliyt.github.io/decisionmodelbench/papers/publicservice-cs-en.html)
+> - 📄 **PDF Naskah (Indonesia):** [IEEE_Paper_PublicService_CS_ID.pdf](papers/IEEE_Paper_PublicService_CS_ID.pdf) | [Web View](https://tuwiliyt.github.io/decisionmodelbench/papers/publicservice-cs-id.html)
+> - 📐 **Source LaTeX:** [`papers/IEEE_Paper_PublicService_CS_EN.tex`](papers/IEEE_Paper_PublicService_CS_EN.tex)
+
+🌐 **Portal Web Interaktif & Hasil Lengkap:** [https://tuwiliyt.github.io/decisionmodelbench/](https://tuwiliyt.github.io/decisionmodelbench/)
 
 ---
 
@@ -388,7 +418,21 @@ Pada sistem dengan 2 GPU (seperti 2x Tesla T4), beban komputasi didistribusikan 
 
 ```text
 decisionmodelbench/
+├── papers/                           # Publikasi Ilmiah Resmi (IEEE Transactions Format)
+│   ├── IEEE_Paper_DecisionModelBench_EN.pdf  # Paper CPS & Algorithmic Trading (English)
+│   ├── IEEE_Paper_DecisionModelBench_ID.pdf  # Paper CPS & Algorithmic Trading (Indonesian)
+│   ├── IEEE_Paper_DecisionModelBench_EN.tex  # LaTeX Source Code (English)
+│   ├── IEEE_Paper_PublicService_CS_EN.pdf    # Paper Municipal 112 Triage (English)
+│   ├── IEEE_Paper_PublicService_CS_ID.pdf    # Paper Municipal 112 Triage (Indonesian)
+│   └── IEEE_Paper_PublicService_CS_EN.tex    # LaTeX Source Code (English)
+├── docs/                             # Portal Web Statis GitHub Pages (Google Scholar SEO)
+│   ├── index.html                    # Halaman Utama Portal Publikasi & Arena
+│   ├── papers/                       # Landing Page Ilmiah Highwire Press Metadata
+│   ├── feed.xml                      # RSS Feed Publikasi untuk Indexing Otomatis
+│   ├── sitemap.xml                   # Peta Situs Mesin Pencari
+│   └── *.html                        # Simulator Web Interaktif (Air Defense, Trading, Breaker)
 ├── app_server.py                     # Server FastAPI (Multi-GPU Sharding, API REST, Web Server)
+├── build_github_pages.py             # Generator Situs Statis GitHub Pages & Metadata Scholar
 ├── gpu_manager.py                    # Detektor hardware dinamis & multi-GPU scaler
 ├── benchmark_headless.py             # CLI Tool: Komparasi Dengan vs Tanpa Jev, Matrix, Why
 ├── download_models.py                # Skrip pengunduh otomatis model GGUF dari Hugging Face
@@ -413,8 +457,41 @@ decisionmodelbench/
 ├── generate_dashboard.py             # Generator antarmuka web playground kelas ringan (HTML)
 ├── benchmark_dashboard.html          # Antarmuka web playground single-question (System 1)
 ├── test_jev.py                       # Skrip uji konektivitas TypeSafe Jev API
+├── CITATION.cff                      # Standard Citation File Format untuk GitHub & Zenodo
+├── .zenodo.json                      # Metadata Registrasi Otomatis DOI Zenodo
 └── README.md                         # Dokumentasi & panduan teknis komprehensif
 ```
+
+---
+
+## 📚 Cara Sitasi (Citation)
+
+Jika Anda menggunakan repository ini, dataset benchmark, atau mengutip hasil paper dalam publikasi Anda, silakan gunakan format sitasi berikut:
+
+### BibTeX
+```bibtex
+@article{sumual2026autoregression,
+  title={The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading: An Empirical Benchmark of Non-Autoregressive Decision Models versus Foundation Large Language Models},
+  author={Sumual, Richie O.},
+  journal={PANITA GORONTALO Independent Research Reports},
+  volume={2026},
+  number={02},
+  year={2026},
+  url={https://tuwiliyt.github.io/decisionmodelbench/papers/decisionmodelbench-en.html}
+}
+
+@article{sumual2026publicservice,
+  title={Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration},
+  author={Sumual, Richie O.},
+  journal={PANITA GORONTALO Independent Research Reports},
+  volume={2026},
+  number={03},
+  year={2026},
+  url={https://tuwiliyt.github.io/decisionmodelbench/papers/publicservice-cs-en.html}
+}
+```
+
+Repository ini juga dilengkapi dengan file sitasi standar [`CITATION.cff`](CITATION.cff) untuk integrasi sitasi langsung di GitHub dan Zenodo.
 
 ---
 

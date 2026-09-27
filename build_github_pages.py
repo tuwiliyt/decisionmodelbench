@@ -1201,7 +1201,7 @@ Sitemap: {BASE_URL}/sitemap.xml
 
 
 def main():
-    root_dir = "/kaggle/working/decisionmodelbench"
+    root_dir = os.path.dirname(os.path.abspath(__file__))
     papers_dir = os.path.join(root_dir, "papers")
     docs_dir = os.path.join(root_dir, "docs")
     docs_papers_dir = os.path.join(docs_dir, "papers")
