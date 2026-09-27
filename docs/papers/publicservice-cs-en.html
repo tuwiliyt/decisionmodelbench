@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration | Richie O. Sumual</title>
+    
+    <!-- Google Scholar & Highwire Press Bibliographic Meta Tags -->
+    <meta name="citation_title" content="Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration">
+    <meta name="citation_author" content="Sumual, Richie O.">
+    <meta name="citation_author" content="Richie O. Sumual">
+    <meta name="citation_author_institution" content="PANITA GORONTALO">
+    <meta name="citation_author_email" content="richie@panita.web.id">
+    <meta name="citation_publication_date" content="2026/09/27">
+    <meta name="citation_date" content="2026/09/27">
+    <meta name="citation_online_date" content="2026/09/27">
+    <meta name="citation_year" content="2026">
+    <meta name="citation_journal_title" content="PANITA GORONTALO Independent Research Reports">
+    <meta name="citation_technical_report_number" content="PANITA-RR-2026-03-EN">
+    <meta name="citation_pdf_url" content="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_EN.pdf">
+    <meta name="citation_language" content="en">
+    <meta name="citation_keywords" content="Public Administration AI; Sovereign AI; Emergency Calling 911/112; Two-Tier Hybrid Brain Pipeline; Intent Gating; Non-Autoregressive Decision Models; Large Language Models; Erlang-C Queueing; Golden Period Resuscitation; Data Sovereignty; Total Cost of Ownership">
+    <meta name="citation_abstract" content="The wholesale integration of autoregressive Large Language Models (LLMs) into municipal emergency hotlines (e.g., 911 / Indonesia 112), public administration dispatch channels, and enterprise customer support has introduced severe operational vulnerabilities: queue divergence, catastrophic service-level agreement (SLA) breaches, non-deterministic schema mutation, and privacy exposure of personally identifiable information (PII). In life-safety emergency dispatch, sequential next-token synthesis incurs multi-second latency (>4,500 ms to >12,500 ms), severely compromising the 3-to-5 minute clinical 'golden period' of out-of-hospital cardiac arrest and violating statutory dispatch timing regulations (<3 s). In this paper, we present an empirical evaluation conducted on DecisionModelBench, benchmarking non-autoregressive decision models against flagship foundation generative LLMs—including the Indonesian sovereign model Sahabat-AI 8B Instruct, Alibaba Cloud's Qwen 2.5 7B Instruct, and Google DeepMind's Gemma 2 9B Instruct deployed on dual NVIDIA Tesla T4 GPUs—across fifteen comprehensive scenarios: ten high-throughput civic and enterprise support cases and five critical life-safety 911/112 emergency calling scenarios. We formalize Erlang-C queue explosion dynamics, statutory SLA breach probability integrals, clinical survival probability decay functions, and schema entropy failure laws. Across civic triage, non-autoregressive decision models (TypeSafe JEV System One at 197.6 ms, OpenJev 0.5B at 540.6 ms, Kev-0.8B at 648.5 ms, and dedicated Laya 421M at 35.8–63.2 ms) achieve 100% schema compliance, up to 100% routing accuracy, zero token waste, and 100% SLA compliance (<500 ms) at $0.05 per 100,000 queries. In critical emergency calling, Standalone LLMs exhibit dangerous dispatch latencies: 3,340.0 ms for Sahabat-AI 8B, 10,024.4 ms for Qwen 2.5 7B, and 12,681.7 ms for Gemma 2 9B, with Qwen exhibiting severe syntax fragility (33.3% standalone accuracy due to markdown fence wrapping). Conversely, our Two-Tier Hybrid Tandem Pipeline decouples physical CAD mobilization (<220 ms, up to 64.2x acceleration, 100% deterministic accuracy, 0 tokens) from asynchronous high-fidelity conversational guidance (207–294 tokens), establishing the definitive paradigm for life-safety emergency operations.">
+
+    <!-- Dublin Core Metadata for Academic Repositories -->
+    <meta name="DC.title" content="Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration">
+    <meta name="DC.creator" content="Sumual, Richie O.">
+    <meta name="DC.contributor" content="PANITA GORONTALO">
+    <meta name="DC.date" content="2026-09-27">
+    <meta name="DC.type" content="Text">
+    <meta name="DC.format" content="application/pdf">
+    <meta name="DC.language" content="en">
+    <meta name="DC.publisher" content="PANITA GORONTALO">
+    <meta name="DC.identifier" content="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_EN.pdf">
+    <meta name="DC.description" content="The wholesale integration of autoregressive Large Language Models (LLMs) into municipal emergency hotlines (e.g., 911 / Indonesia 112), public administration dispatch channels, and enterprise customer support has introduced severe operational vulnerabilities: queue divergence, catastrophic service-level agreement (SLA) breaches, non-deterministic schema mutation, and privacy exposure of personally identifiable information (PII). In life-safety emergency dispatch, sequential next-token synthesis incurs multi-second latency (>4,500 ms to >12,500 ms), severely compromising the 3-to-5 minute clinical 'golden period' of out-of-hospital cardiac arrest and violating statutory dispatch timing regulations (<3 s). In this paper, we present an empirical evaluation conducted on DecisionModelBench, benchmarking non-autoregressive decision models against flagship foundation generative LLMs—including the Indonesian sovereign model Sahabat-AI 8B Instruct, Alibaba Cloud's Qwen 2.5 7B Instruct, and Google DeepMind's Gemma 2 9B Instruct deployed on dual NVIDIA Tesla T4 GPUs—across fifteen comprehensive scenarios: ten high-throughput civic and enterprise support cases and five critical life-safety 911/112 emergency calling scenarios. We formalize Erlang-C queue explosion dynamics, statutory SLA breach probability integrals, clinical survival probability decay functions, and schema entropy failure laws. Across civic triage, non-autoregressive decision models (TypeSafe JEV System One at 197.6 ms, OpenJev 0.5B at 540.6 ms, Kev-0.8B at 648.5 ms, and dedicated Laya 421M at 35.8–63.2 ms) achieve 100% schema compliance, up to 100% routing accuracy, zero token waste, and 100% SLA compliance (<500 ms) at $0.05 per 100,000 queries. In critical emergency calling, Standalone LLMs exhibit dangerous dispatch latencies: 3,340.0 ms for Sahabat-AI 8B, 10,024.4 ms for Qwen 2.5 7B, and 12,681.7 ms for Gemma 2 9B, with Qwen exhibiting severe syntax fragility (33.3% standalone accuracy due to markdown fence wrapping). Conversely, our Two-Tier Hybrid Tandem Pipeline decouples physical CAD mobilization (<220 ms, up to 64.2x acceleration, 100% deterministic accuracy, 0 tokens) from asynchronous high-fidelity conversational guidance (207–294 tokens), establishing the definitive paradigm for life-safety emergency operations.">
+
+    <!-- Schema.org ScholarlyArticle JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "headline": "Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration",
+      "name": "Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration",
+      "author": {
+        "@type": "Person",
+        "name": "Richie O. Sumual",
+        "email": "richie@panita.web.id",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "PANITA GORONTALO",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Gorontalo",
+            "addressCountry": "ID"
+          }
+        }
+      },
+      "datePublished": "2026-09-27",
+      "description": "The wholesale integration of autoregressive Large Language Models (LLMs) into municipal emergency hotlines (e.g., 911 / Indonesia 112), public administration dispatch channels, and enterprise customer support has introduced severe operational vulnerabilities: queue divergence, catastrophic service-level agreement (SLA) breaches, non-deterministic schema mutation, and privacy exposure of personally identifiable information (PII). In life-safety emergency dispatch, sequential next-token synthesis incurs multi-second latency (>4,500 ms to >12,500 ms), severely compromising the 3-to-5 minute clinical 'golden period' of out-of-hospital cardiac arrest and violating statutory dispatch timing regulations (<3 s). In this paper, we present an empirical evaluation conducted on DecisionModelBench, benchmarking non-autoregressive decision models against flagship foundation generative LLMs—including the Indonesian sovereign model Sahabat-AI 8B Instruct, Alibaba Cloud's Qwen 2.5 7B Instruct, and Google DeepMind's Gemma 2 9B Instruct deployed on dual NVIDIA Tesla T4 GPUs—across fifteen comprehensive scenarios: ten high-throughput civic and enterprise support cases and five critical life-safety 911/112 emergency calling scenarios. We formalize Erlang-C queue explosion dynamics, statutory SLA breach probability integrals, clinical survival probability decay functions, and schema entropy failure laws. Across civic triage, non-autoregressive decision models (TypeSafe JEV System One at 197.6 ms, OpenJev 0.5B at 540.6 ms, Kev-0.8B at 648.5 ms, and dedicated Laya 421M at 35.8–63.2 ms) achieve 100% schema compliance, up to 100% routing accuracy, zero token waste, and 100% SLA compliance (<500 ms) at $0.05 per 100,000 queries. In critical emergency calling, Standalone LLMs exhibit dangerous dispatch latencies: 3,340.0 ms for Sahabat-AI 8B, 10,024.4 ms for Qwen 2.5 7B, and 12,681.7 ms for Gemma 2 9B, with Qwen exhibiting severe syntax fragility (33.3% standalone accuracy due to markdown fence wrapping). Conversely, our Two-Tier Hybrid Tandem Pipeline decouples physical CAD mobilization (<220 ms, up to 64.2x acceleration, 100% deterministic accuracy, 0 tokens) from asynchronous high-fidelity conversational guidance (207–294 tokens), establishing the definitive paradigm for life-safety emergency operations.",
+      "url": "https://tuwiliyt.github.io/decisionmodelbench/papers/publicservice-cs-en.html",
+      "encoding": {
+        "@type": "MediaObject",
+        "contentUrl": "https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_EN.pdf",
+        "encodingFormat": "application/pdf"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #121a2f;
+            --bg-card: #18233e;
+            --border-color: rgba(99, 140, 255, 0.2);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.35);
+            --accent-green: #10b981;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 0;
+            margin: 0;
+        }
+        .navbar {
+            background: rgba(18, 26, 47, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-brand span {
+            color: var(--accent);
+        }
+        .nav-links {
+            display: flex;
+            gap: 18px;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: #fff;
+        }
+        .container {
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+        .badge-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+        h1.paper-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 24px;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+        .author-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 32px;
+        }
+        .author-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .author-affiliation {
+            color: #93c5fd;
+            font-weight: 600;
+            margin: 4px 0;
+            font-size: 0.95rem;
+        }
+        .author-meta {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+        .author-meta a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .cta-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            box-shadow: 0 4px 14px var(--accent-glow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        .btn-secondary {
+            background: var(--bg-card);
+            color: #e2e8f0;
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background: #202d4f;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .abstract-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            text-align: justify;
+            margin-bottom: 32px;
+            background: rgba(18, 26, 47, 0.5);
+            padding: 24px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+        .keywords-box {
+            margin-bottom: 36px;
+        }
+        .keyword-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.06);
+            color: #cbd5e1;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bibtex-box {
+            background: #0d1322;
+            border: 1px solid rgba(99, 140, 255, 0.25);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        pre.bibtex-code {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #93c5fd;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 0;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+        .footer {
+            border-top: 1px solid var(--border-color);
+            padding: 32px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="https://tuwiliyt.github.io/decisionmodelbench/" class="nav-brand">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            DecisionModel<span>Bench</span>
+        </a>
+        <div class="nav-links">
+            <a href="https://tuwiliyt.github.io/decisionmodelbench/">Home & Papers</a>
+            <a href="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_EN.pdf">Direct PDF</a>
+            <a href="https://github.com/tuwiliyt/decisionmodelbench" target="_blank">GitHub Repo</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="badge-bar">
+            <span class="badge badge-blue">Emergency Calling 911/112 & Multi-LLM Tandem</span>
+            <span class="badge badge-green">RISET MANDIRI</span>
+            <span class="badge badge-purple">English</span>
+            <span class="badge badge-blue">IEEE Standard (15 Pages)</span>
+        </div>
+
+        <h1 class="paper-title">Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration</h1>
+
+        <div class="author-box">
+            <div class="author-name">Richie O. Sumual</div>
+            <div class="author-affiliation">PANITA GORONTALO</div>
+            <div class="author-meta">
+                Advanced Agentic AI & Distributed Systems Research &bull; Gorontalo, Indonesia<br>
+                Official Email: <a href="mailto:richie@panita.web.id">richie@panita.web.id</a> &bull; Report ID: <code>PANITA-RR-2026-03-EN</code> &bull; Date: September 2026
+            </div>
+        </div>
+
+        <div class="cta-box">
+            <a href="IEEE_Paper_PublicService_CS_EN.pdf" class="btn btn-primary" download>
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                Download Full Paper (PDF)
+            </a>
+            <a href="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_EN.pdf" class="btn btn-secondary" target="_blank">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View PDF in Browser
+            </a>
+            <a href="https://tuwiliyt.github.io/decisionmodelbench/" class="btn btn-secondary">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to All Papers
+            </a>
+        </div>
+
+        <h2 class="section-title">Abstract</h2>
+        <div class="abstract-text">
+            The wholesale integration of autoregressive Large Language Models (LLMs) into municipal emergency hotlines (e.g., 911 / Indonesia 112), public administration dispatch channels, and enterprise customer support has introduced severe operational vulnerabilities: queue divergence, catastrophic service-level agreement (SLA) breaches, non-deterministic schema mutation, and privacy exposure of personally identifiable information (PII). In life-safety emergency dispatch, sequential next-token synthesis incurs multi-second latency (>4,500 ms to >12,500 ms), severely compromising the 3-to-5 minute clinical 'golden period' of out-of-hospital cardiac arrest and violating statutory dispatch timing regulations (<3 s). In this paper, we present an empirical evaluation conducted on DecisionModelBench, benchmarking non-autoregressive decision models against flagship foundation generative LLMs—including the Indonesian sovereign model Sahabat-AI 8B Instruct, Alibaba Cloud's Qwen 2.5 7B Instruct, and Google DeepMind's Gemma 2 9B Instruct deployed on dual NVIDIA Tesla T4 GPUs—across fifteen comprehensive scenarios: ten high-throughput civic and enterprise support cases and five critical life-safety 911/112 emergency calling scenarios. We formalize Erlang-C queue explosion dynamics, statutory SLA breach probability integrals, clinical survival probability decay functions, and schema entropy failure laws. Across civic triage, non-autoregressive decision models (TypeSafe JEV System One at 197.6 ms, OpenJev 0.5B at 540.6 ms, Kev-0.8B at 648.5 ms, and dedicated Laya 421M at 35.8–63.2 ms) achieve 100% schema compliance, up to 100% routing accuracy, zero token waste, and 100% SLA compliance (<500 ms) at $0.05 per 100,000 queries. In critical emergency calling, Standalone LLMs exhibit dangerous dispatch latencies: 3,340.0 ms for Sahabat-AI 8B, 10,024.4 ms for Qwen 2.5 7B, and 12,681.7 ms for Gemma 2 9B, with Qwen exhibiting severe syntax fragility (33.3% standalone accuracy due to markdown fence wrapping). Conversely, our Two-Tier Hybrid Tandem Pipeline decouples physical CAD mobilization (<220 ms, up to 64.2x acceleration, 100% deterministic accuracy, 0 tokens) from asynchronous high-fidelity conversational guidance (207–294 tokens), establishing the definitive paradigm for life-safety emergency operations.
+        </div>
+
+        <h2 class="section-title">Index Terms & Keywords</h2>
+        <div class="keywords-box">
+            <span class="keyword-tag">Public Administration AI</span><span class="keyword-tag">Sovereign AI</span><span class="keyword-tag">Emergency Calling 911/112</span><span class="keyword-tag">Two-Tier Hybrid Brain Pipeline</span><span class="keyword-tag">Intent Gating</span><span class="keyword-tag">Non-Autoregressive Decision Models</span><span class="keyword-tag">Large Language Models</span><span class="keyword-tag">Erlang-C Queueing</span><span class="keyword-tag">Golden Period Resuscitation</span><span class="keyword-tag">Data Sovereignty</span><span class="keyword-tag">Total Cost of Ownership</span>
+        </div>
+
+        <h2 class="section-title">BibTeX Citation</h2>
+        <div class="bibtex-box">
+            <button class="copy-btn" onclick="copyBibtex()">Copy BibTeX</button>
+            <pre class="bibtex-code" id="bibtexText">@article{sumual2026deterministic,
+  title={Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration},
+  author={Sumual, Richie O.},
+  journal={PANITA GORONTALO Independent Research Reports},
+  volume={2026},
+  number={PANITA-RR-2026-03-EN},
+  pages={1--15},
+  year={2026},
+  month={September},
+  institution={PANITA GORONTALO},
+  address={Gorontalo, Indonesia},
+  url={https://tuwiliyt.github.io/decisionmodelbench/papers/publicservice-cs-en.html}
+}</pre>
+        </div>
+
+        <h2 class="section-title">Archival & Academic Metadata</h2>
+        <div style="background: var(--bg-card); padding: 18px 24px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem;">
+            <p><strong>Full Title:</strong> Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration</p>
+            <p><strong>Primary Author:</strong> Richie O. Sumual</p>
+            <p><strong>Affiliation:</strong> PANITA GORONTALO (Gorontalo, Indonesia)</p>
+            <p><strong>Publication Series:</strong> PANITA GORONTALO Independent Research Reports</p>
+            <p><strong>Permanent Document Link:</strong> <a href="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_EN.pdf" style="color: var(--accent);">https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_EN.pdf</a></p>
+            <p><strong>Google Scholar Metadata Compatibility:</strong> Highwire Press, Dublin Core, Schema.org ScholarlyArticle verified.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Richie O. Sumual &bull; PANITA GORONTALO &bull; Advanced Agentic AI & Distributed Systems Research</p>
+        <p style="margin-top: 6px; font-size: 0.8rem; color: #64748b;">Gorontalo, Indonesia &bull; Contact: richie@panita.web.id</p>
+    </footer>
+
+    <script>
+        function copyBibtex() {
+            const text = document.getElementById('bibtexText').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy BibTeX', 2000);
+            });
+        }
+    </script>
+</body>
+</html>

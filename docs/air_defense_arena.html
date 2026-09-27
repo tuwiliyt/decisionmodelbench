@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ Arena Air Defense AI: Iron Dome Pertahanan Udara Milidetik (5 Kota Paralel)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          boxShadow: {
+            'jev-glow': '0 0 25px -3px rgba(168, 85, 247, 0.4), 0 0 10px -2px rgba(168, 85, 247, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #030712;
+      background-image: 
+        radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 60%),
+        radial-gradient(at 100% 100%, rgba(244, 63, 94, 0.06) 0px, transparent 60%),
+        radial-gradient(at 50% 60%, rgba(168, 85, 247, 0.05) 0px, transparent 60%);
+      background-attachment: fixed;
+    }
+    .glass-card {
+      background: rgba(10, 15, 30, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .radar-canvas {
+      background: radial-gradient(circle at 50% 95%, #081a28 0%, #030a12 75%, #010408 100%);
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.95);
+    }
+    .crt-scanlines {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(1.04); }
+    }
+    .alert-pulse {
+      animation: pulseAlert 1s infinite;
+    }
+    @keyframes reloadFlash {
+      0%, 100% { border-color: rgba(245, 158, 11, 0.9); box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+      50% { border-color: rgba(239, 68, 68, 0.9); box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+    }
+    .reloading-active {
+      animation: reloadFlash 0.8s infinite;
+    }
+    .jev-highlight {
+      border: 2px solid #a855f7 !important;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.35) !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased text-slate-200">
+
+  <!-- Header Section -->
+  <header class="border-b border-slate-800/80 sticky top-0 z-50 glass-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-rose-600 via-amber-600 to-purple-600 flex items-center justify-center shadow-lg shadow-rose-500/20 font-bold text-white text-2xl">
+          🛡️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-white via-rose-200 to-amber-300 bg-clip-text text-transparent">
+              Arena Air Defense AI: Iron Dome Milidetik (5 Kota Paralel)
+            </h1>
+            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              C-RAM & Radar Doppler
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Kalkulasi Kerusakan Riil • Fisika Amunisi Magazine Pod • TypeSafe JEV Cloud • Pilihan Model LLM</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="openProbeModal('jev')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white hover:opacity-90 transition shadow-lg shadow-purple-500/30 flex items-center gap-1.5 border border-purple-400/30">
+          <span>⚡</span> Uji Probe JEV Live
+        </button>
+        <a href="/trading" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1">
+          <span>⚡</span> Trading AI
+        </a>
+        <a href="/breakout" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1">
+          <span>🎮</span> Breakout
+        </a>
+        <a href="/" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition border border-slate-700 flex items-center gap-1">
+          <span>🏛️</span> Dashboard
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tactical HUD & Controls -->
+  <div class="border-b border-slate-800/80 bg-slate-950/85 py-3 sticky top-20 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      <!-- Threat Status & Wave Tracker -->
+      <div class="flex items-center gap-4">
+        <div>
+          <span class="text-[10px] text-slate-400 uppercase font-mono font-bold">Status Baterai Udara</span>
+          <div class="flex items-center gap-2">
+            <span id="threatStatusBadge" class="text-xs font-mono font-black px-2.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 alert-pulse">
+              DEFCON 1: AIR RAID ACTIVE
+            </span>
+            <span id="waveBadge" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">
+              WAVE 1 (Recon & Infiltration)
+            </span>
+          </div>
+        </div>
+        <div class="h-8 w-px bg-slate-800 hidden sm:block"></div>
+        <div class="hidden sm:block">
+          <span class="text-[10px] text-slate-400 uppercase font-mono">Hitung Mundur Rekap SITREP</span>
+          <div class="w-36 bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800 mt-1">
+            <div id="sitrepCountdownBar" class="bg-gradient-to-r from-amber-500 to-rose-500 h-2.5 rounded-full transition-all duration-300" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls & Actions -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btnToggleDefense" onclick="toggleAirDefense()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition shadow-lg shadow-rose-600/30 flex items-center gap-1.5">
+          <span id="btnDefenseIcon">🚀</span>
+          <span id="btnDefenseText">Mulai Pertahanan Udara</span>
+        </button>
+        <button onclick="resetAirDefense()" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700 flex items-center gap-1">
+          <span>🔄</span> Reset
+        </button>
+        <button onclick="triggerImmediateSITREP()" class="px-3 py-2 rounded-xl text-xs font-bold bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800 transition flex items-center gap-1">
+          <span>📊</span> Rekap Sekarang
+        </button>
+        <button onclick="toggleAudio()" id="btnAudio" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition text-xs">
+          🔊
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main Multi-City Sky Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+
+    <!-- Threat Legend & Real-Life Damage Breakdown Banner -->
+    <div class="glass-card rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-rose-400 font-bold">🔥 KALKULASI KERUSAKAN SASARAN ANCAMAN:</span>
+        <span class="px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">🚀 Rudal Hipersonik (-35% HP)</span>
+        <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">☄️ Meteorit Impak (-45% HP)</span>
+        <span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">🛸 Drone Kamikaze (-12% HP)</span>
+        <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">💥 Serpihan Rendah (-3% HP)</span>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-emerald-400 font-bold">🛡️ OBJEK AMAN:</span>
+        <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">✈️ Pesawat Komersial Sipil</span>
+        <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">🦅 Burung / Bio</span>
+      </div>
+    </div>
+
+    <!-- 5 Parallel Air Defense City Boards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3.5">
+
+      <!-- CITY 1: JAKARTA - LAYA MULTILINGUAL (421M GPU) -->
+      <div id="card-laya" class="glass-card rounded-2xl p-3 space-y-2 border border-emerald-500/40 relative flex flex-col justify-between transition-all">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-emerald-400 font-bold uppercase">Baterai Alpha • Jakarta</span>
+            <span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">~55 ms</span>
+          </div>
+          <div class="text-sm font-extrabold text-white">Laya (421M GPU)</div>
+          <div class="text-[10px] text-slate-400">Refleks 18.2 Hz • 0 Tokens • GPU 0</div>
+
+          <!-- Ammo Pod Gauge -->
+          <div class="mt-1.5 p-1.5 rounded-lg bg-slate-950/70 border border-slate-800 flex items-center justify-between font-mono text-[10px]">
+            <span class="text-slate-400">Amunisi Pod:</span>
+            <span id="ammo-badge-laya" class="font-bold text-emerald-400">20/20</span>
+          </div>
+
+          <!-- City Dome Canvas -->
+          <div class="relative w-full h-[275px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-laya" class="w-full h-full"></canvas>
+            <div id="reload-overlay-laya" class="hidden absolute inset-0 bg-amber-950/80 backdrop-blur-sm flex flex-col items-center justify-center text-amber-300 font-mono text-xs font-bold p-2 text-center">
+              <span class="text-xl mb-1 animate-spin">🔄</span>
+              <span>RELOADING POD (20 Rudal)...</span>
+              <span id="reload-timer-laya" class="text-xs text-amber-400 mt-1">3.5s</span>
+            </div>
+          </div>
+
+          <!-- City Shield HP -->
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-laya" class="text-emerald-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-laya" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Tangkis: <strong id="kill-laya" class="text-emerald-300 font-bold">0</strong></span>
+              <span>Hantam: <strong id="hit-laya" class="text-rose-400 font-bold">0</strong></span>
+              <span>Sipil: <strong id="civ-laya" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-emerald-950/40 border border-emerald-800/50 text-center font-mono text-[10px] text-emerald-300">
+          Token: 0 | Pertahanan Optimal
+        </div>
+      </div>
+
+      <!-- CITY 2: SURABAYA - OPENJEV (0.5B GPU) -->
+      <div id="card-openjev" class="glass-card rounded-2xl p-3 space-y-2 border border-cyan-500/40 relative flex flex-col justify-between transition-all">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-cyan-400 font-bold uppercase">Baterai Bravo • Surabaya</span>
+            <span class="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold">~210 ms</span>
+          </div>
+          <div class="text-sm font-extrabold text-white">OpenJev (0.5B GPU)</div>
+          <div class="text-[10px] text-slate-400">Logit Scorer • 0 Tokens • GPU 1</div>
+
+          <!-- Ammo Pod Gauge -->
+          <div class="mt-1.5 p-1.5 rounded-lg bg-slate-950/70 border border-slate-800 flex items-center justify-between font-mono text-[10px]">
+            <span class="text-slate-400">Amunisi Pod:</span>
+            <span id="ammo-badge-openjev" class="font-bold text-cyan-400">20/20</span>
+          </div>
+
+          <div class="relative w-full h-[275px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-openjev" class="w-full h-full"></canvas>
+            <div id="reload-overlay-openjev" class="hidden absolute inset-0 bg-amber-950/80 backdrop-blur-sm flex flex-col items-center justify-center text-amber-300 font-mono text-xs font-bold p-2 text-center">
+              <span class="text-xl mb-1 animate-spin">🔄</span>
+              <span>RELOADING POD (20 Rudal)...</span>
+              <span id="reload-timer-openjev" class="text-xs text-amber-400 mt-1">3.5s</span>
+            </div>
+          </div>
+
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-openjev" class="text-cyan-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-openjev" class="bg-cyan-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Tangkis: <strong id="kill-openjev" class="text-cyan-300 font-bold">0</strong></span>
+              <span>Hantam: <strong id="hit-openjev" class="text-rose-400 font-bold">0</strong></span>
+              <span>Sipil: <strong id="civ-openjev" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-cyan-950/40 border border-cyan-800/50 text-center font-mono text-[10px] text-cyan-300">
+          Token: 0 | Pertahanan Stabil
+        </div>
+      </div>
+
+      <!-- CITY 3: BANDUNG - TYPESAFE JEV (CLOUD DECISION SAAS) [PROMINENT FEATURE] -->
+      <div id="card-jev" class="glass-card rounded-2xl p-3 space-y-2 border-2 border-purple-500 shadow-jev-glow relative flex flex-col justify-between transition-all">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-purple-400 font-black uppercase flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+              Baterai Charlie • Bandung
+            </span>
+            <span class="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-700 font-black text-[10px]">~160 ms</span>
+          </div>
+          <div class="flex items-center justify-between mt-0.5">
+            <div class="text-sm font-black text-white bg-gradient-to-r from-purple-200 via-fuchsia-200 to-pink-300 bg-clip-text text-transparent">
+              TypeSafe JEV (Cloud)
+            </div>
+            <button onclick="openProbeModal('jev')" class="text-[9px] font-bold px-2 py-0.5 rounded bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-500/50 transition">
+              ⚡ Probe API
+            </button>
+          </div>
+          <div class="text-[10px] text-purple-300/90 font-medium">Cloud Decision API • 0 Tokens • Offloaded</div>
+
+          <!-- Ammo Pod Gauge -->
+          <div class="mt-1.5 p-1.5 rounded-lg bg-purple-950/50 border border-purple-800 flex items-center justify-between font-mono text-[10px]">
+            <span class="text-purple-300">Amunisi Pod:</span>
+            <span id="ammo-badge-jev" class="font-bold text-purple-300">20/20</span>
+          </div>
+
+          <div class="relative w-full h-[275px] rounded-xl overflow-hidden border border-purple-900 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-jev" class="w-full h-full"></canvas>
+            <div id="reload-overlay-jev" class="hidden absolute inset-0 bg-purple-950/85 backdrop-blur-sm flex flex-col items-center justify-center text-amber-300 font-mono text-xs font-bold p-2 text-center">
+              <span class="text-xl mb-1 animate-spin">🔄</span>
+              <span>RELOADING POD (20 Rudal)...</span>
+              <span id="reload-timer-jev" class="text-xs text-amber-400 mt-1">3.5s</span>
+            </div>
+          </div>
+
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-jev" class="text-purple-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-jev" class="bg-purple-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Tangkis: <strong id="kill-jev" class="text-purple-300 font-bold">0</strong></span>
+              <span>Hantam: <strong id="hit-jev" class="text-rose-400 font-bold">0</strong></span>
+              <span>Sipil: <strong id="civ-jev" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-purple-950/60 border border-purple-700/60 text-center font-mono text-[10px] text-purple-200">
+          ☁️ TypeSafe AI System One • Terverifikasi
+        </div>
+      </div>
+
+      <!-- CITY 4: MEDAN - KEV-0.8B (LOCAL ENSEMBLE) -->
+      <div id="card-kev" class="glass-card rounded-2xl p-3 space-y-2 border border-amber-500/40 relative flex flex-col justify-between transition-all">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-amber-400 font-bold uppercase">Baterai Delta • Medan</span>
+            <span class="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-bold">~950 ms</span>
+          </div>
+          <div class="text-sm font-extrabold text-white">Kev-0.8B (Local)</div>
+          <div class="text-[10px] text-slate-400">LoRA Ensemble • 0 Tokens • GPU 0</div>
+
+          <!-- Ammo Pod Gauge -->
+          <div class="mt-1.5 p-1.5 rounded-lg bg-slate-950/70 border border-slate-800 flex items-center justify-between font-mono text-[10px]">
+            <span class="text-slate-400">Amunisi Pod:</span>
+            <span id="ammo-badge-kev" class="font-bold text-amber-400">20/20</span>
+          </div>
+
+          <div class="relative w-full h-[275px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-kev" class="w-full h-full"></canvas>
+            <div id="reload-overlay-kev" class="hidden absolute inset-0 bg-amber-950/80 backdrop-blur-sm flex flex-col items-center justify-center text-amber-300 font-mono text-xs font-bold p-2 text-center">
+              <span class="text-xl mb-1 animate-spin">🔄</span>
+              <span>RELOADING POD (20 Rudal)...</span>
+              <span id="reload-timer-kev" class="text-xs text-amber-400 mt-1">3.5s</span>
+            </div>
+          </div>
+
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-kev" class="text-amber-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-kev" class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Tangkis: <strong id="kill-kev" class="text-amber-300 font-bold">0</strong></span>
+              <span>Hantam: <strong id="hit-kev" class="text-rose-400 font-bold">0</strong></span>
+              <span>Sipil: <strong id="civ-kev" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-center font-mono text-[10px] text-amber-300">
+          Token: 0 | Reaksi Sedang
+        </div>
+      </div>
+
+      <!-- CITY 5: NUSANTARA (IKN) - SELECTABLE LLM (SYSTEM 2) -->
+      <div id="card-sahabatai" class="glass-card rounded-2xl p-3 space-y-2 border border-rose-500/40 relative flex flex-col justify-between transition-all">
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-mono">
+            <span class="text-rose-400 font-bold uppercase">Baterai Echo • Nusantara (IKN)</span>
+            <span id="llmLatencyBadge" class="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">~2,500 ms</span>
+          </div>
+
+          <!-- Selectable LLM Model Dropdown -->
+          <div class="mt-1">
+            <select id="selectCityLLM" onchange="changeLLMModel(this.value)" class="w-full bg-slate-900 border border-rose-800/70 text-white rounded-lg px-2 py-1 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-rose-500">
+              <option value="sahabatai">Sahabat-AI 8B (~2500ms • 36 tok)</option>
+              <option value="qwen">Qwen 2.5 7B (~2200ms • 36 tok)</option>
+              <option value="gemma">Gemma 2 9B (~2800ms • 36 tok)</option>
+              <option value="gemma-2b">Gemma 2 2B (~1100ms • 32 tok)</option>
+            </select>
+          </div>
+          <div id="llmSubtitle" class="text-[10px] text-rose-300/80 mt-0.5">Decision Lag Tinggi • Boros Token</div>
+
+          <!-- Ammo Pod Gauge -->
+          <div class="mt-1 p-1.5 rounded-lg bg-slate-950/70 border border-slate-800 flex items-center justify-between font-mono text-[10px]">
+            <span class="text-slate-400">Amunisi Pod:</span>
+            <span id="ammo-badge-sahabatai" class="font-bold text-rose-400">20/20</span>
+          </div>
+
+          <div class="relative w-full h-[275px] rounded-xl overflow-hidden border border-slate-800 mt-2 radar-canvas crt-scanlines">
+            <canvas id="canvas-sahabatai" class="w-full h-full"></canvas>
+            <div id="reload-overlay-sahabatai" class="hidden absolute inset-0 bg-rose-950/85 backdrop-blur-sm flex flex-col items-center justify-center text-amber-300 font-mono text-xs font-bold p-2 text-center">
+              <span class="text-xl mb-1 animate-spin">🔄</span>
+              <span>RELOADING POD (20 Rudal)...</span>
+              <span id="reload-timer-sahabatai" class="text-xs text-amber-400 mt-1">3.5s</span>
+            </div>
+          </div>
+
+          <div class="space-y-1 mt-2 font-mono text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Integritas Kota:</span>
+              <strong id="hp-sahabatai" class="text-rose-400 font-bold">100%</strong>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="hp-bar-sahabatai" class="bg-rose-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 pt-1">
+              <span>Tangkis: <strong id="kill-sahabatai" class="text-slate-300 font-bold">0</strong></span>
+              <span>Hantam: <strong id="hit-sahabatai" class="text-rose-400 font-bold">0</strong></span>
+              <span>Sipil: <strong id="civ-sahabatai" class="text-cyan-300">0</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="p-1.5 rounded-lg bg-rose-950/40 border border-rose-800/50 text-center font-mono text-[10px] text-rose-300">
+          Token: <span id="tok-sahabatai">0</span> | Rentan Kehancuran
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PERIODIC SITREP RECAP SECTION (REKAP BERKALA SERANGAN & KERUSAKAN) -->
+    <div id="sitrepSection" class="glass-card rounded-2xl p-6 border border-amber-500/40 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-3 h-3 rounded-full bg-amber-400 animate-ping"></div>
+          <h2 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <span>📊</span> SITREP REKAP TAKTIS: Hasil Pertahanan Udara & Efisiensi Tiap Kota
+          </h2>
+        </div>
+        <span id="sitrepWaveLabel" class="text-xs font-mono font-bold px-3 py-1 rounded bg-amber-950 text-amber-300 border border-amber-800">
+          Laporan Rekap: Wave 1 Selesai
+        </span>
+      </div>
+
+      <!-- Quick Model Navigation Badge Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs font-mono">
+        <div class="p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/60">
+          <div class="text-[10px] text-slate-400">Baterai 1 • Jakarta</div>
+          <div class="font-bold text-emerald-300">Laya GPU (~55ms)</div>
+        </div>
+        <div class="p-2 rounded-lg bg-cyan-950/40 border border-cyan-800/60">
+          <div class="text-[10px] text-slate-400">Baterai 2 • Surabaya</div>
+          <div class="font-bold text-cyan-300">OpenJev Logit (~210ms)</div>
+        </div>
+        <div class="p-2 rounded-lg bg-purple-950/70 border-2 border-purple-500 shadow-sm">
+          <div class="text-[10px] text-purple-300 font-bold">Baterai 3 • Bandung</div>
+          <div class="font-black text-purple-200">☁️ TypeSafe JEV Cloud (~160ms) ★</div>
+        </div>
+        <div class="p-2 rounded-lg bg-amber-950/40 border border-amber-800/60">
+          <div class="text-[10px] text-slate-400">Baterai 4 • Medan</div>
+          <div class="font-bold text-amber-300">Kev-0.8B Local (~950ms)</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-950/40 border border-rose-800/60">
+          <div class="text-[10px] text-slate-400">Baterai 5 • Nusantara (IKN)</div>
+          <div class="font-bold text-rose-300">Heavyweight LLM (~2500ms)</div>
+        </div>
+      </div>
+
+      <!-- SITREP Table with Pre-Populated Rows -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-mono text-xs">
+          <thead>
+            <tr class="text-slate-400 border-b border-slate-800 pb-2">
+              <th class="pb-2">Kota Pertahanan</th>
+              <th class="pb-2">Arsitektur AI</th>
+              <th class="pb-2">Latensi</th>
+              <th class="pb-2 text-center">Integritas HP</th>
+              <th class="pb-2 text-center">Amunisi Pod</th>
+              <th class="pb-2 text-center">Ditangkis</th>
+              <th class="pb-2 text-center">Hantaman (Lolos)</th>
+              <th class="pb-2 text-center">Sipil Selamat</th>
+              <th class="pb-2 text-right">Token Terbuang</th>
+              <th class="pb-2 text-right">Status Kota</th>
+            </tr>
+          </thead>
+          <tbody id="sitrepTableBody" class="divide-y divide-slate-900 text-slate-300">
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] mr-1.5 font-mono">KOTA 1</span> Jakarta (Pusat)</td>
+              <td class="py-2.5 font-bold text-emerald-300">🟢 Laya Multilingual (421M GPU)</td>
+              <td class="py-2.5 text-cyan-400 font-mono">~55 ms</td>
+              <td class="py-2.5 text-center font-bold text-emerald-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-slate-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-laya">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-laya">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-laya">0 aman</td>
+              <td class="py-2.5 text-right text-emerald-400 font-bold">0</td>
+              <td class="py-2.5 text-right"><span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 text-[10px] mr-1.5 font-mono">KOTA 2</span> Surabaya (AL)</td>
+              <td class="py-2.5 font-bold text-cyan-300">🔵 OpenJev Logit Scorer (0.5B GPU)</td>
+              <td class="py-2.5 text-cyan-400 font-mono">~210 ms</td>
+              <td class="py-2.5 text-center font-bold text-emerald-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-slate-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-openjev">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-openjev">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-openjev">0 aman</td>
+              <td class="py-2.5 text-right text-emerald-400 font-bold">0</td>
+              <td class="py-2.5 text-right"><span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+            <tr class="hover:bg-slate-900/60 transition bg-purple-950/40 border-l-4 border-purple-500">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 text-[10px] mr-1.5 font-mono">KOTA 3</span> Bandung (Pusat C2 JEV)</td>
+              <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-purple-900/80 text-purple-200 border border-purple-500 font-black text-xs shadow-sm">☁️ TypeSafe JEV (Cloud Decision API SaaS) ★</span></td>
+              <td class="py-2.5 text-purple-300 font-mono font-bold">~160 ms</td>
+              <td class="py-2.5 text-center font-bold text-purple-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-purple-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-jev">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-jev">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-jev">0 aman</td>
+              <td class="py-2.5 text-right text-emerald-400 font-bold">0 (Offloaded)</td>
+              <td class="py-2.5 text-right"><span class="text-purple-300 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 text-[10px] mr-1.5 font-mono">KOTA 4</span> Medan (Radar Terdepan)</td>
+              <td class="py-2.5 font-bold text-amber-300">🟡 Kev-0.8B (Local Ensemble)</td>
+              <td class="py-2.5 text-cyan-400 font-mono">~950 ms</td>
+              <td class="py-2.5 text-center font-bold text-emerald-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-slate-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-kev">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-kev">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-kev">0 aman</td>
+              <td class="py-2.5 text-right text-emerald-400 font-bold">0</td>
+              <td class="py-2.5 text-right"><span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 text-[10px] mr-1.5 font-mono">KOTA 5</span> Nusantara (IKN)</td>
+              <td class="py-2.5 font-bold text-rose-300" id="sitrep-label-sahabatai">🔴 Heavyweight LLM (Sahabat-AI 8B)</td>
+              <td class="py-2.5 text-rose-400 font-mono" id="sitrep-lat-sahabatai">~2,500 ms</td>
+              <td class="py-2.5 text-center font-bold text-emerald-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-slate-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-sahabatai">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-sahabatai">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-sahabatai">0 aman</td>
+              <td class="py-2.5 text-right text-rose-400 font-bold" id="sitrep-tok-sahabatai">0</td>
+              <td class="py-2.5 text-right"><span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <strong>⚡ Mengapa Decision Model Unggul Telak?</strong><br>
+          Rudal hipersonik bergerak dengan waktu tempuh kurang dari 3 detik. <strong>Laya (~55ms)</strong> dan <strong>TypeSafe JEV Cloud (~160ms)</strong> meluncurkan rudal pencegat saat sasaran masih berada di stratosfer tinggi (altitude > 10 km).
+        </div>
+        <div>
+          <strong>🛑 Risiko Fatal Heavyweight LLM di Medan Tempur:</strong><br>
+          Generative LLM (Sahabat-AI / Qwen / Gemma) membutuhkan 1.1s - 2.8s untuk generate token penalaran. Saat perintah <em>"FIRE"</em> keluar, rudal telah menghantam daratan dan meratakan kota!
+        </div>
+      </div>
+
+      <!-- Dedicated TypeSafe JEV Cloud Spotlight Box in SITREP -->
+      <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-600/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-purple-200 text-xs">
+        <div>
+          <strong class="text-purple-300">☁️ Sorotan Baterai Charlie: TypeSafe JEV (Cloud Decision API)</strong><br>
+          <span class="text-slate-300">Inferensi System One deterministik sub-200ms langsung ke endpoint cloud tanpa menyita VRAM GPU lokal (0 MB GPU, 0 Token), menjamin kedaulatan C2 udara tetap responsif bahkan saat GPU lokal sibuk.</span>
+        </div>
+        <button onclick="openProbeModal('jev')" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:opacity-90 text-white font-bold text-xs shadow flex items-center gap-1.5 whitespace-nowrap">
+          <span>⚡</span> Uji Probe JEV
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Live Decision Probe Modal (Interactive Test for TypeSafe JEV & Others) -->
+  <div id="probeModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-xl w-full p-6 border border-purple-500 shadow-jev-glow space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚡</span>
+          <h3 class="text-base font-bold text-white">Live Decision API Radar Probe</h3>
+        </div>
+        <button onclick="closeProbeModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-300">
+        Kirimkan telemetri radar Doppler darurat ke model pengambil keputusan untuk mengevaluasi kecepatan refleks dan validitas taktis.
+      </p>
+
+      <div class="space-y-3 font-mono text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Pilih Model Pengambil Keputusan:</label>
+          <select id="probeModelSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+            <option value="jev">TypeSafe JEV (Cloud System One SaaS - https://api.typesafe.ai/v1/systemone)</option>
+            <option value="laya">Laya Multilingual (421M GPU 0 - Sub-60ms)</option>
+            <option value="openjev">OpenJev Logit Scorer (0.5B GPU 1)</option>
+            <option value="kev">Kev-0.8B (Local Ensemble)</option>
+            <option value="sahabatai">Heavyweight LLM (Sahabat-AI 8B)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Simulasi Telemetri Radar Sasaran:</label>
+          <select id="probeThreatSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+            <option value="MISSILE">🚀 Rudal Hipersonik (Mach 4.2, Alt: 14km, IFF: Nihil)</option>
+            <option value="METEOR">☄️ Meteorit Kinetic Impak (Mach 5.1, Alt: 22km)</option>
+            <option value="DRONE">🛸 Drone Kamikaze (Mach 1.2, Alt: 3km)</option>
+            <option value="AIRLINER">✈️ Pesawat Komersil Garuda GA-402 (Mach 0.85, Alt: 10km, IFF: Valid)</option>
+          </select>
+        </div>
+
+        <button id="btnExecuteProbe" onclick="executeProbeLive()" class="w-full py-2.5 rounded-xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:opacity-90 text-white transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2">
+          <span>🚀</span> Kirimkan Radar Ping & Dapatkan Keputusan
+        </button>
+
+        <!-- Probe Response Output -->
+        <div id="probeResultBox" class="hidden mt-3 p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] space-y-2">
+          <div class="flex items-center justify-between text-xs border-b border-slate-800/80 pb-1.5">
+            <span id="probeResultStatus" class="font-bold text-emerald-400">HTTP 200 OK</span>
+            <span id="probeResultLatency" class="font-mono text-cyan-300">~162 ms</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Keputusan Taktis:</span>
+            <strong id="probeResultAction" class="text-rose-400 font-bold text-sm">FIRE_INTERCEPTOR</strong>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Tingkat Keyakinan:</span>
+            <span id="probeResultConf" class="text-slate-200">100% (High Confidence)</span>
+          </div>
+          <div class="text-[10px] text-slate-500 border-t border-slate-900 pt-1.5 break-all" id="probeRawJson"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript Engine -->
+  <script>
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type, duration, gainVal = 0.05) {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playAirRaidSiren() {
+      playTone(480, 'sawtooth', 0.45, 0.06);
+      setTimeout(() => playTone(680, 'sawtooth', 0.45, 0.06), 250);
+    }
+
+    function playExplosionSound() {
+      playTone(110, 'square', 0.4, 0.09);
+      setTimeout(() => playTone(75, 'sawtooth', 0.5, 0.08), 50);
+    }
+
+    function playLaunchSound() {
+      playTone(650, 'sine', 0.15, 0.04);
+      setTimeout(() => playTone(1300, 'sine', 0.22, 0.04), 40);
+    }
+
+    function playReloadSound() {
+      playTone(900, 'sine', 0.1, 0.05);
+      setTimeout(() => playTone(1200, 'sine', 0.15, 0.05), 100);
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('btnAudio').innerText = audioEnabled ? '🔊' : '🔇';
+    }
+
+    // Simulation Engine Parameters
+    let isRunning = false;
+    let simInterval = null;
+    let wave = 1;
+    let waveTick = 0;
+    const TICKS_PER_WAVE = 100;
+    let objCounter = 0;
+    let radarAngle = 0;
+
+    // Real-Life Threat Damage Table
+    const DAMAGE_TABLE = {
+      'MISSILE': 35.0,
+      'METEOR': 45.0,
+      'DRONE': 12.0,
+      'SHRAPNEL': 3.0
+    };
+
+    // LLM Specs Catalog
+    const LLM_SPECS = {
+      'sahabatai': { label: 'Sahabat-AI 8B', latencyMs: 2500, tokenCost: 36, desc: 'Indonesian Sovereign LLM • 28 t/s • Lag ~2.5s' },
+      'qwen': { label: 'Qwen 2.5 7B', latencyMs: 2200, tokenCost: 36, desc: 'Alibaba Reasoning LLM • 32 t/s • Lag ~2.2s' },
+      'gemma': { label: 'Gemma 2 9B', latencyMs: 2800, tokenCost: 36, desc: 'Google DeepMind LLM • 25 t/s • Lag ~2.8s' },
+      'gemma-2b': { label: 'Gemma 2 2B', latencyMs: 1100, tokenCost: 32, desc: 'Google Compact LLM • 60 t/s • Lag ~1.1s' }
+    };
+
+    // 5 Cities State
+    const models = ['laya', 'openjev', 'jev', 'kev', 'sahabatai'];
+    const citiesData = {
+      'laya': {
+        name: 'Jakarta (Pusat)',
+        label: '🟢 Laya Multilingual (421M GPU)',
+        latencyMs: 55,
+        tokenCost: 0,
+        hp: 100,
+        ammo: 20,
+        maxAmmo: 20,
+        isReloading: false,
+        reloadTicks: 0,
+        fireCooldown: 0,
+        kills: 0,
+        hits: 0,
+        civSafe: 0,
+        tokens: 0,
+        interceptors: []
+      },
+      'openjev': {
+        name: 'Surabaya (AL)',
+        label: '🔵 OpenJev Logit Scorer (0.5B GPU)',
+        latencyMs: 210,
+        tokenCost: 0,
+        hp: 100,
+        ammo: 20,
+        maxAmmo: 20,
+        isReloading: false,
+        reloadTicks: 0,
+        fireCooldown: 0,
+        kills: 0,
+        hits: 0,
+        civSafe: 0,
+        tokens: 0,
+        interceptors: []
+      },
+      'jev': {
+        name: 'Bandung (Pusat C2 JEV)',
+        label: '☁️ TypeSafe JEV (Cloud Decision API SaaS) ★',
+        latencyMs: 160,
+        tokenCost: 0,
+        hp: 100,
+        ammo: 20,
+        maxAmmo: 20,
+        isReloading: false,
+        reloadTicks: 0,
+        fireCooldown: 0,
+        kills: 0,
+        hits: 0,
+        civSafe: 0,
+        tokens: 0,
+        interceptors: []
+      },
+      'kev': {
+        name: 'Medan (Radar)',
+        label: '🟡 Kev-0.8B (Local Ensemble)',
+        latencyMs: 950,
+        tokenCost: 0,
+        hp: 100,
+        ammo: 20,
+        maxAmmo: 20,
+        isReloading: false,
+        reloadTicks: 0,
+        fireCooldown: 0,
+        kills: 0,
+        hits: 0,
+        civSafe: 0,
+        tokens: 0,
+        interceptors: []
+      },
+      'sahabatai': {
+        name: 'Nusantara (IKN)',
+        label: '🔴 Heavyweight LLM (Sahabat-AI 8B)',
+        latencyMs: 2500,
+        tokenCost: 36,
+        hp: 100,
+        ammo: 20,
+        maxAmmo: 20,
+        isReloading: false,
+        reloadTicks: 0,
+        fireCooldown: 0,
+        kills: 0,
+        hits: 0,
+        civSafe: 0,
+        tokens: 0,
+        interceptors: []
+      }
+    };
+
+    let skyObjects = [];
+    let particleExplosions = [];
+    let floatingTexts = [];
+    let rocketSmokeTrails = [];
+    let jetContrails = [];
+
+    // Setup Canvases
+    const canvases = {};
+    const contexts = {};
+
+    models.forEach(m => {
+      const c = document.getElementById('canvas-' + m);
+      canvases[m] = c;
+      contexts[m] = c.getContext('2d');
+      c.width = 240;
+      c.height = 275;
+    });
+
+    function changeLLMModel(key) {
+      const spec = LLM_SPECS[key] || LLM_SPECS['sahabatai'];
+      const c = citiesData['sahabatai'];
+      c.label = spec.label;
+      c.latencyMs = spec.latencyMs;
+      c.tokenCost = spec.tokenCost;
+      document.getElementById('llmLatencyBadge').innerText = `~${spec.latencyMs.toLocaleString()} ms`;
+      document.getElementById('llmSubtitle').innerText = spec.desc;
+
+      // Sync with server if online
+      fetch('/api/air_defense/set_llm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model_key: key })
+      }).catch(() => {});
+    }
+
+    // Spawn sky object
+    function spawnObject() {
+      objCounter++;
+      const speedMult = 1.0 + (wave - 1) * 0.22;
+      const hostileProb = Math.min(0.92, 0.60 + (wave - 1) * 0.08);
+      const isHostile = Math.random() < hostileProb;
+
+      const x = Math.random() * 180 + 30;
+      const y = -15;
+      const targetX = 120 + (Math.random() * 80 - 40);
+      const targetY = 265;
+
+      if (isHostile) {
+        const typeChoice = Math.random() < 0.55 ? 'MISSILE' : (Math.random() < 0.6 ? 'METEOR' : 'DRONE');
+        const baseSpeed = (Math.random() * 1.5 + 2.2) * speedMult;
+        const angle = Math.atan2(targetY - y, targetX - x);
+        const vx = baseSpeed * Math.cos(angle);
+        const vy = baseSpeed * Math.sin(angle);
+
+        return {
+          id: objCounter,
+          type: typeChoice,
+          isHostile: true,
+          x: x,
+          y: y,
+          vx: vx,
+          vy: vy,
+          targetX: targetX,
+          speed: baseSpeed,
+          destroyedBy: {},
+          impactedIn: {},
+          assignedBy: {},
+          countedCiv: {}
+        };
+      } else {
+        const isAirliner = Math.random() < 0.70;
+        const typeChoice = isAirliner ? 'AIRLINER' : 'BIRD';
+        const vx = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 0.4 + 0.8);
+        const vy = Math.random() * 0.12 + 0.04;
+        const startX = vx > 0 ? 10 : 230;
+        const callsigns = ['GA-402', 'JT-610', 'QG-801', 'PK-LUV', 'SQ-77'];
+        const callsign = callsigns[Math.floor(Math.random() * callsigns.length)];
+
+        return {
+          id: objCounter,
+          type: typeChoice,
+          isHostile: false,
+          x: startX,
+          y: Math.random() * 65 + 35,
+          vx: vx,
+          vy: vy,
+          callsign: callsign,
+          destroyedBy: {},
+          impactedIn: {},
+          assignedBy: {},
+          countedCiv: {}
+        };
+      }
+    }
+
+    // Engine Tick Loop
+    function engineTick() {
+      waveTick++;
+      radarAngle = (radarAngle + 0.05) % (Math.PI * 2);
+
+      // Wave Escalation
+      if (waveTick >= TICKS_PER_WAVE) {
+        wave++;
+        waveTick = 0;
+        playAirRaidSiren();
+        updateSITREPReport();
+      }
+
+      // Update countdown bar
+      const pctLeft = ((TICKS_PER_WAVE - waveTick) / TICKS_PER_WAVE) * 100;
+      document.getElementById('sitrepCountdownBar').style.width = pctLeft + '%';
+      document.getElementById('waveBadge').innerText = `WAVE ${wave} (${getWaveName(wave)})`;
+
+      // Spawn rate escalates with wave
+      const spawnRate = Math.max(3, Math.floor(15 - wave * 2.2));
+      if (waveTick % spawnRate === 0) {
+        skyObjects.push(spawnObject());
+      }
+
+      // Move sky objects
+      skyObjects.forEach(obj => {
+        obj.x += obj.vx;
+        obj.y += obj.vy;
+
+        // Jet engine contrails
+        if (obj.type === 'AIRLINER' && waveTick % 2 === 0) {
+          jetContrails.push({
+            x: obj.x - (obj.vx > 0 ? 8 : -8),
+            y: obj.y,
+            life: 1.0,
+            size: 2.5
+          });
+        }
+      });
+
+      // Update each city independently
+      models.forEach(m => {
+        const city = citiesData[m];
+
+        // 1. Tick battery load & reload cooldown
+        if (city.fireCooldown > 0) city.fireCooldown--;
+
+        if (city.isReloading) {
+          city.reloadTicks--;
+          const secLeft = (city.reloadTicks * 0.1).toFixed(1);
+          document.getElementById('reload-timer-' + m).innerText = `${secLeft}s`;
+          if (city.reloadTicks <= 0) {
+            city.isReloading = false;
+            city.ammo = city.maxAmmo;
+            document.getElementById('reload-overlay-' + m).classList.add('hidden');
+            document.getElementById('card-' + m).classList.remove('reloading-active');
+            playReloadSound();
+          }
+        }
+
+        // 2. AI Auto-Engagement
+        skyObjects.forEach(obj => {
+          if (obj.destroyedBy[m] || obj.impactedIn[m]) return;
+
+          if (obj.isHostile) {
+            // Can battery fire?
+            if (!obj.assignedBy[m] && city.ammo > 0 && !city.isReloading && city.fireCooldown <= 0) {
+              obj.assignedBy[m] = true;
+              city.ammo--;
+              city.fireCooldown = 2; // ripple delay
+              city.tokens += city.tokenCost;
+
+              // If magazine exhausted, trigger reload cycle!
+              if (city.ammo <= 0) {
+                city.isReloading = true;
+                city.reloadTicks = 35; // ~3.5 seconds
+                document.getElementById('reload-overlay-' + m).classList.remove('hidden');
+                document.getElementById('card-' + m).classList.add('reloading-active');
+              }
+
+              // Latency delay ticks before interceptor launches
+              const delayTicks = Math.max(1, Math.floor(city.latencyMs / 55));
+              city.interceptors.push({
+                startX: 120,
+                startY: 260,
+                x: 120,
+                y: 260,
+                targetId: obj.id,
+                delay: delayTicks,
+                speed: 8.0,
+                active: true,
+                curveSeed: (Math.random() - 0.5) * 40
+              });
+
+              if (m === 'laya' || m === 'jev') playLaunchSound();
+            }
+
+            // Check ground impact on this city
+            if (obj.y >= 265 && !obj.impactedIn[m]) {
+              obj.impactedIn[m] = true;
+              const dmg = DAMAGE_TABLE[obj.type] || 30;
+              city.hits++;
+              city.hp = Math.max(0, city.hp - dmg);
+              createExplosion(obj.x, 268, true, m);
+              playExplosionSound();
+              floatingTexts.push({
+                city: m,
+                text: `-${dmg}% ${obj.type}!`,
+                x: obj.x,
+                y: 260,
+                life: 1.0,
+                color: '#f43f5e'
+              });
+            }
+
+          } else {
+            // Civilian protection
+            if (obj.y > 220 && !obj.countedCiv[m]) {
+              obj.countedCiv[m] = true;
+              city.civSafe++;
+            }
+          }
+        });
+
+        // 3. Move interceptors
+        city.interceptors.forEach(inc => {
+          if (!inc.active) return;
+          if (inc.delay > 0) {
+            inc.delay--;
+            return;
+          }
+
+          const target = skyObjects.find(o => o.id === inc.targetId);
+          if (!target || target.destroyedBy[m] || target.impactedIn[m]) {
+            inc.active = false;
+            return;
+          }
+
+          // Proportional guidance tracking
+          const dx = target.x - inc.x;
+          const dy = target.y - inc.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Rocket smoke trail
+          rocketSmokeTrails.push({
+            city: m,
+            x: inc.x,
+            y: inc.y + 2,
+            life: 0.8,
+            size: Math.random() * 2 + 1.5
+          });
+
+          if (dist < 14) {
+            inc.active = false;
+            target.destroyedBy[m] = true;
+            city.kills++;
+            createExplosion(target.x, target.y, false, m);
+            playExplosionSound();
+
+            // Low altitude shrapnel
+            if (target.y > 220) {
+              city.hp = Math.max(0, city.hp - DAMAGE_TABLE['SHRAPNEL']);
+              floatingTexts.push({
+                city: m,
+                text: `-3% SHRAPNEL`,
+                x: target.x,
+                y: target.y - 10,
+                life: 0.8,
+                color: '#f59e0b'
+              });
+            }
+          } else {
+            inc.x += (dx / dist) * inc.speed;
+            inc.y += (dy / dist) * inc.speed;
+          }
+        });
+
+        // Render Canvas & UI
+        renderCityCanvas(m);
+        updateCityUI(m);
+      });
+
+      // Update particle effects
+      updateParticles();
+
+      // Clean up out-of-screen objects
+      skyObjects = skyObjects.filter(o => o.y < 310 && o.x > -60 && o.x < 300);
+    }
+
+    function getWaveName(w) {
+      if (w === 1) return 'Recon & Infiltration';
+      if (w === 2) return 'Tactical Escalation';
+      if (w === 3) return 'Hypersonic Missile Salvo';
+      if (w === 4) return 'Saturation Drone Swarm';
+      return 'CATACLYSMIC BOMBARDMENT';
+    }
+
+    // Particle Explosions, Smoke & Shockwaves
+    function createExplosion(x, y, isGround, cityKey) {
+      // Expanding Flak Shockwave Ring
+      particleExplosions.push({
+        city: cityKey,
+        type: 'shockwave',
+        x: x,
+        y: y,
+        radius: 4,
+        maxRadius: isGround ? 35 : 24,
+        life: 1.0,
+        color: isGround ? 'rgba(244, 63, 94, ' : 'rgba(56, 189, 248, '
+      });
+
+      // Fireball & Shrapnel sparks
+      const count = isGround ? 22 : 16;
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 3.5 + 1.2;
+        particleExplosions.push({
+          city: cityKey,
+          type: 'spark',
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          life: 1.0,
+          color: isGround ? '#f43f5e' : (Math.random() < 0.5 ? '#f59e0b' : '#38bdf8'),
+          size: Math.random() * 3.5 + 1.5
+        });
+      }
+
+      // Rising black smoke on ground impact
+      if (isGround) {
+        for (let j = 0; j < 6; j++) {
+          particleExplosions.push({
+            city: cityKey,
+            type: 'ground_smoke',
+            x: x + (Math.random() * 16 - 8),
+            y: y,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: -Math.random() * 1.5 - 0.5,
+            life: 1.2,
+            size: Math.random() * 8 + 6,
+            color: 'rgba(51, 65, 85, '
+          });
+        }
+      }
+    }
+
+    function updateParticles() {
+      particleExplosions.forEach(p => {
+        if (p.type === 'shockwave') {
+          p.radius += (p.maxRadius - p.radius) * 0.2;
+          p.life -= 0.08;
+        } else if (p.type === 'spark') {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 0.05;
+        } else if (p.type === 'ground_smoke') {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.size += 0.3;
+          p.life -= 0.03;
+        }
+      });
+      particleExplosions = particleExplosions.filter(p => p.life > 0);
+
+      rocketSmokeTrails.forEach(s => {
+        s.life -= 0.08;
+      });
+      rocketSmokeTrails = rocketSmokeTrails.filter(s => s.life > 0);
+
+      jetContrails.forEach(c => {
+        c.life -= 0.04;
+      });
+      jetContrails = jetContrails.filter(c => c.life > 0);
+
+      floatingTexts.forEach(t => {
+        t.y -= 0.6;
+        t.life -= 0.03;
+      });
+      floatingTexts = floatingTexts.filter(t => t.life > 0);
+    }
+
+    // Render Canvas per City
+    function renderCityCanvas(m) {
+      const c = canvases[m];
+      const ctx = contexts[m];
+      const city = citiesData[m];
+      const W = c.width;
+      const H = c.height;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Radar Concentric Range Rings
+      ctx.strokeStyle = m === 'jev' ? 'rgba(168, 85, 247, 0.16)' : 'rgba(16, 185, 129, 0.14)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(120, 265, 70, Math.PI, 0);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(120, 265, 140, Math.PI, 0);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(120, 265, 210, Math.PI, 0);
+      ctx.stroke();
+
+      // Rotating Radar Doppler Beam Sweep
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(120, 265);
+      ctx.arc(120, 265, 210, radarAngle, radarAngle + 0.35);
+      ctx.closePath();
+      const sweepGrad = ctx.createRadialGradient(120, 265, 0, 120, 265, 210);
+      sweepGrad.addColorStop(0, m === 'jev' ? 'rgba(168, 85, 247, 0.15)' : 'rgba(16, 185, 129, 0.12)');
+      sweepGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = sweepGrad;
+      ctx.fill();
+      ctx.restore();
+
+      // Jet Contrails
+      jetContrails.forEach(ct => {
+        ctx.fillStyle = `rgba(226, 232, 240, ${ct.life * 0.4})`;
+        ctx.beginPath();
+        ctx.arc(ct.x, ct.y, ct.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // City Dome Force Shield
+      ctx.lineWidth = 1.5;
+      if (city.hp > 65) {
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.12)';
+        ctx.strokeStyle = '#06b6d4';
+      } else if (city.hp > 30) {
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.18)';
+        ctx.strokeStyle = '#f59e0b';
+      } else if (city.hp > 0) {
+        ctx.fillStyle = 'rgba(244, 63, 94, 0.25)';
+        ctx.strokeStyle = '#f43f5e';
+      } else {
+        ctx.fillStyle = 'transparent';
+        ctx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
+      }
+      ctx.beginPath();
+      ctx.arc(120, 265, 62, Math.PI, 0);
+      ctx.fill();
+      ctx.stroke();
+
+      // Buildings Skyline Silhouettes
+      ctx.fillStyle = city.hp > 0 ? '#09131f' : '#030712';
+      ctx.fillRect(45, 250, 22, 20);
+      ctx.fillRect(72, 235, 26, 35);
+      ctx.fillRect(108, 225, 24, 45);
+      ctx.fillRect(138, 240, 26, 30);
+      ctx.fillRect(170, 252, 22, 18);
+
+      // Building Damage Smoke / Fire
+      if (city.hp < 70 && city.hp > 0) {
+        ctx.fillStyle = 'rgba(249, 115, 22, 0.7)';
+        ctx.fillRect(76, 233, 4, 3);
+        ctx.fillRect(144, 238, 5, 3);
+      }
+      if (city.hp < 35 && city.hp > 0) {
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.9)';
+        ctx.fillRect(112, 223, 8, 4);
+      }
+
+      // Launcher Base & Pod Cells
+      ctx.fillStyle = m === 'jev' ? '#a855f7' : '#10b981';
+      ctx.fillRect(116, 260, 8, 9);
+
+      // Draw Sky Objects
+      skyObjects.forEach(obj => {
+        if (obj.destroyedBy[m] || obj.impactedIn[m]) return;
+
+        if (obj.type === 'MISSILE') {
+          // Hypersonic Red Rocket with exhaust flame
+          ctx.strokeStyle = '#f43f5e';
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(obj.x, obj.y);
+          ctx.lineTo(obj.x - obj.vx * 3.5, obj.y - obj.vy * 3.5);
+          ctx.stroke();
+          ctx.fillStyle = '#ffedd5';
+          ctx.fillRect(obj.x - 2, obj.y - 2, 4, 4);
+        } else if (obj.type === 'METEOR') {
+          // Orange Meteor with burning halo
+          ctx.fillStyle = '#f97316';
+          ctx.beginPath();
+          ctx.arc(obj.x, obj.y, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(251, 146, 60, 0.45)';
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(obj.x, obj.y);
+          ctx.lineTo(obj.x - obj.vx * 4.5, obj.y - obj.vy * 4.5);
+          ctx.stroke();
+        } else if (obj.type === 'DRONE') {
+          // Drone Kamikaze (X quadcopter)
+          ctx.fillStyle = '#a855f7';
+          ctx.fillRect(obj.x - 3, obj.y - 3, 6, 6);
+          ctx.strokeStyle = '#c084fc';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(obj.x - 4, obj.y - 4, 8, 8);
+        } else if (obj.type === 'AIRLINER') {
+          // Commercial Airliner with blinking wingtips
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(obj.x - 6, obj.y - 2, 12, 4); // fuselage
+          ctx.fillRect(obj.x - 2, obj.y - 6, 4, 12); // wings
+          // Wingtip lights (Green right, Red left)
+          const blink = waveTick % 10 < 5;
+          ctx.fillStyle = blink ? '#22c55e' : '#14532d';
+          ctx.fillRect(obj.x - 2, obj.y + 6, 2, 2);
+          ctx.fillStyle = blink ? '#ef4444' : '#7f1d1d';
+          ctx.fillRect(obj.x - 2, obj.y - 7, 2, 2);
+          // Callsign
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '8px JetBrains Mono';
+          ctx.fillText(obj.callsign, obj.x - 12, obj.y - 9);
+        } else if (obj.type === 'BIRD') {
+          ctx.fillStyle = '#4ade80';
+          ctx.beginPath();
+          ctx.arc(obj.x, obj.y, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Draw Rocket Smoke Trails
+      rocketSmokeTrails.forEach(st => {
+        if (st.city !== m) return;
+        ctx.fillStyle = `rgba(203, 213, 225, ${st.life * 0.5})`;
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, st.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw Interceptors
+      city.interceptors.forEach(inc => {
+        if (!inc.active || inc.delay > 0) return;
+        ctx.strokeStyle = m === 'jev' ? '#c084fc' : '#38bdf8';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.moveTo(inc.x, inc.y);
+        ctx.lineTo(inc.x, inc.y + 6);
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(inc.x - 1.5, inc.y - 1.5, 3, 3);
+      });
+
+      // Draw Explosions & Shockwaves
+      particleExplosions.forEach(p => {
+        if (p.city !== m) return;
+        if (p.type === 'shockwave') {
+          ctx.strokeStyle = `${p.color}${p.life})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (p.type === 'spark') {
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.life;
+          ctx.fillRect(p.x, p.y, p.size, p.size);
+          ctx.globalAlpha = 1.0;
+        } else if (p.type === 'ground_smoke') {
+          ctx.fillStyle = `${p.color}${p.life * 0.4})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Draw Floating Damage Texts
+      floatingTexts.forEach(ft => {
+        if (ft.city !== m) return;
+        ctx.font = 'bold 9px JetBrains Mono';
+        ctx.fillStyle = ft.color;
+        ctx.globalAlpha = ft.life;
+        ctx.fillText(ft.text, ft.x - 18, ft.y);
+        ctx.globalAlpha = 1.0;
+      });
+    }
+
+    function updateCityUI(m) {
+      const city = citiesData[m];
+      document.getElementById('hp-' + m).innerText = city.hp.toFixed(0) + '%';
+      document.getElementById('hp-bar-' + m).style.width = city.hp + '%';
+
+      if (city.hp < 35) {
+        document.getElementById('hp-bar-' + m).className = 'bg-rose-600 h-full rounded-full transition-all duration-300';
+      } else if (city.hp < 70) {
+        document.getElementById('hp-bar-' + m).className = 'bg-amber-500 h-full rounded-full transition-all duration-300';
+      } else {
+        document.getElementById('hp-bar-' + m).className = m === 'jev' ? 'bg-purple-500 h-full rounded-full transition-all duration-300' : 'bg-emerald-500 h-full rounded-full transition-all duration-300';
+      }
+
+      // Ammo gauge
+      const ammoBadge = document.getElementById('ammo-badge-' + m);
+      if (city.isReloading) {
+        ammoBadge.innerText = 'RELOAD...';
+        ammoBadge.className = 'font-bold text-amber-400 animate-pulse';
+      } else {
+        ammoBadge.innerText = `${city.ammo}/${city.maxAmmo}`;
+        ammoBadge.className = city.ammo > 7 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+      }
+
+      document.getElementById('kill-' + m).innerText = city.kills;
+      document.getElementById('hit-' + m).innerText = city.hits;
+      document.getElementById('civ-' + m).innerText = city.civSafe;
+
+      if (m === 'sahabatai') {
+        document.getElementById('tok-sahabatai').innerText = city.tokens;
+      }
+    }
+
+    // SITREP Report Generator
+    function updateSITREPReport() {
+      const tbody = document.getElementById('sitrepTableBody');
+      document.getElementById('sitrepWaveLabel').innerText = `Laporan Rekap: Wave ${wave - 1} Selesai`;
+
+      let rows = '';
+      models.forEach(m => {
+        const c = citiesData[m];
+        const statusText = c.hp > 65 ? 
+          '<span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span>' : 
+          (c.hp > 0 ? '<span class="text-amber-400 font-bold">RUSAK WASPADA</span>' : '<span class="text-rose-500 font-bold">KOTA HANCUR TOTAL</span>');
+
+        const hpColor = c.hp > 65 ? 'text-emerald-400' : (c.hp > 30 ? 'text-amber-400' : 'text-rose-500 font-bold');
+        const modelLabelHtml = m === 'jev' ? 
+          '<span class="px-2 py-0.5 rounded bg-purple-900/80 text-purple-200 border border-purple-500 font-black text-xs shadow-sm">☁️ TypeSafe JEV (Cloud Decision API SaaS) ★</span>' : 
+          `<span class="text-slate-200 font-bold">${c.label}</span>`;
+
+        const rowStyle = m === 'jev' ? 'bg-purple-950/40 border-l-4 border-purple-500' : '';
+        const cityBadgeColor = m === 'jev' ? 'bg-purple-950 text-purple-300 border-purple-800' : 
+          (m === 'laya' ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 
+          (m === 'openjev' ? 'bg-cyan-950 text-cyan-300 border-cyan-800' : 
+          (m === 'kev' ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-rose-950 text-rose-300 border-rose-800')));
+
+        const badgeNum = m === 'laya' ? '1' : (m === 'openjev' ? '2' : (m === 'jev' ? '3' : (m === 'kev' ? '4' : '5')));
+
+        rows += `
+          <tr class="hover:bg-slate-900/60 transition ${rowStyle}">
+            <td class="py-2.5 font-bold text-white">
+              <span class="px-2 py-0.5 rounded ${cityBadgeColor} border text-[10px] mr-1.5 font-mono">KOTA ${badgeNum}</span>
+              ${c.name}
+            </td>
+            <td class="py-2.5">${modelLabelHtml}</td>
+            <td class="py-2.5 ${m === 'jev' ? 'text-purple-300 font-bold' : 'text-cyan-400'} font-mono">~${c.latencyMs} ms</td>
+            <td class="py-2.5 text-center font-bold ${hpColor}">${c.hp.toFixed(0)}%</td>
+            <td class="py-2.5 text-center font-mono text-slate-300">${c.ammo}/${c.maxAmmo}</td>
+            <td class="py-2.5 text-center text-emerald-400 font-bold">${c.kills} ditangkis</td>
+            <td class="py-2.5 text-center text-rose-400 font-bold">${c.hits} hantaman</td>
+            <td class="py-2.5 text-center text-cyan-300 font-bold">${c.civSafe} aman</td>
+            <td class="py-2.5 text-right ${c.tokens > 0 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}">${c.tokens}${m === 'jev' ? ' (Offloaded)' : ''}</td>
+            <td class="py-2.5 text-right">${statusText}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = rows;
+    }
+
+    function toggleAirDefense() {
+      isRunning = !isRunning;
+      const btn = document.getElementById('btnToggleDefense');
+      const icon = document.getElementById('btnDefenseIcon');
+      const txt = document.getElementById('btnDefenseText');
+
+      if (isRunning) {
+        initAudio();
+        simInterval = setInterval(engineTick, 100);
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition shadow-lg shadow-amber-600/30 flex items-center gap-1.5';
+        icon.innerText = '⏸️';
+        txt.innerText = 'Jeda Pertahanan';
+        playAirRaidSiren();
+      } else {
+        clearInterval(simInterval);
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition shadow-lg shadow-rose-600/30 flex items-center gap-1.5';
+        icon.innerText = '🚀';
+        txt.innerText = 'Lanjutkan Pertahanan';
+      }
+    }
+
+    function resetAirDefense() {
+      if (isRunning) toggleAirDefense();
+      wave = 1;
+      waveTick = 0;
+      objCounter = 0;
+      skyObjects = [];
+      particleExplosions = [];
+      floatingTexts = [];
+      rocketSmokeTrails = [];
+      jetContrails = [];
+
+      models.forEach(m => {
+        const c = citiesData[m];
+        c.hp = 100;
+        c.ammo = 20;
+        c.isReloading = false;
+        c.reloadTicks = 0;
+        c.fireCooldown = 0;
+        c.kills = 0;
+        c.hits = 0;
+        c.civSafe = 0;
+        c.tokens = 0;
+        c.interceptors = [];
+        document.getElementById('reload-overlay-' + m).classList.add('hidden');
+        document.getElementById('card-' + m).classList.remove('reloading-active');
+        updateCityUI(m);
+        renderCityCanvas(m);
+      });
+
+      document.getElementById('waveBadge').innerText = 'WAVE 1 (Recon & Infiltration)';
+      document.getElementById('sitrepCountdownBar').style.width = '100%';
+      updateSITREPReport();
+    }
+
+    function triggerImmediateSITREP() {
+      updateSITREPReport();
+      const el = document.getElementById('sitrepSection');
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Live Probe Modal Functions
+    function openProbeModal(modelKey = 'jev') {
+      document.getElementById('probeModelSelect').value = modelKey;
+      document.getElementById('probeModal').classList.remove('hidden');
+      document.getElementById('probeResultBox').classList.add('hidden');
+    }
+
+    function closeProbeModal() {
+      document.getElementById('probeModal').classList.add('hidden');
+    }
+
+    async function executeProbeLive() {
+      const model = document.getElementById('probeModelSelect').value;
+      const threat = document.getElementById('probeThreatSelect').value;
+      const btn = document.getElementById('btnExecuteProbe');
+      btn.innerText = '⏳ Menghubungi API Server...';
+      btn.disabled = true;
+
+      try {
+        const payload = {
+          model: model,
+          threat_type: threat,
+          speed_mach: threat === 'MISSILE' ? 4.2 : (threat === 'METEOR' ? 5.1 : 0.85),
+          altitude_km: threat === 'MISSILE' ? 14.5 : (threat === 'METEOR' ? 22.0 : 10.5),
+          time_to_impact_sec: threat === 'AIRLINER' ? 999.0 : 2.5,
+          iff_code: threat === 'AIRLINER' ? 'GARUDA-GA402' : null
+        };
+
+        const t0 = performance.now();
+        const resp = await fetch('/api/air_defense/decision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const lat = (performance.now() - t0).toFixed(1);
+        const data = await resp.json();
+
+        document.getElementById('probeResultBox').classList.remove('hidden');
+        document.getElementById('probeResultStatus').innerText = `HTTP ${resp.status} OK • ${data.model || model}`;
+        document.getElementById('probeResultLatency').innerText = `~${data.latency_ms || lat} ms`;
+        document.getElementById('probeResultAction').innerText = data.action || 'FIRE';
+        document.getElementById('probeResultAction').className = data.action === 'SAFE_PASS' ? 'text-emerald-400 font-bold text-sm' : 'text-rose-400 font-bold text-sm';
+        document.getElementById('probeResultConf').innerText = `Keyakinan: ${(data.confidence * 100).toFixed(0)}% • Arsitektur: ${data.architecture || 'System 1'}`;
+        document.getElementById('probeRawJson').innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('probeResultBox').classList.remove('hidden');
+        document.getElementById('probeResultStatus').innerText = 'Simulasi Respons Radar';
+        document.getElementById('probeResultLatency').innerText = '~160 ms';
+        document.getElementById('probeResultAction').innerText = threat === 'AIRLINER' ? 'SAFE_PASS' : 'FIRE';
+        document.getElementById('probeResultAction').className = threat === 'AIRLINER' ? 'text-emerald-400 font-bold text-sm' : 'text-rose-400 font-bold text-sm';
+        document.getElementById('probeResultConf').innerText = '100% (High Confidence - Client Simulation)';
+        document.getElementById('probeRawJson').innerText = `Model: ${model}\nStatus: Fallback Simulasi Lokal\nError: ${err.message}`;
+      } finally {
+        btn.innerText = '🚀 Kirimkan Radar Ping & Dapatkan Keputusan';
+        btn.disabled = false;
+      }
+    }
+
+    // Initial render
+    models.forEach(m => {
+      renderCityCanvas(m);
+      updateCityUI(m);
+    });
+    updateSITREPReport();
+  </script>
+</body>
+</html>

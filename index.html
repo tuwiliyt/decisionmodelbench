@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DecisionModelBench &bull; Research Publications &bull; Richie O. Sumual (PANITA GORONTALO)</title>
+    <meta name="description" content="Official Research Publications Portal for DecisionModelBench by Richie O. Sumual, PANITA GORONTALO. Empirical benchmarks comparing Non-Autoregressive Decision Models against Foundation Large Language Models.">
+    <meta name="author" content="Richie O. Sumual">
+    <meta name="keywords" content="Decision Models, LLM Benchmark, Richie O. Sumual, PANITA GORONTALO, Sahabat-AI, Qwen 2.5, Gemma 2, Emergency 112, Algorithmic Trading, Air Defense">
+
+    <!-- Schema.org Portal Metadata -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "DecisionModelBench Research Publications",
+      "author": {
+        "@type": "Person",
+        "name": "Richie O. Sumual",
+        "email": "richie@panita.web.id",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "PANITA GORONTALO"
+        }
+      },
+      "description": "Empirical benchmarks comparing Non-Autoregressive Decision Models against Foundation Large Language Models across Cyber-Physical Systems, Algorithmic Trading, Emergency Calling, and Public Administration."
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #121a2f;
+            --bg-card: #18233e;
+            --border-color: rgba(99, 140, 255, 0.2);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.35);
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+        }
+        .navbar {
+            background: rgba(18, 26, 47, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 18px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-brand span { color: var(--accent); }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #fff; }
+        .hero {
+            padding: 70px 24px 50px;
+            text-align: center;
+            background: radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .hero-inst {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.12);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        .hero-desc {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 28px;
+            line-height: 1.7;
+        }
+        .author-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 10px 22px;
+            border-radius: 9999px;
+            font-size: 0.95rem;
+        }
+        .author-badge strong { color: #fff; }
+        .container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 0 24px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 14px;
+        }
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .paper-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+        @media (max-width: 600px) {
+            .paper-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 2rem; }
+        }
+        .paper-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 26px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .paper-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(99, 140, 255, 0.45);
+        }
+        .card-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+        .card-title a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .card-title a:hover { color: var(--accent); }
+        .card-author {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+        .card-abstract {
+            font-size: 0.92rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 22px;
+            flex-grow: 1;
+        }
+        .card-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 7px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-sm { padding: 8px 14px; font-size: 0.84rem; }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn-secondary {
+            background: var(--bg-card);
+            color: #e2e8f0;
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover { background: #223055; color: #fff; transform: translateY(-1px); }
+        .sim-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 60px;
+        }
+        .sim-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: all 0.2s;
+        }
+        .sim-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .sim-title { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+        .sim-desc { font-size: 0.85rem; color: var(--text-muted); }
+        .footer {
+            border-top: 1px solid var(--border-color);
+            padding: 36px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="https://tuwiliyt.github.io/decisionmodelbench/" class="nav-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            DecisionModel<span>Bench</span>
+        </a>
+        <div class="nav-links">
+            <a href="#papers">Papers</a>
+            <a href="#arenas">Interactive Arenas</a>
+            <a href="https://github.com/tuwiliyt/decisionmodelbench" target="_blank">GitHub</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-inst">PANITA GORONTALO &bull; RISET MANDIRI</div>
+        <h1 class="hero-title">DecisionModelBench</h1>
+        <p class="hero-desc">
+            Empirical benchmarks evaluating Non-Autoregressive Decision Models against Foundation Large Language Models (Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B) across Time-Critical Cyber-Physical Defense, Algorithmic Trading, and Sovereign Emergency 911/112 Triage.
+        </p>
+        <div class="author-badge">
+            <span>Author: <strong>Richie O. Sumual</strong></span>
+            <span>&bull;</span>
+            <span>Affiliation: <strong style="color: #60a5fa;">PANITA GORONTALO</strong></span>
+            <span>&bull;</span>
+            <span>Gorontalo, Indonesia</span>
+            <span>&bull;</span>
+            <span><a href="mailto:richie@panita.web.id" style="color: var(--accent); text-decoration: none;">richie@panita.web.id</a></span>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="section-header" id="papers">
+            <div>
+                <h2 class="section-title">Research Publications</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Peer-review quality IEEE Transactions format manuscripts with complete empirical telemetry data.</p>
+            </div>
+        </div>
+
+        <div class="paper-grid">
+            
+        <div class="paper-card">
+            <div class="card-badges">
+                <span class="badge badge-blue">Cyber-Physical Systems & Algorithmic Trading</span>
+                <span class="badge badge-green">RISET MANDIRI</span>
+                <span class="badge badge-purple">English</span>
+                <span class="badge badge-blue">7 Pages</span>
+            </div>
+            <h3 class="card-title">
+                <a href="papers/decisionmodelbench-en.html">The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading: An Empirical Benchmark of Non-Autoregressive Decision Models versus Foundation Large Language Models</a>
+            </h3>
+            <div class="card-author">
+                <strong>Richie O. Sumual</strong> &bull; <span style="color: #60a5fa;">PANITA GORONTALO</span> (Gorontalo, Indonesia)
+            </div>
+            <p class="card-abstract">
+                The prevailing tendency to deploy autoregressive Large Language Models (LLMs) across arbitrary decision boundaries has introduced severe architectural pathologies into time-critical cyber-physical systems (CPS) and sub-second algorithmic trading. Autoregressive decoders suffer fr...
+            </p>
+            <div class="card-actions">
+                <a href="papers/decisionmodelbench-en.html" class="btn btn-secondary btn-sm">
+                    View Paper & Metadata
+                </a>
+                <a href="papers/IEEE_Paper_DecisionModelBench_EN.pdf" class="btn btn-primary btn-sm" download>
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+        
+        <div class="paper-card">
+            <div class="card-badges">
+                <span class="badge badge-blue">Sistem Siber-Fisik & Perdagangan Algoritmik</span>
+                <span class="badge badge-green">RISET MANDIRI</span>
+                <span class="badge badge-purple">Bahasa Indonesia</span>
+                <span class="badge badge-blue">7 Pages</span>
+            </div>
+            <h3 class="card-title">
+                <a href="papers/decisionmodelbench-id.html">Kekeliruan Autoregresi dalam Sistem Siber-Fisik Kritis-Waktu dan Perdagangan Algoritmik: Tolok Ukur Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional</a>
+            </h3>
+            <div class="card-author">
+                <strong>Richie O. Sumual</strong> &bull; <span style="color: #60a5fa;">PANITA GORONTALO</span> (Gorontalo, Indonesia)
+            </div>
+            <p class="card-abstract">
+                Kecenderungan mutakhir untuk menerapkan Model Bahasa Besar (Large Language Models atau LLM) berbasis autoregresif pada seluruh domain komputasi keputusan telah memicu patologi arsitektural yang parah dalam sistem siber-fisik (cyber-physical systems/CPS) kritis-waktu dan perdagang...
+            </p>
+            <div class="card-actions">
+                <a href="papers/decisionmodelbench-id.html" class="btn btn-secondary btn-sm">
+                    View Paper & Metadata
+                </a>
+                <a href="papers/IEEE_Paper_DecisionModelBench_ID.pdf" class="btn btn-primary btn-sm" download>
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+        
+        <div class="paper-card">
+            <div class="card-badges">
+                <span class="badge badge-blue">Emergency Calling 911/112 & Multi-LLM Tandem</span>
+                <span class="badge badge-green">RISET MANDIRI</span>
+                <span class="badge badge-purple">English</span>
+                <span class="badge badge-blue">15 Pages</span>
+            </div>
+            <h3 class="card-title">
+                <a href="papers/publicservice-cs-en.html">Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration</a>
+            </h3>
+            <div class="card-author">
+                <strong>Richie O. Sumual</strong> &bull; <span style="color: #60a5fa;">PANITA GORONTALO</span> (Gorontalo, Indonesia)
+            </div>
+            <p class="card-abstract">
+                The wholesale integration of autoregressive Large Language Models (LLMs) into municipal emergency hotlines (e.g., 911 / Indonesia 112), public administration dispatch channels, and enterprise customer support has introduced severe operational vulnerabilities: queue divergence, ca...
+            </p>
+            <div class="card-actions">
+                <a href="papers/publicservice-cs-en.html" class="btn btn-secondary btn-sm">
+                    View Paper & Metadata
+                </a>
+                <a href="papers/IEEE_Paper_PublicService_CS_EN.pdf" class="btn btn-primary btn-sm" download>
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+        
+        <div class="paper-card">
+            <div class="card-badges">
+                <span class="badge badge-blue">Panggilan Darurat 112/911 & Tandem Multi-LLM</span>
+                <span class="badge badge-green">RISET MANDIRI</span>
+                <span class="badge badge-purple">Bahasa Indonesia</span>
+                <span class="badge badge-blue">13 Pages</span>
+            </div>
+            <h3 class="card-title">
+                <a href="papers/publicservice-cs-id.html">Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi</a>
+            </h3>
+            <div class="card-author">
+                <strong>Richie O. Sumual</strong> &bull; <span style="color: #60a5fa;">PANITA GORONTALO</span> (Gorontalo, Indonesia)
+            </div>
+            <p class="card-abstract">
+                Integrasi masif Model Bahasa Besar (Large Language Models/LLM) autoregresif ke dalam kanal tanggap darurat terpadu pemerintah daerah (Panggilan Darurat 112 Indonesia / 911), kanal disposisi administrasi publik nasional (SP4N-LAPOR!), serta pusat layanan pelanggan korporat telah m...
+            </p>
+            <div class="card-actions">
+                <a href="papers/publicservice-cs-id.html" class="btn btn-secondary btn-sm">
+                    View Paper & Metadata
+                </a>
+                <a href="papers/IEEE_Paper_PublicService_CS_ID.pdf" class="btn btn-primary btn-sm" download>
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+        
+        </div>
+
+        <div class="section-header" id="arenas">
+            <div>
+                <h2 class="section-title">Interactive Simulators & Telemetry Dashboards</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Explore live browser-based physics engines and multi-LLM benchmark evaluation suites.</p>
+            </div>
+        </div>
+
+        <div class="sim-grid">
+            <a href="air_defense_arena.html" class="sim-card">
+                <div class="sim-title">Tactical Air Defense Arena</div>
+                <div class="sim-desc">Iron Dome/C-RAM radar simulation testing sub-100ms kinetic missile interception vs LLM lag.</div>
+            </a>
+            <a href="fast_trading_arena.html" class="sim-card">
+                <div class="sim-title">Sub-Second Trading Arena</div>
+                <div class="sim-desc">L2 orderbook matching & slippage simulation across $10,000 algorithmic portfolio.</div>
+            </a>
+            <a href="brick_breaker_arena.html" class="sim-card">
+                <div class="sim-title">Arcade Trajectory Interception</div>
+                <div class="sim-desc">Ball-paddle continuous physics testing state drift under 55ms vs 2,500ms inferencing.</div>
+            </a>
+            <a href="heavyweight_llm_dashboard.html" class="sim-card">
+                <div class="sim-title">Heavyweight Multi-LLM Dashboard</div>
+                <div class="sim-desc">Comparative multi-GPU telemetry for Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, and JEV.</div>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 <strong>Richie O. Sumual</strong> &bull; <strong>PANITA GORONTALO</strong> &bull; Advanced Agentic AI & Distributed Systems Research</p>
+        <p style="margin-top: 8px; font-size: 0.82rem; color: #64748b;">
+            Gorontalo, Indonesia &bull; Pos-el / Email: <a href="mailto:richie@panita.web.id" style="color: var(--accent);">richie@panita.web.id</a> &bull;
+            Indexed for Google Scholar, Semantic Scholar, and Open Academic Research.
+        </p>
+    </footer>
+</body>
+</html>

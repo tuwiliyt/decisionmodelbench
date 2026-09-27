@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi | Richie O. Sumual</title>
+    
+    <!-- Google Scholar & Highwire Press Bibliographic Meta Tags -->
+    <meta name="citation_title" content="Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi">
+    <meta name="citation_author" content="Sumual, Richie O.">
+    <meta name="citation_author" content="Richie O. Sumual">
+    <meta name="citation_author_institution" content="PANITA GORONTALO">
+    <meta name="citation_author_email" content="richie@panita.web.id">
+    <meta name="citation_publication_date" content="2026/09/27">
+    <meta name="citation_date" content="2026/09/27">
+    <meta name="citation_online_date" content="2026/09/27">
+    <meta name="citation_year" content="2026">
+    <meta name="citation_journal_title" content="Laporan Riset Mandiri PANITA GORONTALO">
+    <meta name="citation_technical_report_number" content="PANITA-RR-2026-03-ID">
+    <meta name="citation_pdf_url" content="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_ID.pdf">
+    <meta name="citation_language" content="id">
+    <meta name="citation_keywords" content="Kecerdasan Buatan Sektor Publik; Kedaulatan AI; Panggilan Darurat 112/911; Pipeline Tandem Hibrida Dua-Tingkat; Penapisan Niat; Model Keputusan Non-Autoregresif; Model Bahasa Besar; Antrean Erlang-C; Resusitasi Periode Emas; Pelindungan Data Pribadi; Total Biaya Kepemilikan">
+    <meta name="citation_abstract" content="Integrasi masif Model Bahasa Besar (Large Language Models/LLM) autoregresif ke dalam kanal tanggap darurat terpadu pemerintah daerah (Panggilan Darurat 112 Indonesia / 911), kanal disposisi administrasi publik nasional (SP4N-LAPOR!), serta pusat layanan pelanggan korporat telah menyingkap kerentanan operasional yang kritis: penumpukan antrean ekstrem, kegagalan pemenuhan kesepakatan tingkat layanan (Service Level Agreement/SLA), mutasi sintaksis skema data JSON yang non-deterministik, serta risiko kebocoran data pribadi warga (Personally Identifiable Information/PII). Pada triase darurat penyelamatan nyawa, sintesis teks sekuensial token-demi-token menimbulkan latensi multi-detik (>3.300 ms hingga >12.600 ms) yang memangkas secara fatal batas klinis 'periode emas' (golden period) 3 hingga 5 menit pada kasus henti jantung di luar rumah sakit serta melanggar regulasi batas waktu pengiriman armada (<3 detik). Dalam makalah ini, kami menyajikan evaluasi empiris menggunakan tolok ukur DecisionModelBench, yang menguji model keputusan non-autoregresif melawan jajaran LLM generatif fondasional unggulan dunia—meliputi model kedaulatan Indonesia Sahabat-AI 8B Instruct, Qwen 2.5 7B Instruct dari Alibaba Cloud, dan Gemma 2 9B Instruct dari Google DeepMind pada peladen akselerator ganda NVIDIA Tesla T4—melintasi lima belas skenario komprehensif: sepuluh skenario sipil dan korporat serta lima skenario kritis panggilan darurat 112/911. Kami memformulasikan dinamika ledakan antrean Erlang-C, integral probabilitas pelanggaran batas waktu SLA, fungsi peluruhan probabilitas kelangsungan hidup klinis pasien henti jantung, serta hukum entropi kegagalan skema JSON. Secara empiris, model keputusan non-autoregresif mencapai 100% kepatuhan skema, akurasi perutean semantik hingga 100%, serta nol emisi token dengan biaya $0,05 per 100.000 transaksi. Sebaliknya, LLM Mandiri menunjukkan latensi pengiriman armada yang berbahaya: 3.340,0 ms untuk Sahabat-AI 8B, 10.024,4 ms untuk Qwen 2.5 7B, dan 12.681,7 ms untuk Gemma 2 9B. Menjawab krisis ini, kami mengevaluasi Pipeline Tandem Hibrida Dua-Tingkat di mana Tingkat 1 (Model Keputusan JEV) mengeksekusi disipasi sinyal pengiriman armada penyelamat secara instan dalam 178,5 ms hingga 217,7 ms (<220 ms, akselerasi hingga 64,2x, akurasi 100%, 0 token), sementara Tingkat 2 secara paralel/asinkron mengasimilasi metadata triase guna menyintesis panduan verbal resusitasi jantung paru (RJP) yang mendalam (207–294 token).">
+
+    <!-- Dublin Core Metadata for Academic Repositories -->
+    <meta name="DC.title" content="Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi">
+    <meta name="DC.creator" content="Sumual, Richie O.">
+    <meta name="DC.contributor" content="PANITA GORONTALO">
+    <meta name="DC.date" content="2026-09-27">
+    <meta name="DC.type" content="Text">
+    <meta name="DC.format" content="application/pdf">
+    <meta name="DC.language" content="id">
+    <meta name="DC.publisher" content="PANITA GORONTALO">
+    <meta name="DC.identifier" content="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_ID.pdf">
+    <meta name="DC.description" content="Integrasi masif Model Bahasa Besar (Large Language Models/LLM) autoregresif ke dalam kanal tanggap darurat terpadu pemerintah daerah (Panggilan Darurat 112 Indonesia / 911), kanal disposisi administrasi publik nasional (SP4N-LAPOR!), serta pusat layanan pelanggan korporat telah menyingkap kerentanan operasional yang kritis: penumpukan antrean ekstrem, kegagalan pemenuhan kesepakatan tingkat layanan (Service Level Agreement/SLA), mutasi sintaksis skema data JSON yang non-deterministik, serta risiko kebocoran data pribadi warga (Personally Identifiable Information/PII). Pada triase darurat penyelamatan nyawa, sintesis teks sekuensial token-demi-token menimbulkan latensi multi-detik (>3.300 ms hingga >12.600 ms) yang memangkas secara fatal batas klinis 'periode emas' (golden period) 3 hingga 5 menit pada kasus henti jantung di luar rumah sakit serta melanggar regulasi batas waktu pengiriman armada (<3 detik). Dalam makalah ini, kami menyajikan evaluasi empiris menggunakan tolok ukur DecisionModelBench, yang menguji model keputusan non-autoregresif melawan jajaran LLM generatif fondasional unggulan dunia—meliputi model kedaulatan Indonesia Sahabat-AI 8B Instruct, Qwen 2.5 7B Instruct dari Alibaba Cloud, dan Gemma 2 9B Instruct dari Google DeepMind pada peladen akselerator ganda NVIDIA Tesla T4—melintasi lima belas skenario komprehensif: sepuluh skenario sipil dan korporat serta lima skenario kritis panggilan darurat 112/911. Kami memformulasikan dinamika ledakan antrean Erlang-C, integral probabilitas pelanggaran batas waktu SLA, fungsi peluruhan probabilitas kelangsungan hidup klinis pasien henti jantung, serta hukum entropi kegagalan skema JSON. Secara empiris, model keputusan non-autoregresif mencapai 100% kepatuhan skema, akurasi perutean semantik hingga 100%, serta nol emisi token dengan biaya $0,05 per 100.000 transaksi. Sebaliknya, LLM Mandiri menunjukkan latensi pengiriman armada yang berbahaya: 3.340,0 ms untuk Sahabat-AI 8B, 10.024,4 ms untuk Qwen 2.5 7B, dan 12.681,7 ms untuk Gemma 2 9B. Menjawab krisis ini, kami mengevaluasi Pipeline Tandem Hibrida Dua-Tingkat di mana Tingkat 1 (Model Keputusan JEV) mengeksekusi disipasi sinyal pengiriman armada penyelamat secara instan dalam 178,5 ms hingga 217,7 ms (<220 ms, akselerasi hingga 64,2x, akurasi 100%, 0 token), sementara Tingkat 2 secara paralel/asinkron mengasimilasi metadata triase guna menyintesis panduan verbal resusitasi jantung paru (RJP) yang mendalam (207–294 token).">
+
+    <!-- Schema.org ScholarlyArticle JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "headline": "Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi",
+      "name": "Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi",
+      "author": {
+        "@type": "Person",
+        "name": "Richie O. Sumual",
+        "email": "richie@panita.web.id",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "PANITA GORONTALO",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Gorontalo",
+            "addressCountry": "ID"
+          }
+        }
+      },
+      "datePublished": "2026-09-27",
+      "description": "Integrasi masif Model Bahasa Besar (Large Language Models/LLM) autoregresif ke dalam kanal tanggap darurat terpadu pemerintah daerah (Panggilan Darurat 112 Indonesia / 911), kanal disposisi administrasi publik nasional (SP4N-LAPOR!), serta pusat layanan pelanggan korporat telah menyingkap kerentanan operasional yang kritis: penumpukan antrean ekstrem, kegagalan pemenuhan kesepakatan tingkat layanan (Service Level Agreement/SLA), mutasi sintaksis skema data JSON yang non-deterministik, serta risiko kebocoran data pribadi warga (Personally Identifiable Information/PII). Pada triase darurat penyelamatan nyawa, sintesis teks sekuensial token-demi-token menimbulkan latensi multi-detik (>3.300 ms hingga >12.600 ms) yang memangkas secara fatal batas klinis 'periode emas' (golden period) 3 hingga 5 menit pada kasus henti jantung di luar rumah sakit serta melanggar regulasi batas waktu pengiriman armada (<3 detik). Dalam makalah ini, kami menyajikan evaluasi empiris menggunakan tolok ukur DecisionModelBench, yang menguji model keputusan non-autoregresif melawan jajaran LLM generatif fondasional unggulan dunia—meliputi model kedaulatan Indonesia Sahabat-AI 8B Instruct, Qwen 2.5 7B Instruct dari Alibaba Cloud, dan Gemma 2 9B Instruct dari Google DeepMind pada peladen akselerator ganda NVIDIA Tesla T4—melintasi lima belas skenario komprehensif: sepuluh skenario sipil dan korporat serta lima skenario kritis panggilan darurat 112/911. Kami memformulasikan dinamika ledakan antrean Erlang-C, integral probabilitas pelanggaran batas waktu SLA, fungsi peluruhan probabilitas kelangsungan hidup klinis pasien henti jantung, serta hukum entropi kegagalan skema JSON. Secara empiris, model keputusan non-autoregresif mencapai 100% kepatuhan skema, akurasi perutean semantik hingga 100%, serta nol emisi token dengan biaya $0,05 per 100.000 transaksi. Sebaliknya, LLM Mandiri menunjukkan latensi pengiriman armada yang berbahaya: 3.340,0 ms untuk Sahabat-AI 8B, 10.024,4 ms untuk Qwen 2.5 7B, dan 12.681,7 ms untuk Gemma 2 9B. Menjawab krisis ini, kami mengevaluasi Pipeline Tandem Hibrida Dua-Tingkat di mana Tingkat 1 (Model Keputusan JEV) mengeksekusi disipasi sinyal pengiriman armada penyelamat secara instan dalam 178,5 ms hingga 217,7 ms (<220 ms, akselerasi hingga 64,2x, akurasi 100%, 0 token), sementara Tingkat 2 secara paralel/asinkron mengasimilasi metadata triase guna menyintesis panduan verbal resusitasi jantung paru (RJP) yang mendalam (207–294 token).",
+      "url": "https://tuwiliyt.github.io/decisionmodelbench/papers/publicservice-cs-id.html",
+      "encoding": {
+        "@type": "MediaObject",
+        "contentUrl": "https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_ID.pdf",
+        "encodingFormat": "application/pdf"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #121a2f;
+            --bg-card: #18233e;
+            --border-color: rgba(99, 140, 255, 0.2);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.35);
+            --accent-green: #10b981;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 0;
+            margin: 0;
+        }
+        .navbar {
+            background: rgba(18, 26, 47, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-brand span {
+            color: var(--accent);
+        }
+        .nav-links {
+            display: flex;
+            gap: 18px;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: #fff;
+        }
+        .container {
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+        .badge-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+        h1.paper-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 24px;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+        .author-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 32px;
+        }
+        .author-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .author-affiliation {
+            color: #93c5fd;
+            font-weight: 600;
+            margin: 4px 0;
+            font-size: 0.95rem;
+        }
+        .author-meta {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+        .author-meta a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .cta-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            box-shadow: 0 4px 14px var(--accent-glow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        .btn-secondary {
+            background: var(--bg-card);
+            color: #e2e8f0;
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background: #202d4f;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .abstract-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            text-align: justify;
+            margin-bottom: 32px;
+            background: rgba(18, 26, 47, 0.5);
+            padding: 24px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+        .keywords-box {
+            margin-bottom: 36px;
+        }
+        .keyword-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.06);
+            color: #cbd5e1;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bibtex-box {
+            background: #0d1322;
+            border: 1px solid rgba(99, 140, 255, 0.25);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        pre.bibtex-code {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #93c5fd;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 0;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+        .footer {
+            border-top: 1px solid var(--border-color);
+            padding: 32px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="https://tuwiliyt.github.io/decisionmodelbench/" class="nav-brand">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            DecisionModel<span>Bench</span>
+        </a>
+        <div class="nav-links">
+            <a href="https://tuwiliyt.github.io/decisionmodelbench/">Home & Papers</a>
+            <a href="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_ID.pdf">Direct PDF</a>
+            <a href="https://github.com/tuwiliyt/decisionmodelbench" target="_blank">GitHub Repo</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="badge-bar">
+            <span class="badge badge-blue">Panggilan Darurat 112/911 & Tandem Multi-LLM</span>
+            <span class="badge badge-green">RISET MANDIRI</span>
+            <span class="badge badge-purple">Bahasa Indonesia</span>
+            <span class="badge badge-blue">IEEE Standard (13 Pages)</span>
+        </div>
+
+        <h1 class="paper-title">Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi</h1>
+
+        <div class="author-box">
+            <div class="author-name">Richie O. Sumual</div>
+            <div class="author-affiliation">PANITA GORONTALO</div>
+            <div class="author-meta">
+                Advanced Agentic AI & Distributed Systems Research &bull; Gorontalo, Indonesia<br>
+                Official Email: <a href="mailto:richie@panita.web.id">richie@panita.web.id</a> &bull; Report ID: <code>PANITA-RR-2026-03-ID</code> &bull; Date: September 2026
+            </div>
+        </div>
+
+        <div class="cta-box">
+            <a href="IEEE_Paper_PublicService_CS_ID.pdf" class="btn btn-primary" download>
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                Download Full Paper (PDF)
+            </a>
+            <a href="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_ID.pdf" class="btn btn-secondary" target="_blank">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View PDF in Browser
+            </a>
+            <a href="https://tuwiliyt.github.io/decisionmodelbench/" class="btn btn-secondary">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to All Papers
+            </a>
+        </div>
+
+        <h2 class="section-title">Abstract</h2>
+        <div class="abstract-text">
+            Integrasi masif Model Bahasa Besar (Large Language Models/LLM) autoregresif ke dalam kanal tanggap darurat terpadu pemerintah daerah (Panggilan Darurat 112 Indonesia / 911), kanal disposisi administrasi publik nasional (SP4N-LAPOR!), serta pusat layanan pelanggan korporat telah menyingkap kerentanan operasional yang kritis: penumpukan antrean ekstrem, kegagalan pemenuhan kesepakatan tingkat layanan (Service Level Agreement/SLA), mutasi sintaksis skema data JSON yang non-deterministik, serta risiko kebocoran data pribadi warga (Personally Identifiable Information/PII). Pada triase darurat penyelamatan nyawa, sintesis teks sekuensial token-demi-token menimbulkan latensi multi-detik (>3.300 ms hingga >12.600 ms) yang memangkas secara fatal batas klinis 'periode emas' (golden period) 3 hingga 5 menit pada kasus henti jantung di luar rumah sakit serta melanggar regulasi batas waktu pengiriman armada (<3 detik). Dalam makalah ini, kami menyajikan evaluasi empiris menggunakan tolok ukur DecisionModelBench, yang menguji model keputusan non-autoregresif melawan jajaran LLM generatif fondasional unggulan dunia—meliputi model kedaulatan Indonesia Sahabat-AI 8B Instruct, Qwen 2.5 7B Instruct dari Alibaba Cloud, dan Gemma 2 9B Instruct dari Google DeepMind pada peladen akselerator ganda NVIDIA Tesla T4—melintasi lima belas skenario komprehensif: sepuluh skenario sipil dan korporat serta lima skenario kritis panggilan darurat 112/911. Kami memformulasikan dinamika ledakan antrean Erlang-C, integral probabilitas pelanggaran batas waktu SLA, fungsi peluruhan probabilitas kelangsungan hidup klinis pasien henti jantung, serta hukum entropi kegagalan skema JSON. Secara empiris, model keputusan non-autoregresif mencapai 100% kepatuhan skema, akurasi perutean semantik hingga 100%, serta nol emisi token dengan biaya $0,05 per 100.000 transaksi. Sebaliknya, LLM Mandiri menunjukkan latensi pengiriman armada yang berbahaya: 3.340,0 ms untuk Sahabat-AI 8B, 10.024,4 ms untuk Qwen 2.5 7B, dan 12.681,7 ms untuk Gemma 2 9B. Menjawab krisis ini, kami mengevaluasi Pipeline Tandem Hibrida Dua-Tingkat di mana Tingkat 1 (Model Keputusan JEV) mengeksekusi disipasi sinyal pengiriman armada penyelamat secara instan dalam 178,5 ms hingga 217,7 ms (<220 ms, akselerasi hingga 64,2x, akurasi 100%, 0 token), sementara Tingkat 2 secara paralel/asinkron mengasimilasi metadata triase guna menyintesis panduan verbal resusitasi jantung paru (RJP) yang mendalam (207–294 token).
+        </div>
+
+        <h2 class="section-title">Index Terms & Keywords</h2>
+        <div class="keywords-box">
+            <span class="keyword-tag">Kecerdasan Buatan Sektor Publik</span><span class="keyword-tag">Kedaulatan AI</span><span class="keyword-tag">Panggilan Darurat 112/911</span><span class="keyword-tag">Pipeline Tandem Hibrida Dua-Tingkat</span><span class="keyword-tag">Penapisan Niat</span><span class="keyword-tag">Model Keputusan Non-Autoregresif</span><span class="keyword-tag">Model Bahasa Besar</span><span class="keyword-tag">Antrean Erlang-C</span><span class="keyword-tag">Resusitasi Periode Emas</span><span class="keyword-tag">Pelindungan Data Pribadi</span><span class="keyword-tag">Total Biaya Kepemilikan</span>
+        </div>
+
+        <h2 class="section-title">BibTeX Citation</h2>
+        <div class="bibtex-box">
+            <button class="copy-btn" onclick="copyBibtex()">Copy BibTeX</button>
+            <pre class="bibtex-code" id="bibtexText">@article{sumual2026penapisan,
+  title={Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi},
+  author={Sumual, Richie O.},
+  journal={Laporan Riset Mandiri PANITA GORONTALO},
+  volume={2026},
+  number={PANITA-RR-2026-03-ID},
+  pages={1--13},
+  year={2026},
+  month={September},
+  institution={PANITA GORONTALO},
+  address={Gorontalo, Indonesia},
+  url={https://tuwiliyt.github.io/decisionmodelbench/papers/publicservice-cs-id.html}
+}</pre>
+        </div>
+
+        <h2 class="section-title">Archival & Academic Metadata</h2>
+        <div style="background: var(--bg-card); padding: 18px 24px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem;">
+            <p><strong>Full Title:</strong> Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi</p>
+            <p><strong>Primary Author:</strong> Richie O. Sumual</p>
+            <p><strong>Affiliation:</strong> PANITA GORONTALO (Gorontalo, Indonesia)</p>
+            <p><strong>Publication Series:</strong> Laporan Riset Mandiri PANITA GORONTALO</p>
+            <p><strong>Permanent Document Link:</strong> <a href="https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_ID.pdf" style="color: var(--accent);">https://tuwiliyt.github.io/decisionmodelbench/papers/IEEE_Paper_PublicService_CS_ID.pdf</a></p>
+            <p><strong>Google Scholar Metadata Compatibility:</strong> Highwire Press, Dublin Core, Schema.org ScholarlyArticle verified.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Richie O. Sumual &bull; PANITA GORONTALO &bull; Advanced Agentic AI & Distributed Systems Research</p>
+        <p style="margin-top: 6px; font-size: 0.8rem; color: #64748b;">Gorontalo, Indonesia &bull; Contact: richie@panita.web.id</p>
+    </footer>
+
+    <script>
+        function copyBibtex() {
+            const text = document.getElementById('bibtexText').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy BibTeX', 2000);
+            });
+        }
+    </script>
+</body>
+</html>
