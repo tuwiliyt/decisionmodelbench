@@ -335,7 +335,7 @@ def predict(payload: PredictPayload):
             kev_lat = (time.perf_counter() - t0) * 1000
             results["kev"] = {
                 "name": "Kev-0.8B (Qwen3.5 LoRA)",
-                "deployment": "Local GPU (Tesla T4)",
+                "deployment": f"Local GPU ({torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'})",
                 "latency_ms": round(kev_lat, 1),
                 "answers": r_kev.get("answers", {})
             }

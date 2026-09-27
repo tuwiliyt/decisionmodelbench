@@ -40,7 +40,7 @@ def main():
             "latency_ms": None,
             "status": "vram_insufficient",
             "hardware_warning": True,
-            "message": f"⚠️ VRAM Terbatas: CLM-8B membutuhkan ~16 GB VRAM unquantized. Sisa VRAM GPU Tesla T4 saat ini: {free_gb} GB (terpakai {used_gb} GB oleh Laya, Kev, & OpenJev). Dibutuhkan isolasi GPU tunggal atau kuantisasi 4-bit (AWQ) agar tidak mengalami CUDA Out of Memory.",
+            "message": f"⚠️ VRAM Terbatas: CLM-8B membutuhkan ~16 GB VRAM unquantized. Sisa VRAM GPU {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'N/A'} saat ini: {free_gb} GB (terpakai {used_gb} GB oleh Laya, Kev, & OpenJev). Dibutuhkan isolasi GPU tunggal atau kuantisasi 4-bit (AWQ) agar tidak mengalami CUDA Out of Memory.",
             "required_vram_gb": 16.0,
             "free_vram_gb": free_gb,
             "answers": {}
