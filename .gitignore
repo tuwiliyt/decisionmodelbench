@@ -23,3 +23,11 @@ scratch/
 .idea/
 .vscode/
 *.whl
+
+# LaTeX Auxiliary Build Files
+*.aux
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
