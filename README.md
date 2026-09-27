@@ -151,8 +151,9 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# 3. Pasang llama-cpp-python dengan akselerasi CUDA
-CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --no-cache-dir
+# 3. Pasang llama-cpp-python dengan akselerasi CUDA & live detail progress
+python3 install_llama_cpp.py
+# (atau manual: CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --no-cache-dir -v)
 
 # 4. Pasang Kev dari GitHub
 pip install git+https://github.com/jaredpalmer/kev.git
@@ -283,6 +284,7 @@ decisionmodelbench/
 ├── config.py                         # Modul pembaca konfigurasi & .env
 ├── .env.example                      # Template file variabel lingkungan
 ├── requirements.txt                  # Daftar dependensi pustaka Python
+├── install_llama_cpp.py              # Installer live detail progress kompilasi llama-cpp-python
 ├── heavyweight_llm_engine.py         # Engine manajer multi-LLM (CUDA llama-cpp-python)
 ├── openjev_engine.py                 # Engine native OpenJev logit continuation scorer
 ├── sahabatai_engine.py               # Engine wrapper Sahabat-AI

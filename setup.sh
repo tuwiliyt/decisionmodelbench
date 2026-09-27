@@ -142,10 +142,9 @@ else
     echo -e "  ${GREEN}✓ Pustaka Kev (jaredpalmer/kev) sudah terpasang.${NC}"
 fi
 
-# Check llama-cpp-python CUDA acceleration
+# Check llama-cpp-python installation & compilation with live detailed progress
 if ! python3 -c "import llama_cpp" &> /dev/null; then
-    echo -e "Memasang llama-cpp-python dengan akselerasi CUDA GPU..."
-    CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --no-cache-dir || pip install llama-cpp-python
+    python3 install_llama_cpp.py
 else
     echo -e "  ${GREEN}✓ llama-cpp-python (CUDA Engine) sudah terpasang.${NC}"
 fi
