@@ -5,7 +5,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-teal.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Multi-GPU](https://img.shields.io/badge/Multi--GPU-Dual%20Tesla%20T4%20Sharding-purple.svg)](https://developer.nvidia.com)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22995519.svg)](https://doi.org/10.5281/zenodo.22995519)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22995594.svg)](https://zenodo.org/records/22995595)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Portal%20%26%20Papers-blue?logo=github)](https://tuwiliyt.github.io/decisionmodelbench/)
 
 Platform evaluasi dan arena perbandingan komprehensif untuk memvalidasi mengapa **Model Decision (System 1)** wajib digunakan dalam arsitektur AI produksi dibandingkan membebankan seluruh kueri ke **Foundation Large Language Model Generatif Kelas Berat (System 2)** pada infrastruktur GPU lokal (NVIDIA Tesla T4 / A10G / L4 / RTX 3090/4090 / Multi-GPU).
