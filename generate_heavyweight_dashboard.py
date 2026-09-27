@@ -11,6 +11,8 @@ Generates heavyweight_llm_dashboard.html with:
 8. Deep dive architectural explanations (Non-Autoregressive vs Autoregressive).
 """
 
+import os
+
 def generate_html():
     html_content = '''<!DOCTYPE html>
 <html lang="id" class="dark">
@@ -2130,9 +2132,11 @@ def generate_html():
 </body>
 </html>
 '''
-    with open('/content/drive/MyDrive/AIPROJECT/DecisionModel/heavyweight_llm_dashboard.html', 'w', encoding='utf-8') as f:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    output_path = os.path.join(base_dir, 'heavyweight_llm_dashboard.html')
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
-    print("heavyweight_llm_dashboard.html generated successfully!")
+    print(f"heavyweight_llm_dashboard.html generated successfully at {output_path}!")
 
 if __name__ == "__main__":
     generate_html()

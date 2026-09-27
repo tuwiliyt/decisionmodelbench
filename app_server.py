@@ -422,7 +422,8 @@ class HeavyLLMTwoTierPayload(BaseModel):
 
 @app.get("/heavyweight")
 def serve_heavyweight_dashboard():
-    dashboard_path = "/content/drive/MyDrive/AIPROJECT/DecisionModel/heavyweight_llm_dashboard.html"
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    dashboard_path = os.path.join(_dir, "heavyweight_llm_dashboard.html")
     if os.path.exists(dashboard_path):
         return FileResponse(dashboard_path)
     return HTMLResponse("<h1>Heavyweight LLM Dashboard HTML not found</h1>")
@@ -688,7 +689,8 @@ def gpu_nvtop_endpoint():
 
 @app.get("/")
 def serve_dashboard():
-    dashboard_path = "/content/drive/MyDrive/AIPROJECT/DecisionModel/benchmark_dashboard.html"
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    dashboard_path = os.path.join(_dir, "benchmark_dashboard.html")
     if os.path.exists(dashboard_path):
         return FileResponse(dashboard_path)
     return HTMLResponse("<h1>Dashboard HTML not found</h1>")

@@ -4,9 +4,12 @@ supporting all 5 Decision Models in both the Live Playground AND the 8 Full Scen
 Laya, Kev, Jev, OpenJev, and CLM (with dynamic VRAM detection).
 """
 
+import os
 import json
 
-with open("/content/drive/MyDrive/AIPROJECT/DecisionModel/indonesia_benchmark_results.json", "r", encoding="utf-8") as f:
+base_dir = os.path.dirname(os.path.abspath(__file__))
+results_path = os.path.join(base_dir, "indonesia_benchmark_results.json")
+with open(results_path, "r", encoding="utf-8") as f:
     benchmark_data = json.load(f)
 
 json_str = json.dumps(benchmark_data, ensure_ascii=False)
@@ -1073,7 +1076,8 @@ html_content = f"""<!DOCTYPE html>
 </html>
 """
 
-with open("/content/drive/MyDrive/AIPROJECT/DecisionModel/benchmark_dashboard.html", "w", encoding="utf-8") as f:
+output_path = os.path.join(base_dir, "benchmark_dashboard.html")
+with open(output_path, "w", encoding="utf-8") as f:
     f.write(html_content)
 
 print("Updated benchmark_dashboard.html with 5 models in all 8 scenarios successfully!")

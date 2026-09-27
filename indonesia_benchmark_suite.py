@@ -346,7 +346,8 @@ def main():
         })
 
     # Save to JSON
-    out_file = "/content/drive/MyDrive/AIPROJECT/DecisionModel/indonesia_benchmark_results.json"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    out_file = os.path.join(base_dir, "indonesia_benchmark_results.json")
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
     print(f"\nAll benchmark results saved to: {out_file}")

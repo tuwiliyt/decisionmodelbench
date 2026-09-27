@@ -2,6 +2,7 @@
 Evaluate OpenJev and CLM across all 8 scenarios and update indonesia_benchmark_results.json
 """
 
+import os
 import time
 import json
 import torch
@@ -13,7 +14,7 @@ def main():
     scorer = OpenJevScorer(device="cuda")
 
     # Load existing benchmark results
-    results_path = "/content/drive/MyDrive/AIPROJECT/DecisionModel/indonesia_benchmark_results.json"
+    results_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "indonesia_benchmark_results.json")
     with open(results_path, "r", encoding="utf-8") as f:
         results = json.load(f)
 
