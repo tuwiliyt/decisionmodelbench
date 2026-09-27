@@ -437,7 +437,31 @@
         </span>
       </div>
 
-      <!-- SITREP Table -->
+      <!-- Quick Model Navigation Badge Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs font-mono">
+        <div class="p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/60">
+          <div class="text-[10px] text-slate-400">Baterai 1 • Jakarta</div>
+          <div class="font-bold text-emerald-300">Laya GPU (~55ms)</div>
+        </div>
+        <div class="p-2 rounded-lg bg-cyan-950/40 border border-cyan-800/60">
+          <div class="text-[10px] text-slate-400">Baterai 2 • Surabaya</div>
+          <div class="font-bold text-cyan-300">OpenJev Logit (~210ms)</div>
+        </div>
+        <div class="p-2 rounded-lg bg-purple-950/70 border-2 border-purple-500 shadow-sm">
+          <div class="text-[10px] text-purple-300 font-bold">Baterai 3 • Bandung</div>
+          <div class="font-black text-purple-200">☁️ TypeSafe JEV Cloud (~160ms) ★</div>
+        </div>
+        <div class="p-2 rounded-lg bg-amber-950/40 border border-amber-800/60">
+          <div class="text-[10px] text-slate-400">Baterai 4 • Medan</div>
+          <div class="font-bold text-amber-300">Kev-0.8B Local (~950ms)</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-950/40 border border-rose-800/60">
+          <div class="text-[10px] text-slate-400">Baterai 5 • Nusantara (IKN)</div>
+          <div class="font-bold text-rose-300">Heavyweight LLM (~2500ms)</div>
+        </div>
+      </div>
+
+      <!-- SITREP Table with Pre-Populated Rows -->
       <div class="overflow-x-auto">
         <table class="w-full text-left font-mono text-xs">
           <thead>
@@ -455,7 +479,66 @@
             </tr>
           </thead>
           <tbody id="sitrepTableBody" class="divide-y divide-slate-900 text-slate-300">
-            <!-- Dynamically populated via JS -->
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] mr-1.5 font-mono">KOTA 1</span> Jakarta (Pusat)</td>
+              <td class="py-2.5 font-bold text-emerald-300">🟢 Laya Multilingual (421M GPU)</td>
+              <td class="py-2.5 text-cyan-400 font-mono">~55 ms</td>
+              <td class="py-2.5 text-center font-bold text-emerald-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-slate-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-laya">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-laya">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-laya">0 aman</td>
+              <td class="py-2.5 text-right text-emerald-400 font-bold">0</td>
+              <td class="py-2.5 text-right"><span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 text-[10px] mr-1.5 font-mono">KOTA 2</span> Surabaya (AL)</td>
+              <td class="py-2.5 font-bold text-cyan-300">🔵 OpenJev Logit Scorer (0.5B GPU)</td>
+              <td class="py-2.5 text-cyan-400 font-mono">~210 ms</td>
+              <td class="py-2.5 text-center font-bold text-emerald-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-slate-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-openjev">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-openjev">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-openjev">0 aman</td>
+              <td class="py-2.5 text-right text-emerald-400 font-bold">0</td>
+              <td class="py-2.5 text-right"><span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+            <tr class="hover:bg-slate-900/60 transition bg-purple-950/40 border-l-4 border-purple-500">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 text-[10px] mr-1.5 font-mono">KOTA 3</span> Bandung (Pusat C2 JEV)</td>
+              <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-purple-900/80 text-purple-200 border border-purple-500 font-black text-xs shadow-sm">☁️ TypeSafe JEV (Cloud Decision API SaaS) ★</span></td>
+              <td class="py-2.5 text-purple-300 font-mono font-bold">~160 ms</td>
+              <td class="py-2.5 text-center font-bold text-purple-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-purple-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-jev">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-jev">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-jev">0 aman</td>
+              <td class="py-2.5 text-right text-emerald-400 font-bold">0 (Offloaded)</td>
+              <td class="py-2.5 text-right"><span class="text-purple-300 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 text-[10px] mr-1.5 font-mono">KOTA 4</span> Medan (Radar Terdepan)</td>
+              <td class="py-2.5 font-bold text-amber-300">🟡 Kev-0.8B (Local Ensemble)</td>
+              <td class="py-2.5 text-cyan-400 font-mono">~950 ms</td>
+              <td class="py-2.5 text-center font-bold text-emerald-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-slate-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-kev">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-kev">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-kev">0 aman</td>
+              <td class="py-2.5 text-right text-emerald-400 font-bold">0</td>
+              <td class="py-2.5 text-right"><span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="py-2.5 font-bold text-white"><span class="px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 text-[10px] mr-1.5 font-mono">KOTA 5</span> Nusantara (IKN)</td>
+              <td class="py-2.5 font-bold text-rose-300" id="sitrep-label-sahabatai">🔴 Heavyweight LLM (Sahabat-AI 8B)</td>
+              <td class="py-2.5 text-rose-400 font-mono" id="sitrep-lat-sahabatai">~2,500 ms</td>
+              <td class="py-2.5 text-center font-bold text-emerald-400">100%</td>
+              <td class="py-2.5 text-center font-mono text-slate-300">20/20</td>
+              <td class="py-2.5 text-center text-emerald-400 font-bold" id="sitrep-kill-sahabatai">0 ditangkis</td>
+              <td class="py-2.5 text-center text-rose-400 font-bold" id="sitrep-hit-sahabatai">0 hantaman</td>
+              <td class="py-2.5 text-center text-cyan-300 font-bold" id="sitrep-civ-sahabatai">0 aman</td>
+              <td class="py-2.5 text-right text-rose-400 font-bold" id="sitrep-tok-sahabatai">0</td>
+              <td class="py-2.5 text-right"><span class="text-emerald-400 font-bold">OPERASIONAL PRIMA</span></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -469,6 +552,17 @@
           <strong>🛑 Risiko Fatal Heavyweight LLM di Medan Tempur:</strong><br>
           Generative LLM (Sahabat-AI / Qwen / Gemma) membutuhkan 1.1s - 2.8s untuk generate token penalaran. Saat perintah <em>"FIRE"</em> keluar, rudal telah menghantam daratan dan meratakan kota!
         </div>
+      </div>
+
+      <!-- Dedicated TypeSafe JEV Cloud Spotlight Box in SITREP -->
+      <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-600/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-purple-200 text-xs">
+        <div>
+          <strong class="text-purple-300">☁️ Sorotan Baterai Charlie: TypeSafe JEV (Cloud Decision API)</strong><br>
+          <span class="text-slate-300">Inferensi System One deterministik sub-200ms langsung ke endpoint cloud tanpa menyita VRAM GPU lokal (0 MB GPU, 0 Token), menjamin kedaulatan C2 udara tetap responsif bahkan saat GPU lokal sibuk.</span>
+        </div>
+        <button onclick="openProbeModal('jev')" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:opacity-90 text-white font-bold text-xs shadow flex items-center gap-1.5 whitespace-nowrap">
+          <span>⚡</span> Uji Probe JEV
+        </button>
       </div>
     </div>
 
@@ -618,8 +712,8 @@
     const models = ['laya', 'openjev', 'jev', 'kev', 'sahabatai'];
     const citiesData = {
       'laya': {
-        name: 'Jakarta',
-        label: 'Laya Multilingual (421M GPU)',
+        name: 'Jakarta (Pusat)',
+        label: '🟢 Laya Multilingual (421M GPU)',
         latencyMs: 55,
         tokenCost: 0,
         hp: 100,
@@ -635,8 +729,8 @@
         interceptors: []
       },
       'openjev': {
-        name: 'Surabaya',
-        label: 'OpenJev (0.5B GPU Logits)',
+        name: 'Surabaya (AL)',
+        label: '🔵 OpenJev Logit Scorer (0.5B GPU)',
         latencyMs: 210,
         tokenCost: 0,
         hp: 100,
@@ -652,8 +746,8 @@
         interceptors: []
       },
       'jev': {
-        name: 'Bandung',
-        label: 'TypeSafe JEV (Cloud Decision API)',
+        name: 'Bandung (Pusat C2 JEV)',
+        label: '☁️ TypeSafe JEV (Cloud Decision API SaaS) ★',
         latencyMs: 160,
         tokenCost: 0,
         hp: 100,
@@ -669,8 +763,8 @@
         interceptors: []
       },
       'kev': {
-        name: 'Medan',
-        label: 'Kev-0.8B (Local Ensemble)',
+        name: 'Medan (Radar)',
+        label: '🟡 Kev-0.8B (Local Ensemble)',
         latencyMs: 950,
         tokenCost: 0,
         hp: 100,
@@ -687,7 +781,7 @@
       },
       'sahabatai': {
         name: 'Nusantara (IKN)',
-        label: 'Sahabat-AI 8B (Heavyweight LLM)',
+        label: '🔴 Heavyweight LLM (Sahabat-AI 8B)',
         latencyMs: 2500,
         tokenCost: 36,
         hp: 100,
@@ -1325,20 +1419,31 @@
 
         const hpColor = c.hp > 65 ? 'text-emerald-400' : (c.hp > 30 ? 'text-amber-400' : 'text-rose-500 font-bold');
         const modelLabelHtml = m === 'jev' ? 
-          '<strong class="text-purple-300 font-black">TypeSafe JEV (Cloud API) ★</strong>' : 
-          `<span class="text-slate-200">${c.label}</span>`;
+          '<span class="px-2 py-0.5 rounded bg-purple-900/80 text-purple-200 border border-purple-500 font-black text-xs shadow-sm">☁️ TypeSafe JEV (Cloud Decision API SaaS) ★</span>' : 
+          `<span class="text-slate-200 font-bold">${c.label}</span>`;
+
+        const rowStyle = m === 'jev' ? 'bg-purple-950/40 border-l-4 border-purple-500' : '';
+        const cityBadgeColor = m === 'jev' ? 'bg-purple-950 text-purple-300 border-purple-800' : 
+          (m === 'laya' ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 
+          (m === 'openjev' ? 'bg-cyan-950 text-cyan-300 border-cyan-800' : 
+          (m === 'kev' ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-rose-950 text-rose-300 border-rose-800')));
+
+        const badgeNum = m === 'laya' ? '1' : (m === 'openjev' ? '2' : (m === 'jev' ? '3' : (m === 'kev' ? '4' : '5')));
 
         rows += `
-          <tr class="hover:bg-slate-900/60 transition ${m === 'jev' ? 'bg-purple-950/20' : ''}">
-            <td class="py-2.5 font-bold text-white">${c.name}</td>
+          <tr class="hover:bg-slate-900/60 transition ${rowStyle}">
+            <td class="py-2.5 font-bold text-white">
+              <span class="px-2 py-0.5 rounded ${cityBadgeColor} border text-[10px] mr-1.5 font-mono">KOTA ${badgeNum}</span>
+              ${c.name}
+            </td>
             <td class="py-2.5">${modelLabelHtml}</td>
-            <td class="py-2.5 text-cyan-400 font-mono">~${c.latencyMs} ms</td>
+            <td class="py-2.5 ${m === 'jev' ? 'text-purple-300 font-bold' : 'text-cyan-400'} font-mono">~${c.latencyMs} ms</td>
             <td class="py-2.5 text-center font-bold ${hpColor}">${c.hp.toFixed(0)}%</td>
             <td class="py-2.5 text-center font-mono text-slate-300">${c.ammo}/${c.maxAmmo}</td>
             <td class="py-2.5 text-center text-emerald-400 font-bold">${c.kills} ditangkis</td>
             <td class="py-2.5 text-center text-rose-400 font-bold">${c.hits} hantaman</td>
             <td class="py-2.5 text-center text-cyan-300 font-bold">${c.civSafe} aman</td>
-            <td class="py-2.5 text-right ${c.tokens > 0 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}">${c.tokens}</td>
+            <td class="py-2.5 text-right ${c.tokens > 0 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}">${c.tokens}${m === 'jev' ? ' (Offloaded)' : ''}</td>
             <td class="py-2.5 text-right">${statusText}</td>
           </tr>
         `;

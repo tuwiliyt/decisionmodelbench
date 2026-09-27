@@ -105,13 +105,13 @@ def print_sitrep_table(sitrep: dict):
         header_style="bold cyan",
         border_style="yellow"
     )
-    table.add_column("Kota Pertahanan", style="bold white")
+    table.add_column("Kota & Baterai", style="bold white")
     table.add_column("Arsitektur AI", style="bold")
-    table.add_column("Integritas HP", justify="center")
+    table.add_column("Integritas", justify="center")
     table.add_column("Amunisi", justify="center")
-    table.add_column("Rudal Ditangkis", justify="center", style="green bold")
-    table.add_column("Hantaman Kota (Lolos)", justify="center", style="red bold")
-    table.add_column("Sipil Aman", justify="center", style="cyan")
+    table.add_column("Ditangkis", justify="center", style="green bold")
+    table.add_column("Hantaman", justify="center", style="red bold")
+    table.add_column("Sipil", justify="center", style="cyan")
     table.add_column("Token", justify="right")
     table.add_column("Status Kota", justify="center")
 
@@ -121,21 +121,28 @@ def print_sitrep_table(sitrep: dict):
         status_color = "[green]" if "PRIMA" in c["status"] or "OPERASIONAL" in c["status"] else ("[yellow]" if "WASPADA" in c["status"] else "[red]")
         tok_str = f"[red]{c['tokens']}[/red]" if c["tokens"] > 0 else "[green]0[/green]"
 
-        # Distinct label for Jev vs others
+        raw_city = c["city"]
         m_label = c["model"]
-        if "TypeSafe JEV" in m_label:
-            m_style = "[bold magenta]TypeSafe JEV (Cloud API)[/bold magenta]"
-        elif "OpenJev" in m_label:
-            m_style = "[cyan]OpenJev (0.5B GPU Logits)[/cyan]"
-        elif "Laya" in m_label:
-            m_style = "[green]Laya (421M GPU)[/green]"
-        elif "Kev" in m_label:
-            m_style = "[yellow]Kev-0.8B (Local)[/yellow]"
+
+        # Explicit city + model pairing so JEV is impossible to miss
+        if "TypeSafe JEV" in m_label or "Bandung" in raw_city:
+            city_display = "Bandung (TypeSafe JEV)"
+            m_style = "[bold magenta]☁️ TypeSafe JEV (Cloud API) ★[/bold magenta]"
+        elif "OpenJev" in m_label or "Surabaya" in raw_city:
+            city_display = "Surabaya (OpenJev)"
+            m_style = "[cyan]🔵 OpenJev (0.5B GPU Logits)[/cyan]"
+        elif "Laya" in m_label or "Jakarta" in raw_city:
+            city_display = "Jakarta (Laya)"
+            m_style = "[green]🟢 Laya (421M GPU)[/green]"
+        elif "Kev" in m_label or "Medan" in raw_city:
+            city_display = "Medan (Kev)"
+            m_style = "[yellow]🟡 Kev-0.8B (Local)[/yellow]"
         else:
-            m_style = f"[red]{m_label.split(' (')[0]}[/red]"
+            city_display = "Nusantara (LLM)"
+            m_style = f"[red]🔴 {m_label.split(' (')[0]}[/red]"
 
         table.add_row(
-            c["city"].split(" (")[0],
+            city_display,
             m_style,
             f"{hp_color}{hp_val:.0f}%[/]",
             c.get("ammo", "20/20"),
