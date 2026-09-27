@@ -1,32 +1,34 @@
 #!/usr/bin/env python3
 """
 build_github_pages.py
-Generates the complete GitHub Pages portal and Google Scholar-optimized landing pages
-for DecisionModelBench research papers by Richie O. Sumual (PANITA GORONTALO).
+Enterprise-grade Static Site Generator for DecisionModelBench GitHub Pages portal.
+Fully optimized for Google SEO, Google Scholar, Bing, DuckDuckGo, and academic web crawlers.
+Author: Richie O. Sumual (PANITA GORONTALO)
 """
 
 import os
 import shutil
-import pypdf
+import html
 
 BASE_URL = "https://tuwiliyt.github.io/decisionmodelbench"
 AUTHOR = "Richie O. Sumual"
 AFFILIATION = "PANITA GORONTALO & Advanced Agentic AI & Distributed Systems Research, Gorontalo, Indonesia"
 EMAIL = "richie@panita.web.id"
-PUB_DATE = "2026/09/27"
+PUB_DATE_ISO = "2026-09-27"
+PUB_DATE_SLASH = "2026/09/27"
 PUB_YEAR = "2026"
 
 PAPERS_INFO = [
     {
         "id": "decisionmodelbench-en",
+        "pair_id": "decisionmodelbench-id",
         "title": "The Autoregression Fallacy in Time-Critical Cyber-Physical Systems and Algorithmic Trading: An Empirical Benchmark of Non-Autoregressive Decision Models versus Foundation Large Language Models",
         "lang": "en",
+        "locale": "en_US",
         "lang_label": "English",
         "report_id": "PANITA-RR-2026-02-EN",
         "journal": "PANITA GORONTALO Independent Research Reports",
         "pdf_filename": "IEEE_Paper_DecisionModelBench_EN.pdf",
-        "tex_filename": "IEEE_Paper_DecisionModelBench_EN.tex",
-        "md_filename": "IEEE_Paper_DecisionModelBench_EN.md",
         "pages": 7,
         "badge": "Cyber-Physical Systems & Algorithmic Trading",
         "abstract": "The prevailing tendency to deploy autoregressive Large Language Models (LLMs) across arbitrary decision boundaries has introduced severe architectural pathologies into time-critical cyber-physical systems (CPS) and sub-second algorithmic trading. Autoregressive decoders suffer from an intrinsic generation lag: sequential next-token synthesis enforces an O(N) temporal execution delay and memory bandwidth saturation, inducing catastrophic state-decision drift where physical or market conditions evolve faster than policy resolution. In this paper, we present DecisionModelBench, a multi-domain empirical benchmark evaluating non-autoregressive decision models against foundation generative LLMs (Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, and Gemma 2 2B) across distributed dual NVIDIA Tesla T4 GPU topologies and managed cloud APIs. We formulate the Continuous State Drift integral, Latency-Induced Order Book Slippage, and Negative Alpha Decay. Across three adversarial environments—tactical air defense (C-RAM/Iron Dome multi-threat discrimination under 20-missile magazine constraints and 3.5s reload windows), sub-second order book execution ($10,000 portfolio), and continuous dynamic arcade interception—non-autoregressive decision models (Laya 421M at 55 ms, TypeSafe JEV at 160 ms, OpenJev 0.5B at 210 ms) achieve superior performance with zero token waste. Conversely, autoregressive LLMs (2,200–2,800 ms latency) precipitate structural failure: total city collapse in air defense, -$19.41 P&L versus +$40.90 (Laya) in trading, and 100% loss-of-control in arcade kinematics. We rigorously define the microstructural boundaries separating ultra-high-frequency hardware (FPGA/C++ in microsecond regimes) from sub-second decision models, demonstrating that remote cloud decision APIs outperform local 8B LLMs due to sequential memory bus bottlenecks. Finally, we formalize a Decoupled Two-Tier Cognitive Architecture uniting sub-100ms deterministic reflex triage (System 1) with out-of-band asynchronous strategic deliberation (System 2).",
@@ -47,14 +49,14 @@ PAPERS_INFO = [
     },
     {
         "id": "decisionmodelbench-id",
+        "pair_id": "decisionmodelbench-en",
         "title": "Kekeliruan Autoregresi dalam Sistem Siber-Fisik Kritis-Waktu dan Perdagangan Algoritmik: Tolok Ukur Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional",
         "lang": "id",
+        "locale": "id_ID",
         "lang_label": "Bahasa Indonesia",
         "report_id": "PANITA-RR-2026-02-ID",
         "journal": "Laporan Riset Mandiri PANITA GORONTALO",
         "pdf_filename": "IEEE_Paper_DecisionModelBench_ID.pdf",
-        "tex_filename": "IEEE_Paper_DecisionModelBench_ID.tex",
-        "md_filename": "IEEE_Paper_DecisionModelBench_ID.md",
         "pages": 7,
         "badge": "Sistem Siber-Fisik & Perdagangan Algoritmik",
         "abstract": "Kecenderungan mutakhir untuk menerapkan Model Bahasa Besar (Large Language Models atau LLM) berbasis autoregresif pada seluruh domain komputasi keputusan telah memicu patologi arsitektural yang parah dalam sistem siber-fisik (cyber-physical systems/CPS) kritis-waktu dan perdagangan algoritmik sub-detik. Dekoder autoregresif memiliki keterlambatan inferensi intrinsik: pembentukan token demi token secara berurutan memaksakan latensi eksekusi temporal berorde O(N) dan saturasi lebar pita memori (memory bandwidth saturation), yang menimbulkan State-Decision Drift (pergeseran status-keputusan) katastropik di mana kondisi fisik atau pasar bergerak lebih cepat daripada siklus resolusi kebijakan kendali. Artikel ini menyajikan DecisionModelBench, sebuah kerangka pengujian empiris multi-domain yang mengevaluasi model-model keputusan non-autoregresif melawan LLM fondasional generatif (Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, dan Gemma 2 2B) pada klaster komputasi terdistribusi dual NVIDIA Tesla T4 GPU dan infrastruktur cloud API. Kami merumuskan secara analitis integral Pergeseran Status Kontinu, formula Pergeseran Harga Akibat Latensi, serta Pembusukan Alfa Eksponensial. Melalui tiga lingkungan uji berlawanan—pertahanan udara taktis (klasifikasi multi-ancaman C-RAM/Iron Dome dengan kendala magazin baterai 20-rudal dan jeda reload 3,5 detik), eksekusi buku pesanan sub-detik (portofolio tiruan $10.000), dan penangkisan proyektil dinamik kontinu (vektor kecepatan bola Brick Breaker)—model keputusan non-autoregresif (Laya 421M dengan latensi 55 ms, TypeSafe JEV 160 ms, OpenJev 0.5B 210 ms) secara konsisten mempertahankan integritas operasional dengan pemborosan nol token. Sebaliknya, LLM autoregresif (latensi 2.200–2.800 ms) berujung pada keruntuhan struktural: kehancuran kota total pada pertahanan udara, P&L negatif -$19,41 berbanding +$40,90 (Laya) pada perdagangan, dan kegagalan kendali 100% pada kinematika arkade. Kami secara ilmiah mendefinisikan batas mikrostruktur pasar dan merumuskan Arsitektur Kognitif Dua-Tingkat yang menyatukan penapisan refleks deterministik sub-100ms (Sistem 1) dengan penalaran strategis asinkron di luar jalur kritis (Sistem 2).",
@@ -75,14 +77,14 @@ PAPERS_INFO = [
     },
     {
         "id": "publicservice-cs-en",
+        "pair_id": "publicservice-cs-id",
         "title": "Deterministic Intent Gating, Sovereign Emergency Calling, and Two-Tier Civic Triage: An Empirical Evaluation of Non-Autoregressive Decision Models versus Foundation Large Language Models in Municipal 911/112 Operations and High-Throughput Public Administration",
         "lang": "en",
+        "locale": "en_US",
         "lang_label": "English",
         "report_id": "PANITA-RR-2026-03-EN",
         "journal": "PANITA GORONTALO Independent Research Reports",
         "pdf_filename": "IEEE_Paper_PublicService_CS_EN.pdf",
-        "tex_filename": "IEEE_Paper_PublicService_CS_EN.tex",
-        "md_filename": "IEEE_Paper_PublicService_CS_EN.md",
         "pages": 15,
         "badge": "Emergency Calling 911/112 & Multi-LLM Tandem",
         "abstract": "The wholesale integration of autoregressive Large Language Models (LLMs) into municipal emergency hotlines (e.g., 911 / Indonesia 112), public administration dispatch channels, and enterprise customer support has introduced severe operational vulnerabilities: queue divergence, catastrophic service-level agreement (SLA) breaches, non-deterministic schema mutation, and privacy exposure of personally identifiable information (PII). In life-safety emergency dispatch, sequential next-token synthesis incurs multi-second latency (>4,500 ms to >12,500 ms), severely compromising the 3-to-5 minute clinical 'golden period' of out-of-hospital cardiac arrest and violating statutory dispatch timing regulations (<3 s). In this paper, we present an empirical evaluation conducted on DecisionModelBench, benchmarking non-autoregressive decision models against flagship foundation generative LLMs—including the Indonesian sovereign model Sahabat-AI 8B Instruct, Alibaba Cloud's Qwen 2.5 7B Instruct, and Google DeepMind's Gemma 2 9B Instruct deployed on dual NVIDIA Tesla T4 GPUs—across fifteen comprehensive scenarios: ten high-throughput civic and enterprise support cases and five critical life-safety 911/112 emergency calling scenarios. We formalize Erlang-C queue explosion dynamics, statutory SLA breach probability integrals, clinical survival probability decay functions, and schema entropy failure laws. Across civic triage, non-autoregressive decision models (TypeSafe JEV System One at 197.6 ms, OpenJev 0.5B at 540.6 ms, Kev-0.8B at 648.5 ms, and dedicated Laya 421M at 35.8–63.2 ms) achieve 100% schema compliance, up to 100% routing accuracy, zero token waste, and 100% SLA compliance (<500 ms) at $0.05 per 100,000 queries. In critical emergency calling, Standalone LLMs exhibit dangerous dispatch latencies: 3,340.0 ms for Sahabat-AI 8B, 10,024.4 ms for Qwen 2.5 7B, and 12,681.7 ms for Gemma 2 9B, with Qwen exhibiting severe syntax fragility (33.3% standalone accuracy due to markdown fence wrapping). Conversely, our Two-Tier Hybrid Tandem Pipeline decouples physical CAD mobilization (<220 ms, up to 64.2x acceleration, 100% deterministic accuracy, 0 tokens) from asynchronous high-fidelity conversational guidance (207–294 tokens), establishing the definitive paradigm for life-safety emergency operations.",
@@ -103,14 +105,14 @@ PAPERS_INFO = [
     },
     {
         "id": "publicservice-cs-id",
+        "pair_id": "publicservice-cs-en",
         "title": "Penapisan Niat Deterministik, Panggilan Darurat Berdaulat 112/911, dan Triase Sipil Dua-Tingkat: Evaluasi Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional pada Operasi Penyelamatan Nyawa dan Administrasi Publik Bervolume Tinggi",
         "lang": "id",
+        "locale": "id_ID",
         "lang_label": "Bahasa Indonesia",
         "report_id": "PANITA-RR-2026-03-ID",
         "journal": "Laporan Riset Mandiri PANITA GORONTALO",
         "pdf_filename": "IEEE_Paper_PublicService_CS_ID.pdf",
-        "tex_filename": "IEEE_Paper_PublicService_CS_ID.tex",
-        "md_filename": "IEEE_Paper_PublicService_CS_ID.md",
         "pages": 13,
         "badge": "Panggilan Darurat 112/911 & Tandem Multi-LLM",
         "abstract": "Integrasi masif Model Bahasa Besar (Large Language Models/LLM) autoregresif ke dalam kanal tanggap darurat terpadu pemerintah daerah (Panggilan Darurat 112 Indonesia / 911), kanal disposisi administrasi publik nasional (SP4N-LAPOR!), serta pusat layanan pelanggan korporat telah menyingkap kerentanan operasional yang kritis: penumpukan antrean ekstrem, kegagalan pemenuhan kesepakatan tingkat layanan (Service Level Agreement/SLA), mutasi sintaksis skema data JSON yang non-deterministik, serta risiko kebocoran data pribadi warga (Personally Identifiable Information/PII). Pada triase darurat penyelamatan nyawa, sintesis teks sekuensial token-demi-token menimbulkan latensi multi-detik (>3.300 ms hingga >12.600 ms) yang memangkas secara fatal batas klinis 'periode emas' (golden period) 3 hingga 5 menit pada kasus henti jantung di luar rumah sakit serta melanggar regulasi batas waktu pengiriman armada (<3 detik). Dalam makalah ini, kami menyajikan evaluasi empiris menggunakan tolok ukur DecisionModelBench, yang menguji model keputusan non-autoregresif melawan jajaran LLM generatif fondasional unggulan dunia—meliputi model kedaulatan Indonesia Sahabat-AI 8B Instruct, Qwen 2.5 7B Instruct dari Alibaba Cloud, dan Gemma 2 9B Instruct dari Google DeepMind pada peladen akselerator ganda NVIDIA Tesla T4—melintasi lima belas skenario komprehensif: sepuluh skenario sipil dan korporat serta lima skenario kritis panggilan darurat 112/911. Kami memformulasikan dinamika ledakan antrean Erlang-C, integral probabilitas pelanggaran batas waktu SLA, fungsi peluruhan probabilitas kelangsungan hidup klinis pasien henti jantung, serta hukum entropi kegagalan skema JSON. Secara empiris, model keputusan non-autoregresif mencapai 100% kepatuhan skema, akurasi perutean semantik hingga 100%, serta nol emisi token dengan biaya $0,05 per 100.000 transaksi. Sebaliknya, LLM Mandiri menunjukkan latensi pengiriman armada yang berbahaya: 3.340,0 ms untuk Sahabat-AI 8B, 10.024,4 ms untuk Qwen 2.5 7B, dan 12.681,7 ms untuk Gemma 2 9B. Menjawab krisis ini, kami mengevaluasi Pipeline Tandem Hibrida Dua-Tingkat di mana Tingkat 1 (Model Keputusan JEV) mengeksekusi disipasi sinyal pengiriman armada penyelamat secara instan dalam 178,5 ms hingga 217,7 ms (<220 ms, akselerasi hingga 64,2x, akurasi 100%, 0 token), sementara Tingkat 2 secara paralel/asinkron mengasimilasi metadata triase guna menyintesis panduan verbal resusitasi jantung paru (RJP) yang mendalam (207–294 token).",
@@ -131,19 +133,38 @@ PAPERS_INFO = [
     }
 ]
 
-def render_scholar_meta_tags(paper):
+def render_advanced_seo_meta_tags(paper):
     pdf_url = f"{BASE_URL}/papers/{paper['pdf_filename']}"
     landing_url = f"{BASE_URL}/papers/{paper['id']}.html"
+    pair_url = f"{BASE_URL}/papers/{paper['pair_id']}.html"
+    escaped_title = html.escape(paper['title'])
+    escaped_desc = html.escape(paper['abstract'][:250] + "...")
+    
     return f"""
-    <!-- Google Scholar & Highwire Press Bibliographic Meta Tags -->
-    <meta name="citation_title" content="{paper['title']}">
+    <!-- Canonical & Multilingual Alternate Hreflang Tags -->
+    <link rel="canonical" href="{landing_url}">
+    <link rel="alternate" hreflang="{paper['lang']}" href="{landing_url}">
+    <link rel="alternate" hreflang="{'id' if paper['lang'] == 'en' else 'en'}" href="{pair_url}">
+    <link rel="alternate" hreflang="x-default" href="{BASE_URL}/papers/{paper['id'] if paper['lang'] == 'en' else paper['pair_id']}.html">
+
+    <!-- Universal Search Engine Crawling Directives -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="slurp" content="index, follow">
+    <meta name="duckduckbot" content="index, follow">
+    <meta name="baiduspider" content="index, follow">
+    <meta name="yandexbot" content="index, follow">
+
+    <!-- Google Scholar & Highwire Press Meta Tags -->
+    <meta name="citation_title" content="{escaped_title}">
     <meta name="citation_author" content="Sumual, Richie O.">
     <meta name="citation_author" content="Richie O. Sumual">
     <meta name="citation_author_institution" content="PANITA GORONTALO">
     <meta name="citation_author_email" content="{EMAIL}">
-    <meta name="citation_publication_date" content="{PUB_DATE}">
-    <meta name="citation_date" content="{PUB_DATE}">
-    <meta name="citation_online_date" content="{PUB_DATE}">
+    <meta name="citation_publication_date" content="{PUB_DATE_SLASH}">
+    <meta name="citation_date" content="{PUB_DATE_SLASH}">
+    <meta name="citation_online_date" content="{PUB_DATE_SLASH}">
     <meta name="citation_year" content="{PUB_YEAR}">
     <meta name="citation_journal_title" content="{paper['journal']}">
     <meta name="citation_technical_report_number" content="{paper['report_id']}">
@@ -152,28 +173,46 @@ def render_scholar_meta_tags(paper):
     <meta name="citation_keywords" content="{paper['keywords']}">
     <meta name="citation_abstract" content="{paper['abstract']}">
 
-    <!-- Dublin Core Metadata for Academic Repositories -->
-    <meta name="DC.title" content="{paper['title']}">
+    <!-- Open Graph & Social Media Protocols -->
+    <meta property="og:site_name" content="DecisionModelBench &bull; PANITA GORONTALO">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{escaped_title}">
+    <meta property="og:description" content="{escaped_desc}">
+    <meta property="og:url" content="{landing_url}">
+    <meta property="og:locale" content="{paper['locale']}">
+    <meta property="article:published_time" content="{PUB_DATE_ISO}T00:00:00Z">
+    <meta property="article:author" content="{AUTHOR}">
+    <meta property="article:section" content="Computer Science & Cybernetics">
+    <meta property="article:tag" content="{paper['badge']}">
+
+    <!-- Twitter Card Protocols -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{escaped_title}">
+    <meta name="twitter:description" content="{escaped_desc}">
+
+    <!-- Dublin Core Metadata for Open Access Digital Libraries -->
+    <meta name="DC.title" content="{escaped_title}">
     <meta name="DC.creator" content="Sumual, Richie O.">
     <meta name="DC.contributor" content="PANITA GORONTALO">
-    <meta name="DC.date" content="2026-09-27">
+    <meta name="DC.date" content="{PUB_DATE_ISO}">
     <meta name="DC.type" content="Text">
     <meta name="DC.format" content="application/pdf">
     <meta name="DC.language" content="{paper['lang']}">
     <meta name="DC.publisher" content="PANITA GORONTALO">
     <meta name="DC.identifier" content="{pdf_url}">
-    <meta name="DC.description" content="{paper['abstract']}">
+    <meta name="DC.description" content="{escaped_desc}">
 
     <!-- Schema.org ScholarlyArticle JSON-LD -->
     <script type="application/ld+json">
     {{
       "@context": "https://schema.org",
       "@type": "ScholarlyArticle",
-      "headline": "{paper['title']}",
-      "name": "{paper['title']}",
+      "headline": "{escaped_title}",
+      "name": "{escaped_title}",
+      "inLanguage": "{paper['lang']}",
       "author": {{
         "@type": "Person",
-        "name": "Richie O. Sumual",
+        "name": "{AUTHOR}",
         "email": "{EMAIL}",
         "affiliation": {{
           "@type": "Organization",
@@ -185,9 +224,17 @@ def render_scholar_meta_tags(paper):
           }}
         }}
       }},
-      "datePublished": "2026-09-27",
+      "publisher": {{
+        "@type": "Organization",
+        "name": "PANITA GORONTALO",
+        "url": "{BASE_URL}"
+      }},
+      "datePublished": "{PUB_DATE_ISO}",
+      "dateModified": "{PUB_DATE_ISO}",
       "description": "{paper['abstract']}",
       "url": "{landing_url}",
+      "mainEntityOfPage": "{landing_url}",
+      "isAccessibleForFree": true,
       "encoding": {{
         "@type": "MediaObject",
         "contentUrl": "{pdf_url}",
@@ -199,14 +246,18 @@ def render_scholar_meta_tags(paper):
 
 def generate_paper_landing_page(paper):
     pdf_url = f"{BASE_URL}/papers/{paper['pdf_filename']}"
-    meta_tags = render_scholar_meta_tags(paper)
+    meta_tags = render_advanced_seo_meta_tags(paper)
+    pair_page = f"{paper['pair_id']}.html"
+    pair_label = "Read in Indonesian (Versi Bahasa Indonesia)" if paper['lang'] == 'en' else "Read in English (English Version)"
     
-    html = f"""<!DOCTYPE html>
+    html_doc = f"""<!DOCTYPE html>
 <html lang="{paper['lang']}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{paper['title']} | Richie O. Sumual</title>
+    <title>{paper['title']} | Richie O. Sumual (PANITA GORONTALO)</title>
+    <meta name="description" content="{html.escape(paper['abstract'][:250])}...">
+    <meta name="author" content="{AUTHOR}">
     {meta_tags}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -261,6 +312,7 @@ def generate_paper_landing_page(paper):
         .nav-links {{
             display: flex;
             gap: 18px;
+            align-items: center;
         }}
         .nav-links a {{
             color: var(--text-muted);
@@ -438,6 +490,24 @@ def generate_paper_landing_page(paper):
             background: var(--accent);
             color: #fff;
         }}
+        .lang-switch {{
+            margin-bottom: 24px;
+            padding: 12px 18px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px dashed rgba(59, 130, 246, 0.35);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }}
+        .lang-switch a {{
+            color: #60a5fa;
+            font-weight: 600;
+            text-decoration: none;
+        }}
+        .lang-switch a:hover {{
+            text-decoration: underline;
+        }}
         .footer {{
             border-top: 1px solid var(--border-color);
             padding: 32px 24px;
@@ -456,12 +526,18 @@ def generate_paper_landing_page(paper):
         </a>
         <div class="nav-links">
             <a href="{BASE_URL}/">Home & Papers</a>
-            <a href="{BASE_URL}/papers/{paper['pdf_filename']}">Direct PDF</a>
-            <a href="https://github.com/tuwiliyt/decisionmodelbench" target="_blank">GitHub Repo</a>
+            <a href="{pair_page}">Alternate Language</a>
+            <a href="{paper['pdf_filename']}">Direct PDF</a>
+            <a href="https://github.com/tuwiliyt/decisionmodelbench" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
     </nav>
 
     <main class="container">
+        <div class="lang-switch">
+            <span>Language: <strong>{paper['lang_label']}</strong></span>
+            <a href="{pair_page}">&rarr; {pair_label}</a>
+        </div>
+
         <div class="badge-bar">
             <span class="badge badge-blue">{paper['badge']}</span>
             <span class="badge badge-green">RISET MANDIRI</span>
@@ -481,11 +557,11 @@ def generate_paper_landing_page(paper):
         </div>
 
         <div class="cta-box">
-            <a href="{paper['pdf_filename']}" class="btn btn-primary" download>
+            <a href="{paper['pdf_filename']}" class="btn btn-primary" download rel="alternate" type="application/pdf">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                 Download Full Paper (PDF)
             </a>
-            <a href="{BASE_URL}/papers/{paper['pdf_filename']}" class="btn btn-secondary" target="_blank">
+            <a href="{BASE_URL}/papers/{paper['pdf_filename']}" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 View PDF in Browser
             </a>
@@ -518,7 +594,7 @@ def generate_paper_landing_page(paper):
             <p><strong>Affiliation:</strong> PANITA GORONTALO (Gorontalo, Indonesia)</p>
             <p><strong>Publication Series:</strong> {paper['journal']}</p>
             <p><strong>Permanent Document Link:</strong> <a href="{pdf_url}" style="color: var(--accent);">{pdf_url}</a></p>
-            <p><strong>Google Scholar Metadata Compatibility:</strong> Highwire Press, Dublin Core, Schema.org ScholarlyArticle verified.</p>
+            <p><strong>Crawler & Indexing Support:</strong> Highwire Press, Dublin Core, Schema.org ScholarlyArticle, Hreflang Multilingual Linking, XML Sitemap, Robots.txt.</p>
         </div>
     </main>
 
@@ -540,14 +616,14 @@ def generate_paper_landing_page(paper):
 </body>
 </html>
 """
-    return html
+    return html_doc
 
 
 def generate_homepage():
     cards_html = ""
     for p in PAPERS_INFO:
         cards_html += f"""
-        <div class="paper-card">
+        <article class="paper-card">
             <div class="card-badges">
                 <span class="badge badge-blue">{p['badge']}</span>
                 <span class="badge badge-green">RISET MANDIRI</span>
@@ -567,40 +643,90 @@ def generate_homepage():
                 <a href="papers/{p['id']}.html" class="btn btn-secondary btn-sm">
                     View Paper & Metadata
                 </a>
-                <a href="papers/{p['pdf_filename']}" class="btn btn-primary btn-sm" download>
+                <a href="papers/{p['pdf_filename']}" class="btn btn-primary btn-sm" download rel="alternate" type="application/pdf">
                     <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     Download PDF
                 </a>
             </div>
-        </div>
+        </article>
         """
 
-    html = f"""<!DOCTYPE html>
+    html_doc = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DecisionModelBench &bull; Research Publications &bull; Richie O. Sumual (PANITA GORONTALO)</title>
-    <meta name="description" content="Official Research Publications Portal for DecisionModelBench by Richie O. Sumual, PANITA GORONTALO. Empirical benchmarks comparing Non-Autoregressive Decision Models against Foundation Large Language Models.">
+    <meta name="description" content="Official Research Publications Portal for DecisionModelBench by Richie O. Sumual, PANITA GORONTALO. Empirical benchmarks comparing Non-Autoregressive Decision Models against Foundation Large Language Models across Cyber-Physical Defense, Algorithmic Trading, and Sovereign Emergency 911/112 Triage.">
     <meta name="author" content="Richie O. Sumual">
     <meta name="keywords" content="Decision Models, LLM Benchmark, Richie O. Sumual, PANITA GORONTALO, Sahabat-AI, Qwen 2.5, Gemma 2, Emergency 112, Algorithmic Trading, Air Defense">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{BASE_URL}/">
+
+    <!-- Universal Search Engine Crawling Directives -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+    <!-- Open Graph Protocols -->
+    <meta property="og:site_name" content="DecisionModelBench &bull; PANITA GORONTALO">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="DecisionModelBench &bull; Research Publications &bull; Richie O. Sumual">
+    <meta property="og:description" content="Empirical benchmarks evaluating Non-Autoregressive Decision Models against Foundation LLMs (Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B) across Cyber-Physical Systems, Sub-Second Trading, and Emergency Calling.">
+    <meta property="og:url" content="{BASE_URL}/">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card Protocols -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DecisionModelBench &bull; PANITA GORONTALO Research">
+    <meta name="twitter:description" content="Empirical benchmarks evaluating Non-Autoregressive Decision Models against Foundation LLMs across Cyber-Physical Systems and Emergency Calling.">
+
+    <!-- RSS & Atom Feeds -->
+    <link rel="alternate" type="application/rss+xml" title="DecisionModelBench Publications RSS" href="{BASE_URL}/feed.xml">
+    <link rel="alternate" type="application/atom+xml" title="DecisionModelBench Publications Atom" href="{BASE_URL}/atom.xml">
 
     <!-- Schema.org Portal Metadata -->
     <script type="application/ld+json">
     {{
       "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "name": "DecisionModelBench Research Publications",
-      "author": {{
-        "@type": "Person",
-        "name": "Richie O. Sumual",
-        "email": "{EMAIL}",
-        "affiliation": {{
+      "@graph": [
+        {{
+          "@type": "WebSite",
+          "@id": "{BASE_URL}/#website",
+          "url": "{BASE_URL}/",
+          "name": "DecisionModelBench Research Publications",
+          "description": "Empirical benchmarks comparing Non-Autoregressive Decision Models against Foundation Large Language Models across Cyber-Physical Systems, Algorithmic Trading, Emergency Calling, and Public Administration.",
+          "publisher": {{
+            "@type": "Organization",
+            "name": "PANITA GORONTALO",
+            "url": "{BASE_URL}"
+          }}
+        }},
+        {{
           "@type": "Organization",
-          "name": "PANITA GORONTALO"
+          "@id": "{BASE_URL}/#organization",
+          "name": "PANITA GORONTALO",
+          "url": "{BASE_URL}",
+          "email": "{EMAIL}",
+          "address": {{
+            "@type": "PostalAddress",
+            "addressLocality": "Gorontalo",
+            "addressCountry": "ID"
+          }}
+        }},
+        {{
+          "@type": "Person",
+          "@id": "{BASE_URL}/#author",
+          "name": "{AUTHOR}",
+          "email": "{EMAIL}",
+          "jobTitle": "Lead AI Researcher",
+          "affiliation": {{
+            "@type": "Organization",
+            "name": "PANITA GORONTALO"
+          }}
         }}
-      }},
-      "description": "Empirical benchmarks comparing Non-Autoregressive Decision Models against Foundation Large Language Models across Cyber-Physical Systems, Algorithmic Trading, Emergency Calling, and Public Administration."
+      ]
     }}
     </script>
 
@@ -857,7 +983,8 @@ def generate_homepage():
         <div class="nav-links">
             <a href="#papers">Papers</a>
             <a href="#arenas">Interactive Arenas</a>
-            <a href="https://github.com/tuwiliyt/decisionmodelbench" target="_blank">GitHub</a>
+            <a href="{BASE_URL}/sitemap.xml">Sitemap</a>
+            <a href="https://github.com/tuwiliyt/decisionmodelbench" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
     </nav>
 
@@ -879,25 +1006,25 @@ def generate_homepage():
     </header>
 
     <main class="container">
-        <div class="section-header" id="papers">
+        <section class="section-header" id="papers">
             <div>
                 <h2 class="section-title">Research Publications</h2>
                 <p style="color: var(--text-muted); font-size: 0.95rem;">Peer-review quality IEEE Transactions format manuscripts with complete empirical telemetry data.</p>
             </div>
-        </div>
+        </section>
 
-        <div class="paper-grid">
+        <section class="paper-grid">
             {cards_html}
-        </div>
+        </section>
 
-        <div class="section-header" id="arenas">
+        <section class="section-header" id="arenas">
             <div>
                 <h2 class="section-title">Interactive Simulators & Telemetry Dashboards</h2>
                 <p style="color: var(--text-muted); font-size: 0.95rem;">Explore live browser-based physics engines and multi-LLM benchmark evaluation suites.</p>
             </div>
-        </div>
+        </section>
 
-        <div class="sim-grid">
+        <section class="sim-grid">
             <a href="air_defense_arena.html" class="sim-card">
                 <div class="sim-title">Tactical Air Defense Arena</div>
                 <div class="sim-desc">Iron Dome/C-RAM radar simulation testing sub-100ms kinetic missile interception vs LLM lag.</div>
@@ -914,51 +1041,126 @@ def generate_homepage():
                 <div class="sim-title">Heavyweight Multi-LLM Dashboard</div>
                 <div class="sim-desc">Comparative multi-GPU telemetry for Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, and JEV.</div>
             </a>
-        </div>
+        </section>
     </main>
 
     <footer class="footer">
         <p>&copy; 2026 <strong>Richie O. Sumual</strong> &bull; <strong>PANITA GORONTALO</strong> &bull; Advanced Agentic AI & Distributed Systems Research</p>
         <p style="margin-top: 8px; font-size: 0.82rem; color: #64748b;">
             Gorontalo, Indonesia &bull; Pos-el / Email: <a href="mailto:{EMAIL}" style="color: var(--accent);">{EMAIL}</a> &bull;
-            Indexed for Google Scholar, Semantic Scholar, and Open Academic Research.
+            Indexed for Google Scholar, Semantic Scholar, Bing, and Open Academic Research.
         </p>
     </footer>
 </body>
 </html>
 """
-    return html
+    return html_doc
 
 
 def generate_sitemap():
-    urls = [
-        f"{BASE_URL}/",
-        f"{BASE_URL}/air_defense_arena.html",
-        f"{BASE_URL}/fast_trading_arena.html",
-        f"{BASE_URL}/brick_breaker_arena.html",
-        f"{BASE_URL}/heavyweight_llm_dashboard.html",
-    ]
-    for p in PAPERS_INFO:
-        urls.append(f"{BASE_URL}/papers/{p['id']}.html")
-        urls.append(f"{BASE_URL}/papers/{p['pdf_filename']}")
-    
     xml = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-"""
-    for u in urls:
-        xml += f"""  <url>
-    <loc>{u}</loc>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://tuwiliyt.github.io/decisionmodelbench/</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://tuwiliyt.github.io/decisionmodelbench/air_defense_arena.html</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>{"1.0" if u.endswith('/') or '.pdf' in u else "0.8"}</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tuwiliyt.github.io/decisionmodelbench/fast_trading_arena.html</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tuwiliyt.github.io/decisionmodelbench/brick_breaker_arena.html</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tuwiliyt.github.io/decisionmodelbench/heavyweight_llm_dashboard.html</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+"""
+    for p in PAPERS_INFO:
+        landing_url = f"{BASE_URL}/papers/{p['id']}.html"
+        pair_url = f"{BASE_URL}/papers/{p['pair_id']}.html"
+        pdf_url = f"{BASE_URL}/papers/{p['pdf_filename']}"
+        alt_lang = "id" if p['lang'] == "en" else "en"
+        
+        xml += f"""  <url>
+    <loc>{landing_url}</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="{p['lang']}" href="{landing_url}"/>
+    <xhtml:link rel="alternate" hreflang="{alt_lang}" href="{pair_url}"/>
+  </url>
+  <url>
+    <loc>{pdf_url}</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
   </url>
 """
     xml += "</urlset>\n"
     return xml
 
 
+def generate_rss_feed():
+    items = ""
+    for p in PAPERS_INFO:
+        landing_url = f"{BASE_URL}/papers/{p['id']}.html"
+        pdf_url = f"{BASE_URL}/papers/{p['pdf_filename']}"
+        escaped_title = html.escape(p['title'])
+        escaped_desc = html.escape(p['abstract'])
+        
+        items += f"""    <item>
+      <title>{escaped_title}</title>
+      <link>{landing_url}</link>
+      <guid isPermaLink="true">{landing_url}</guid>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 GMT</pubDate>
+      <author>{EMAIL} ({AUTHOR})</author>
+      <category>{p['badge']}</category>
+      <description>{escaped_desc}</description>
+      <enclosure url="{pdf_url}" type="application/pdf" length="350000" />
+    </item>
+"""
+
+    return f"""<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>DecisionModelBench Research Publications</title>
+    <link>{BASE_URL}/</link>
+    <description>Empirical benchmarks evaluating Non-Autoregressive Decision Models against Foundation Large Language Models by Richie O. Sumual (PANITA GORONTALO).</description>
+    <language>en-us</language>
+    <copyright>2026 Richie O. Sumual / PANITA GORONTALO</copyright>
+    <lastBuildDate>Sun, 27 Sep 2026 00:00:00 GMT</lastBuildDate>
+    <atom:link href="{BASE_URL}/feed.xml" rel="self" type="application/rss+xml" />
+{items}
+  </channel>
+</rss>
+"""
+
+
 def generate_robots():
-    return f"""User-agent: *
+    return f"""# ========================================================
+# robots.txt for DecisionModelBench Research Portal
+# Institution: PANITA GORONTALO
+# Author: Richie O. Sumual (richie@panita.web.id)
+# ========================================================
+
+User-agent: *
 Allow: /
 
 User-agent: Googlebot
@@ -967,10 +1169,31 @@ Allow: /
 User-agent: Googlebot-Scholar
 Allow: /
 
+User-agent: Google-Extended
+Allow: /
+
 User-agent: Bingbot
 Allow: /
 
+User-agent: Applebot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
 User-agent: Slurp
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: ia_archiver
+Allow: /
+
+User-agent: semantic-scholar
 Allow: /
 
 Sitemap: {BASE_URL}/sitemap.xml
@@ -986,21 +1209,21 @@ def main():
     os.makedirs(papers_dir, exist_ok=True)
     os.makedirs(docs_papers_dir, exist_ok=True)
 
-    print("Generating Google Scholar Landing Pages...")
+    print("Generating Google Scholar Landing Pages with advanced SEO...")
     for p in PAPERS_INFO:
-        html = generate_paper_landing_page(p)
+        html_content = generate_paper_landing_page(p)
         # Write to papers/
         p_path = os.path.join(papers_dir, f"{p['id']}.html")
         with open(p_path, "w", encoding="utf-8") as f:
-            f.write(html)
+            f.write(html_content)
         print(f"  -> Generated {p_path}")
         
-        # Also copy to docs/papers/
+        # Write to docs/papers/
         p_docs_path = os.path.join(docs_papers_dir, f"{p['id']}.html")
         with open(p_docs_path, "w", encoding="utf-8") as f:
-            f.write(html)
+            f.write(html_content)
 
-        # Copy PDF to docs/papers/ if it exists
+        # Sync PDF
         src_pdf = os.path.join(papers_dir, p['pdf_filename'])
         dst_pdf = os.path.join(docs_papers_dir, p['pdf_filename'])
         if os.path.exists(src_pdf):
@@ -1014,19 +1237,22 @@ def main():
     with open(os.path.join(docs_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(home_html)
 
-    print("Generating sitemap.xml and robots.txt...")
+    print("Generating sitemap.xml, robots.txt, and feed.xml...")
     sitemap = generate_sitemap()
     robots = generate_robots()
+    rss_feed = generate_rss_feed()
     
     for d in [root_dir, docs_dir]:
         with open(os.path.join(d, "sitemap.xml"), "w", encoding="utf-8") as f:
             f.write(sitemap)
         with open(os.path.join(d, "robots.txt"), "w", encoding="utf-8") as f:
             f.write(robots)
+        with open(os.path.join(d, "feed.xml"), "w", encoding="utf-8") as f:
+            f.write(rss_feed)
         with open(os.path.join(d, ".nojekyll"), "w", encoding="utf-8") as f:
             f.write("")
 
-    # Also copy interactive HTML simulators into docs/
+    # Copy interactive HTML simulators into docs/
     for h in ["air_defense_arena.html", "fast_trading_arena.html", "brick_breaker_arena.html", "heavyweight_llm_dashboard.html"]:
         src_h = os.path.join(root_dir, h)
         dst_h = os.path.join(docs_dir, h)
@@ -1034,7 +1260,7 @@ def main():
             shutil.copy2(src_h, dst_h)
             print(f"  -> Copied simulator {h} to docs/")
 
-    print("All GitHub Pages files successfully generated!")
+    print("All enterprise SEO and Google Scholar files successfully built!")
 
 if __name__ == "__main__":
     main()

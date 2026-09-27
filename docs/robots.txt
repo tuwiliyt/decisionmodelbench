@@ -1,3 +1,9 @@
+# ========================================================
+# robots.txt for DecisionModelBench Research Portal
+# Institution: PANITA GORONTALO
+# Author: Richie O. Sumual (richie@panita.web.id)
+# ========================================================
+
 User-agent: *
 Allow: /
 
@@ -7,10 +13,31 @@ Allow: /
 User-agent: Googlebot-Scholar
 Allow: /
 
+User-agent: Google-Extended
+Allow: /
+
 User-agent: Bingbot
 Allow: /
 
+User-agent: Applebot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
 User-agent: Slurp
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: ia_archiver
+Allow: /
+
+User-agent: semantic-scholar
 Allow: /
 
 Sitemap: https://tuwiliyt.github.io/decisionmodelbench/sitemap.xml
