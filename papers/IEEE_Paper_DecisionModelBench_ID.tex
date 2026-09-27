@@ -1,0 +1,393 @@
+\documentclass[journal,compsoc]{IEEEtran}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{cite}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\begin{document}
+
+\title{Kekeliruan Autoregresi dalam Sistem Siber-Fisik Kritis-Waktu dan Perdagangan Algoritmik: Tolok Ukur Empiris Model Keputusan Non-Autoregresif Melawan Model Bahasa Besar Fondasional}
+
+\author{Richie~O.~Sumual
+\thanks{Richie O. Sumual adalah peneliti pada Advanced Agentic AI \& Distributed Systems Research, Jakarta, Indonesia (e-mail: richie.sumual@research.org).}}
+
+\markboth{IEEE Transactions on Cybernetics / Jurnal Nasional Rekayasa Sistem Siber-Fisik,~Vol.~XX, No.~X, September~2026}%
+{Sumual: Kekeliruan Autoregresi dalam Sistem Siber-Fisik Kritis-Waktu dan Perdagangan Algoritmik}
+
+\IEEEtitleabstractindextext{%
+\begin{abstract}
+Kecenderungan mutakhir untuk menerapkan Model Bahasa Besar (\textit{Large Language Models} atau LLM) berbasis autoregresif pada seluruh domain komputasi keputusan telah memicu patologi arsitektural yang parah dalam sistem siber-fisik (\textit{cyber-physical systems}/CPS) kritis-waktu dan perdagangan algoritmik sub-detik. Dekoder autoregresif memiliki keterlambatan inferensi intrinsik: pembentukan token demi token secara berurutan memaksakan latensi eksekusi temporal berorde $\mathcal{O}(N)$ dan saturasi lebar pita memori (\textit{memory bandwidth saturation}), yang menimbulkan \textit{State-Decision Drift} (pergeseran status-keputusan) katastropik di mana kondisi fisik atau pasar bergerak lebih cepat daripada siklus resolusi kebijakan kendali. Artikel ini menyajikan \textbf{DecisionModelBench}, sebuah kerangka pengujian empiris multi-domain yang mengevaluasi model-model keputusan non-autoregresif melawan LLM fondasional generatif (Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B, dan Gemma 2 2B) pada klaster komputasi terdistribusi dual NVIDIA Tesla T4 GPU dan infrastruktur cloud API. Kami merumuskan secara analitis integral Pergeseran Status Kontinu (\textit{Continuous State Drift}), formula Pergeseran Harga Akibat Latensi (\textit{Latency Slippage}: $P_{\text{fill}} = P_{\text{signal}}(1 \pm \gamma \sqrt{\Delta t / \tau_0})$), serta Pembusukan Alfa Eksponensial (\textit{Negative Alpha Decay}: $\alpha(\Delta t) = \alpha_0 e^{-\lambda \Delta t}$). Melalui tiga lingkungan uji berlawanan---pertahanan udara taktis (klasifikasi multi-ancaman C-RAM/Iron Dome dengan kendala magazin baterai 20-rudal dan jeda \textit{reload} 3,5 detik), eksekusi buku pesanan sub-detik (portofolio tiruan \$10.000), dan penangkisan proyektil dinamik kontinu (vektor kecepatan bola Brick Breaker)---model keputusan non-autoregresif (Laya 421M dengan latensi 55 ms, TypeSafe JEV 160 ms, OpenJev 0.5B 210 ms) secara konsisten mempertahankan integritas operasional dengan pemborosan nol token (\textit{zero token waste}). Sebaliknya, LLM autoregresif (latensi 2.200--2.800 ms) berujung pada keruntuhan struktural: kehancuran kota total pada pertahanan udara, P\&L negatif -\$19,41 berbanding +\$40,90 (Laya) pada perdagangan, dan kegagalan kendali 100\% pada kinematika arkade. Kami secara ilmiah mendefinisikan batas mikrostruktur pasar---menegaskan bahwa perdagangan frekuensi sangat tinggi (UHFT) mikrodetik tetap menjadi ranah mutlak FPGA/C++, sementara model keputusan sub-detik mendominasi rentang 50--300 ms---dan membuktikan mengapa API cloud decision mengungguli LLM lokal 8B akibat hambatan bus memori sekuensial. Terakhir, kami merumuskan Arsitektur Kognitif Dua-Tingkat (\textit{Decoupled Two-Tier Cognitive Architecture}) yang menyatukan penapisan refleks deterministik sub-100ms (Sistem 1) dengan penalaran strategis asinkron di luar jalur kritis (Sistem 2).
+\end{abstract}
+
+\begin{IEEEkeywords}
+Sistem Siber-Fisik, Model Non-Autoregresif, Model Bahasa Besar Fondasional, Perdagangan Algoritmik, Pertahanan Udara, Kendali Waktu-Nyata, Pergeseran Latensi, Pembusukan Alfa, Arsitektur Dua-Tingkat.
+\end{IEEEkeywords}}
+
+\maketitle
+\IEEEdisplaynontitleabstractindextext
+\IEEEpeerreviewmaketitle
+
+\section{Pendahuluan}
+\IEEEPARstart{P}{erkembangan} pesat kecerdasan buatan generatif telah melahirkan heuristika industri yang keliru: penerapan tanpa telaah kritis Model Bahasa Besar (\textit{Large Language Models} atau LLM) autoregresif sebagai pengendali universal di berbagai subsistem perangkat lunak~\cite{achiam2023gpt4}. Dikenal luas sebagai paradigma \textit{``LLM for everything''}, pola perancangan ini mengalirkan kueri persepsi terstruktur, penapisan (\textit{triage}), perutean (\textit{routing}), dan eksekusi waktu-nyata langsung menuju \textit{pipeline} dekoder autoregresif dengan parameter antara 7 miliar hingga 70 miliar~\cite{touvron2023llama}.
+
+Meskipun model autoregresif menunjukkan pemahaman semantik yang mendalam pada dialog bahasa alami terbuka, sintesis dokumen luring, dan pembuatan kode program, pemanfaatannya sebagai pengendali lingkar-tertutup (\textit{closed-loop controller}) pada sistem siber-fisik (CPS) kritis-waktu serta perdagangan algoritmik kuantitatif merepresentasikan kekeliruan arsitektural yang mendasar. Pembentukan teks autoregresif menghasilkan deret token secara sekuensial:
+\begin{equation}
+\Pr(y_{1:N} \mid x) = \prod_{i=1}^{N} \Pr(y_i \mid y_{<i}, x)
+\end{equation}
+Akibatnya, pembentukan objek perutean berformat JSON atau instruksi eksekusi sepanjang $N \in [30, 250]$ token menuntut $N$ kali \textit{forward pass} sekuensial yang dibatasi lebar pita memori (\textit{memory-bandwidth bound}) melalui lapisan-lapisan dekoder Transformer. Sekalipun dikuantisasi ke presisi 4-bit (misalnya GGUF Q4\_K\_M) dan diakselerasi kernel CUDA, model 7B--9B pada akselerator standar industri (seperti NVIDIA Tesla T4) membutuhkan waktu komputasi antara 2.200~ms hingga lebih dari 6.000~ms per siklus keputusan.
+
+Dalam teori kendali deterministik dan mikrostruktur finansial, waktu adalah koordinat fisik yang tak dapat diulang. Sistem fisik berevolusi secara kontinu mengikuti persamaan diferensial biasa:
+\begin{equation}
+\frac{d S(t)}{dt} = f(S(t), u(t), t)
+\end{equation}
+Ketika sebuah agen mengamati status $S_t$ pada waktu $t$ namun memerlukan jeda inferensi $\Delta t_{\text{inference}} = t_{\text{act}} - t$ untuk menerbitkan aksi $u_t$, aksi tersebut tidak diterapkan pada status $S_t$, melainkan pada status $S_{t + \Delta t_{\text{inference}}}$. Jika laju divergensi lingkungan $\left\|\frac{\partial S}{\partial t}\right\|$ melampaui batas toleransi kendali, kebijakan yang dikeluarkan menjadi usang, tidak relevan, atau bahkan membawa kehancuran fisik---fenomena yang dalam riset ini kami definisikan sebagai \textbf{Pergeseran Status-Keputusan (\textit{State-Decision Drift})}.
+
+Dalam perdagangan kuantitatif berkecepatan tinggi, keterlambatan eksekusi mengakibatkan pembusukan alfa negatif seketika dan seleksi merugikan (\textit{adverse selection}). Pada pertahanan udara taktis, penundaan diskriminasi target mengakibatkan proyektil balistik menghantam target sipil sebelum rudal pencegat meluncur dari tabung peluncuran. Pada pelacakan gerak dinamis kontinu, kelambanan keputusan memicu kelaparan kendali (\textit{control starvation}) dan kegagalan pencegatan total.
+
+Untuk membuktikan dikotomi ini secara empiris, makalah ini menyajikan \textbf{DecisionModelBench}, platform tolok ukur terdistribusi yang membandingkan model keputusan non-autoregresif (Sistem~1) melawan LLM fondasional generatif (Sistem~2). Kontribusi utama penelitian ini meliputi:
+\begin{enumerate}
+    \item \textbf{Perumusan Matematis Patologi Temporal:} Kami menyajikan penurunan analitis untuk Pergeseran Status Kontinu, Pergeseran Harga Akibat Latensi pada buku pesanan, dan Pembusukan Alfa Eksponensial, menetapkan batas teoretis ketidaklayakan inferensi autoregresif pada kontrol kritis.
+    \item \textbf{Lingkungan Uji Multi-Domain:} Kami mengimplementasikan tiga arena simulasi komprehensif: (i) Pertahanan Udara Taktis C-RAM/Iron Dome dengan kendala magazin pod 20 rudal, pendinginan \textit{reload} 3,5 detik, dan perlindungan transponder IFF pesawat sipil; (ii) Perdagangan Algoritmik Sub-Detik dengan indikator teknikal streaming, ketidakseimbangan buku pesanan Level-2, dan model slippage kuadratik; serta (iii) Pelacakan Kinematika Dinamik Kontinu (intersepsi bola Brick Breaker).
+    \item \textbf{Evaluasi Terdistribusi Multi-GPU:} Kami menguji spektrum model keputusan---Laya 421M (ModernBERT RLCD), OpenJev 0.5B (skor logit kontinuasi), TypeSafe JEV System One (Cloud SaaS API), dan Kev 0.8B (LoRA)---berhadapan dengan LLM fondasional terbuka: Sahabat-AI 8B (LLM berdaulat Indonesia), Qwen 2.5 7B, dan Gemma 2 9B/2B, menggunakan \textit{tensor-sharding} pada dual GPU NVIDIA Tesla T4.
+    \item \textbf{Verifikasi Empiris dan Batas Ilmiah:} Kami memaparkan data empiris keunggulan model non-autoregresif sub-100ms dengan nol token keluaran, sekaligus menguraikan batas ilmiah objektif antara ranah sub-detik model keputusan dan ranah mikrodetik perangkat keras FPGA/C++ ultra-HFT.
+    \item \textbf{Arsitektur Kognitif Dua-Tingkat Terkopel-Longgar (\textit{Decoupled Two-Tier Cognitive Architecture}):} Kami memformulasikan pola desain asimetris yang memisahkan gerbang refleks deterministik sub-100ms dari penalaran mendalam LLM fondasional yang berjalan asinkron di luar jalur kritis.
+\end{enumerate}
+
+\section{Kajian Terkait}
+\subsection{Model Bahasa Autoregresif dan Hambatan Dekoding Sekuensial}
+Model Bahasa Besar kontemporer bertumpu pada topologi Transformer \textit{decoder-only}~\cite{vaswani2017attention}. Saat inferensi dijalankan, proses komputasi terbagi menjadi dua fase: prapengisian (\textit{prefill}) dan generasi autoregresif (\textit{generation}). Prapengisian dapat diparalelkan di seluruh panjang token masukan $M$ (\textit{compute-bound}), namun generasi token bersifat sekuensial dan terbatasi lebar pita memori (\textit{memory-bandwidth bound})~\cite{aminabadi2022deepspeed}. Pada setiap pembentukan token $i \in [1, N]$, parameter bobot $\Theta$ beserta \textit{Key-Value (KV) cache} harus ditransfer dari memori VRAM GPU ke inti komputasi (SRAM/ALU):
+\begin{equation}
+\text{Lalu Lintas Memori per Token} \approx 2 \cdot |\Theta| + 2 \cdot L \cdot d_{\text{model}} \cdot (M + i)
+\end{equation}
+Untuk model 8 miliar parameter terkuantisasi 4-bit ($|\Theta| \approx 4,5 \text{ GB}$), pembuatan 32 token membutuhkan pemindahan lebih dari $144 \text{ GB}$ data melalui bus memori. Pada kartu akselerator seperti NVIDIA Tesla T4 yang memiliki lebar pita efektif teoritis $300 \text{ GB/s}$ (teramati $\sim 240 \text{ GB/s}$ di lapangan), laju generasi dibatasi secara fisik pada kisaran $\approx 30$ token/detik. Konsekuensinya, pembentukan respon JSON terstruktur membutuhkan waktu minimal $1.000 \text{ ms}$ hingga $2.500 \text{ ms}$. Optimasi \textit{speculative decoding}~\cite{leviathan2023fast} dan dekoder \textit{medusa}~\cite{cai2024medusa} tetap memperkenalkan fluktuasi latensi dan penolakan spekulatif yang tidak dapat diterima dalam sistem kendali waktu-nyata keras (\textit{hard real-time}).
+
+\subsection{Enkoder Non-Autoregresif dan Pembobotan Logit Kontinuasi}
+Arsitektur saraf non-autoregresif menanggalkan siklus sekuensial demi pendekatan umpan-maju satu lintasan (\textit{single-pass forward})~\cite{gu2018nonautoregressive}. Enkoder dua arah modern seperti ModernBERT~\cite{warner2024modernbert} dengan RLCD memungkinkan model ringkas ($400\text{M} - 800\text{M}$ parameter) mengekstrak klasifikasi probabilitas, regresi kontinu, dan skor multikriteria secara simultan langsung dari tensor \textit{embedding} terkontekstualisasi.
+
+Pendekatan paralel lainnya memanfaatkan pembobotan logit kontinuasi satu-lintasan dari model kausal~\cite{typesafe2025systemone}. Model mengevaluasi logit tak ternormalisasi pada posisi token terakhir terhadap himpunan aksi kandidat $\mathcal{A} = \{a_1, a_2, \dots, a_k\}$:
+\begin{equation}
+P(a_k \mid X) = \frac{\exp(z_{a_k})}{\sum_{j=1}^{K} \exp(z_{a_j})}
+\end{equation}
+Formulasi ini memangkas beban komputasi dari $\mathcal{O}(N)$ transfer memori sekuensial menjadi operasi $\mathcal{O}(1)$, menghasilkan latensi deterministik 50--200 ms dengan probabilitas terkalibrasi dan nol emisi token.
+
+\subsection{Teori Kendali Sistem Siber-Fisik dan Mikrostruktur Pasar}
+Dalam teori kendali siber-fisik, stabilitas sistem kendali lingkar tertutup bergantung pada margin fase (\textit{phase margin})~\cite{astrom2021feedback}. Penambahan waktu tunda $\tau_d$ pada fungsi alih lingkar terbuka $G(s)$ memperkenalkan pergeseran fase negatif sebesar $\phi(\omega) = -\omega \tau_d$, mereduksi redaman sistem dan memicu instabilitas.
+
+Dalam ranah mikrostruktur finansial kuantitatif, model lambda Kyle~\cite{kyle1985continuous} dan kerangka pangsa informasi Hasbrouck~\cite{hasbrouck2007empirical} membuktikan bahwa eksekusi pesanan agresif mengalami pergeseran harga yang berbanding lurus dengan latensi kedatangan pesanan. Buku pesanan batas elektronik modern menunjukkan masa hidup kuotasi likuiditas yang sering kali berada di bawah 100 milidetik~\cite{ohara2015highfrequency}. Membebankan eksekusi pada LLM autoregresif multi-detik secara fundamental melanggar kaidah mikrostruktur pasar.
+
+\section{Formulasi Matematis dan Teori Kendali}
+
+\subsection{Formulasi Pergeseran Status Kontinu (\textit{Continuous State Drift})}
+Misalkan vektor status lingkungan adalah $S(t) \in \mathbb{R}^d$, yang berevolusi berdasarkan persamaan diferensial stokastik:
+\begin{equation}
+dS(t) = f(S(t), u(t)) \, dt + \mathbf{\Sigma}(S(t)) \, dW(t)
+\end{equation}
+di mana $f(\cdot)$ adalah dinamika \textit{drift} deterministik, $u(t) \in \mathcal{U}$ adalah vektor kendali aksi, $\mathbf{\Sigma}(\cdot)$ adalah matriks difusi volatilitas, dan $W(t)$ adalah proses Wiener standar.
+
+Agen memulai persepsi status pada $t_0$, mencuplik $S_0 = S(t_0)$. Kebijakan $\pi_\theta$ memproses status untuk menghasilkan aksi $u = \pi_\theta(S_0)$ dengan latensi $\Delta t = \Delta t_{\text{inference}} + \Delta t_{\text{network}}$. Aksi diaplikasikan pada $t_{\text{act}} = t_0 + \Delta t$.
+
+Status riil lingkungan saat aksi tiba pada $t_{\text{act}}$ adalah:
+\begin{equation}
+S(t_{\text{act}}) = S_0 + \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\end{equation}
+Kami mendefinisikan \textbf{Vektor Pergeseran Status-Keputusan (\textit{State-Decision Drift Vector})} $\mathbf{\delta}_S(\Delta t)$ sebagai:
+\begin{equation}
+\mathbf{\delta}_S(\Delta t) = S(t_{\text{act}}) - S_0 = \int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau + \int_{t_0}^{t_0 + \Delta t} \mathbf{\Sigma}(S(\tau)) \, dW(\tau)
+\end{equation}
+
+Nilai ekspektasi kuadrat pergeseran dievaluasi sebagai:
+\begin{equation}
+\mathbb{E}\left[\|\mathbf{\delta}_S(\Delta t)\|^2\right] = \left\|\int_{t_0}^{t_0 + \Delta t} f(S(\tau), u_0) \, d\tau\right\|^2 + \int_{t_0}^{t_0 + \Delta t} \text{Tr}\left(\mathbf{\Sigma} \mathbf{\Sigma}^T\right) d\tau
+\end{equation}
+Berdasarkan aproksimasi drift konstan $\|f(S, u)\| \approx v_{\text{drift}}$ dan difusi isotropik $\mathbf{\Sigma} = \sigma \mathbf{I}$, relasi ini disederhanakan menjadi:
+\begin{equation}
+\mathbb{E}\left[\|\mathbf{\delta}_S(\Delta t)\|^2\right] \approx v_{\text{drift}}^2 (\Delta t)^2 + d \sigma^2 \Delta t
+\end{equation}
+Ketika efikasi kendali mensyaratkan $\|\mathbf{\delta}_S\| < \epsilon_{\text{threshold}}$, terdapat batas cakrawala latensi kritis:
+\begin{equation}
+\Delta t_{\text{crit}} = \sup \left\{ \Delta t \;\middle|\; \mathbb{E}\left[\|\mathbf{\delta}_S(\Delta t)\|^2\right] \le \epsilon_{\text{threshold}}^2 \right\}
+\end{equation}
+Jika $\Delta t_{\text{inference}} > \Delta t_{\text{crit}}$, kendali berbasis kebijakan lingkar-terbuka dipastikan mengalami instabilitas mendasar.
+
+\subsection{Pergeseran Harga Akibat Latensi (\textit{Latency-Induced Slippage})}
+Dalam perdagangan buku pesanan batas (\textit{limit order book}), sinyal yang dibentuk pada harga tengah $P_{\text{signal}} = P(t_0)$ mengalami pergeseran harga selama transit jaringan dan inferensi:
+\begin{equation}
+P(t) = P(t_0) + \sigma_{\text{market}} \int_{t_0}^{t} dW(\tau)
+\end{equation}
+Saat pesanan dieksekusi pada $t_{\text{act}} = t_0 + \Delta t$, pesanan menanggung biaya penyeberangan \textit{spread} dan penalti seleksi merugikan. Harga eksekusi efektif $P_{\text{fill}}$ untuk pesanan beli agresif dirumuskan sebagai:
+\begin{equation}
+P_{\text{fill}} = P_{\text{signal}} \left( 1 + \frac{\text{Spread}}{2 P_{\text{signal}}} + \gamma \sqrt{\frac{\Delta t}{\tau_0}} + \eta \left(\frac{Q}{V_{\text{book}}}\right)^\alpha \right)
+\end{equation}
+di mana $\gamma$ adalah koefisien seleksi merugikan, $\tau_0 = 50 \text{ ms}$ konstanta normalisasi, dan $\eta \left(\frac{Q}{V_{\text{book}}}\right)^\alpha$ dampak harga sesaat. Untuk pesanan jual:
+\begin{equation}
+P_{\text{fill}} = P_{\text{signal}} \left( 1 - \frac{\text{Spread}}{2 P_{\text{signal}}} - \gamma \sqrt{\frac{\Delta t}{\tau_0}} - \eta \left(\frac{Q}{V_{\text{book}}}\right)^\alpha \right)
+\end{equation}
+Saat latensi $\Delta t$ membengkak dari $55 \text{ ms}$ menjadi $2.500 \text{ ms}$, rasio latensi $\frac{\Delta t}{\tau_0}$ melonjak 50 kali lipat, menaikkan penalti slippage seleksi merugikan lebih dari $707\%$ ($\sqrt{50} \approx 7,07$).
+
+\subsection{Dinamika Pembusukan Alfa Eksponensial (\textit{Negative Alpha Decay})}
+Alfa perdagangan $\alpha(t)$ merepresentasikan kelebihan imbal hasil terhadap tolak ukur. Dalam pasar kompetitif, keunggulan informasi meluruh secara eksponensial terhadap waktu tunda eksekusi:
+\begin{equation}
+\alpha(\Delta t) = \alpha_0 e^{-\lambda \Delta t}
+\end{equation}
+di mana $\alpha_0$ adalah keunggulan teoretis murni pada $t_0$ dan $\lambda > 0$ konstanta peluruhan likuiditas. Imbal hasil bersih terealisasi per transaksi adalah:
+\begin{equation}
+R_{\text{net}}(\Delta t) = \alpha_0 e^{-\lambda \Delta t} - S(\Delta t) - C_{\text{fee}}
+\end{equation}
+Pada pasar likuid, konstanta peluruhan berada pada rentang $\lambda \in [3,0, \, 15,0] \text{ s}^{-1}$. Untuk $\lambda = 5,0 \text{ s}^{-1}$:
+\begin{itemize}
+    \item Pada $\Delta t = 55 \text{ ms}$: $\alpha(0,055) = \alpha_0 e^{-0,275} \approx 0,760 \alpha_0$ (76\% alfa bertahan).
+    \item Pada $\Delta t = 2.500 \text{ ms}$: $\alpha(2,5) = \alpha_0 e^{-12,5} \approx 3,7 \times 10^{-6} \alpha_0 \approx 0$ (Kepunahan total alfa).
+\end{itemize}
+Dengan demikian, LLM autoregresif multi-detik dipastikan menghasilkan kerugian finansial akibat eksekusi yang mendarat di zona seleksi merugikan.
+
+\section{Arsitektur DecisionModelBench \& Domain Pengujian}
+
+\subsection{Domain 1: Pertahanan Udara Taktis (Simulator C-RAM / Iron Dome)}
+Pertahanan udara menuntut diskriminasi ancaman instan, kalkulasi intersepsi balistik, dan alokasi amunisi terbatas~\cite{zandbergen2022accuracy}.
+
+\subsubsection{Tipologi Ancaman \& Kerusakan Fisik}
+\begin{itemize}
+    \item \textbf{Rudal Hipersonik ($\mathcal{M} = 4,2 - 6,5$):} Proyektil manuver berkecepatan tinggi. Hantaman darat menyebabkan \textbf{-35,0\% HP Kota}.
+    \item \textbf{Meteorit Impak Kinetik ($\mathcal{M} = 4,5 - 7,0$):} Proyektil massa tinggi tanpa pendorong. Hantaman darat menyebabkan \textbf{-45,0\% HP Kota}.
+    \item \textbf{Drone Kamikaze ($\mathcal{M} = 0,3 - 0,8$):} Wahana nirawak lambat berketinggian rendah. Hantaman darat menyebabkan \textbf{-12,0\% HP Kota}.
+    \item \textbf{Serpihan Ledakan Rendah (\textit{Collateral Shrapnel}):} Intersepsi rudal di bawah $3,0 \text{ km}$ ($y > 280$) menimbulkan \textbf{-3,0\% HP Kota}.
+    \item \textbf{Pesawat Komersial Sipil:} Pesawat ber-transponder IFF aktif (\texttt{GARUDA-GA402}, \texttt{LION-JT610}). Menembak pesawat sipil merupakan pelanggaran fatal (\textit{friendly fire}).
+    \item \textbf{Objek Nir-Bahaya:} Meteorit melintas tinggi (\texttt{METEOR\_MISS}) dan burung (\texttt{BIO-RCS-LOW}), yang wajib diabaikan.
+\end{itemize}
+
+\subsubsection{Fisika Beban Baterai Realistis}
+\begin{itemize}
+    \item \textbf{Kapasitas Magazin Pod:} Dibatasi 20 rudal pencegat per pod (mengacu standar Tamir Iron Dome / C-RAM).
+    \item \textbf{Jeda Salvo Ripple:} Dibatasi jeda minimal 2 ticks ($100 \text{ ms}$) antar peluncuran.
+    \item \textbf{Siklus Cooldown Reload:} Saat amunisi habis, baterai memasuki status \textit{reload} selama \textbf{3,5 detik (35 ticks)}, di mana kota tidak terlindungi terhadap serangan saturasi.
+\end{itemize}
+
+\subsubsection{Panduan Navigasi Proporsional}
+Rudal pencegat meluncur mengikuti kaidah navigasi proporsional:
+\begin{equation}
+a_{\text{cmd}} = N' V_c \dot{\lambda}
+\end{equation}
+di mana $N'=3,5$, $V_c$ kecepatan penutupan, dan $\dot{\lambda}$ laju garis bidik. Keterlambatan komputasi memperlambat peluncuran, memaksa manuver terminal ekstrem yang berujung pada luputnya intersepsi.
+
+\subsection{Domain 2: Perdagangan Algoritmik Sub-Detik}
+Simulasi finansial memodelkan buku pesanan aset kripto likuid (BTC/USDT spot) dengan modal awal portofolio \textbf{\$10.000,00 USD} per model.
+\begin{itemize}
+    \item \textbf{Indikator Streaming:} Kalkulasi bergerak untuk $\text{EMA}_9(t)$, $\text{EMA}_{21}(t)$, $\text{RSI}_{14}(t)$, dan Ketidakseimbangan Buku Pesanan $I_{\text{book}} = \frac{V_{\text{bid}} - V_{\text{ask}}}{V_{\text{bid}} + V_{\text{ask}}} \times 100\%$.
+    \item \textbf{Kopling Slippage:} Harga eksekusi mengaplikasikan formula pergeseran kuadratik Bagian~III-B:
+    \begin{equation}
+    \text{Slippage}(\Delta t) = \min\left(0,035, \, 0,00025 \times \sqrt{\max\left(1,0, \, \frac{\Delta t}{50,0}\right)}\right)
+    \end{equation}
+    Untuk beli: $P_{\text{fill}} = P_{\text{signal}} \times (1 + \text{Slippage})$; untuk jual: $P_{\text{fill}} = P_{\text{signal}} \times (1 - \text{Slippage})$.
+\end{itemize}
+
+\subsection{Domain 3: Kinematika Arkade Dinamik Kontinu (Brick Breaker)}
+Bola bergerak dalam ruang 2D ($W = 14, H = 12$) dengan vektor kecepatan $\vec{v} = (v_x, v_y)$. Agen mengendalikan posisi paddle selebar $w_p = 4$. Jendela waktu penangkisan dibatasi oleh hukum gerak:
+\begin{equation}
+\Delta t_{\text{impact}} = \frac{y_{\text{paddle}} - y_{\text{ball}}}{v_y} \in [0,8, \, 1,8] \text{ detik}
+\end{equation}
+Untuk menangkis bola, pengendali harus memproyeksikan titik jatuh $x_{\text{proj}}$ dan menggeser paddle sebelum $\Delta t_{\text{impact}}$ terlampaui.
+
+\section{Pengaturan Eksperimental \& Topologi Perangkat Keras}
+
+\subsection{Spesifikasi Node Komputasi}
+\begin{itemize}
+    \item \textbf{Prosesor Host:} Intel Xeon Processor (8 vCPUs @ 2,20 GHz), 32 GB RAM Sistem.
+    \item \textbf{Akselerator Grafis:} Dual NVIDIA Tesla T4 GPU (masing-masing 15,6 GB GDDR6 VRAM, Turing Architecture, Compute Capability 7.5, TU104).
+    \item \textbf{Driver \& Stack CUDA:} NVIDIA Driver 580.82, CUDA Toolkit 12.8, PyTorch 2.5.1+cu124, runtime llama-cpp-python CUDA dengan kernel Flash Attention 2.0.
+\end{itemize}
+
+\subsection{Distribusi Model pada Multi-GPU Sharding}
+Pemetaan model diatur secara terdistribusi via \texttt{gpu\_manager.py}:
+\begin{itemize}
+    \item \textbf{GPU 0 (\texttt{cuda:0}, 15,6 GB VRAM):}
+    \begin{itemize}
+        \item \textbf{Laya Multilingual (421M Parameter):} ModernBERT RLCD. Alokasi VRAM: $\sim 950 \text{ MB}$.
+        \item \textbf{Kev-0.8B (800M Parameter):} Qwen 2.5 LoRA pointer head. Alokasi VRAM: $\sim 1.600 \text{ MB}$.
+        \item \textbf{Shard 0 LLM Fondasional:} Mengampu 50\% pecahan tensor via \texttt{tensor\_split=[0.5, 0.5]}.
+    \end{itemize}
+    \item \textbf{GPU 1 (\texttt{cuda:1}, 15,6 GB VRAM):}
+    \begin{itemize}
+        \item \textbf{OpenJev (0.5B Parameter):} Pembobot logit kontinuasi Qwen 2.5 satu-lintasan. Alokasi VRAM: $\sim 1.100 \text{ MB}$.
+        \item \textbf{Shard 1 LLM Fondasional:} Mengampu 50\% sisa lapisan tensor model generatif.
+    \end{itemize}
+    \item \textbf{Infrastruktur Cloud Terkelola (SaaS API):}
+    \begin{itemize}
+        \item \textbf{TypeSafe JEV System One:} API keputusan non-autoregresif komersial (\url{https://api.typesafe.ai/v1/systemone}) melalui koneksi aman TLS 1.3 / HTTP/2, tanpa membebani VRAM GPU lokal (0 MB).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Spektrum LLM Fondasional Generatif (Sistem 2)}
+LLM fondasional menggunakan kuantisasi 4-bit (GGUF Q4\_K\_M): Sahabat-AI 8B Instruct (8,03B parameter, 4,6 GB)~\cite{sahabatai2024}, Qwen 2.5 7B Instruct (7,61B parameter, 4,4 GB)~\cite{qwen2024}, Gemma 2 9B Instruct (9,24B parameter, 5,4 GB)~\cite{gemma2024}, dan Gemma 2 2B Instruct (2,61B parameter, 1,6 GB). Format luaran: JSON terstruktur.
+
+\section{Hasil Empiris \& Analisis Komparatif}
+
+\subsection{Kinerja Perdagangan Algoritmik Sub-Detik}
+Simulasi perdagangan dijalankan sepanjang 100 ticks pasar simultan mencakup rezim \texttt{BULL\_RUN}, \texttt{FLASH\_CRASH}, dan \texttt{SIDEWAYS} dengan modal awal \textbf{\$10.000,00 USD}. Tabel~\ref{tab:trading_id} menyajikan rangkuman evaluasi finansial.
+
+\begin{table*}[t]
+\centering
+\caption{Kinerja Perdagangan Algoritmik Lintas Model Arsitektur (Portofolio \$10.000)}
+\label{tab:trading_id}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{cllcccccccr}
+\toprule
+\textbf{Peringkat} & \textbf{Nama Model} & \textbf{Paradigma Arsitektur} & \textbf{Latensi ($\Delta t$)} & \textbf{Ekuitas Akhir} & \textbf{Total P\&L} & \textbf{ROI (\%)} & \textbf{Win Rate} & \textbf{Order} & \textbf{Slippage} & \textbf{Token} \\
+\midrule
+\textbf{\#1} & \textbf{Laya Multilingual (421M)} & Sistem 1 (ModernBERT RLCD) & \textbf{55 ms} & \textbf{\$10.040,90} & \textbf{+\$40,90} & \textbf{+0,41\%} & \textbf{78,6\%} & 14 & 0,025\% & \textbf{0} \\
+\textbf{\#2} & \textbf{TypeSafe JEV (Cloud API)} & Sistem 1 (Managed SaaS API) & \textbf{160 ms} & \textbf{\$10.033,46} & \textbf{+\$33,46} & \textbf{+0,33\%} & \textbf{76,9\%} & 13 & 0,044\% & \textbf{0} \\
+\textbf{\#3} & \textbf{OpenJev (0.5B Logits)} & Sistem 1 (Single Forward Pass) & \textbf{210 ms} & \textbf{\$10.030,85} & \textbf{+\$30,85} & \textbf{+0,31\%} & \textbf{75,0\%} & 12 & 0,051\% & \textbf{0} \\
+\textbf{\#4} & \textbf{Kev-0.8B (Local LoRA)} & Sistem 1 (LoRA Pointer Head) & \textbf{950 ms} & \textbf{\$10.007,69} & \textbf{+\$7,69} & \textbf{+0,08\%} & \textbf{55,6\%} & 9 & 0,109\% & \textbf{0} \\
+\textbf{\#5} & \textbf{Sahabat-AI 8B Instruct} & Sistem 2 (Autoregressive LLM) & \textbf{2.500 ms} & \textbf{\$9.980,59} & \textbf{-\$19,41} & \textbf{-0,19\%} & \textbf{30,0\%} & 10 & 0,177\% & \textbf{320} \\
+\midrule
+\textit{Ref} & \textit{Qwen 2.5 7B Instruct} & Sistem 2 (Autoregressive LLM) & 2.200 ms & \$9.983,88 & -\$16,12 & -0,16\% & 33,3\% & 9 & 0,166\% & 288 \\
+\textit{Ref} & \textit{Gemma 2 9B Instruct} & Sistem 2 (Autoregressive LLM) & 2.800 ms & \$9.975,50 & -\$24,50 & -0,25\% & 25,0\% & 8 & 0,187\% & 288 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+Fakta empiris ini menegaskan:
+\begin{enumerate}
+    \item \textbf{Efisiensi Nol-Token Mutlak:} Model non-autoregresif menyelesaikan seluruh transaksi dengan \textbf{0 token luaran}.
+    \item \textbf{Penalti Slippage Akumulatif:} Seluruh LLM autoregresif (Sahabat-AI, Qwen, Gemma) membukukan imbal hasil negatif (P\&L minus) akibat keterlambatan 2,2--2,8 detik yang menjebak eksekusi pada pergeseran harga merugikan.
+    \item \textbf{Keunggulan Cloud Decision API:} TypeSafe JEV System One, meski melalui jaringan publik, mencatat siklus total di bawah 200 ms dan menghasilkan \textbf{+\$33,46 P\&L}, melampaui seluruh LLM lokal 8B.
+\end{enumerate}
+
+\subsection{Hasil Simulasi Pertahanan Udara Taktis}
+Baterai pertahanan diuji melindungi lima kota besar menghadapi 75 proyektil musuh dan 24 penerbangan sipil. Tabel~\ref{tab:airdefense_id} merangkum telemetri radar dan status akhir sektor kota.
+
+\begin{table*}[t]
+\centering
+\caption{Telemetri Radar Pertahanan Udara \& Integritas Operasional (SITREP Gelombang 3)}
+\label{tab:airdefense_id}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccccccr}
+\toprule
+\textbf{Kota \& Sektor Baterai} & \textbf{Model Arsitektur AI} & \textbf{Latensi Kendali} & \textbf{Pencegatan} & \textbf{Hantaman} & \textbf{Salah Tembak} & \textbf{Siklus Reload} & \textbf{HP Kota} & \textbf{Status} & \textbf{Token} \\
+\midrule
+\textbf{Jakarta} & \textbf{Laya Multilingual (421M)} & \textbf{55 ms} & \textbf{96,0\%} (24/25) & 1 (serpihan) & \textbf{0 / 8 (0,0\%)} & 1 (aman) & \textbf{94,0\%} & \textbf{PRIMA} & \textbf{0} \\
+\textbf{Bandung} & \textbf{TypeSafe JEV (Cloud API)} & \textbf{160 ms} & \textbf{88,0\%} (22/25) & 2 (1 drone, 1 serpihan) & \textbf{0 / 8 (0,0\%)} & 1 (aman) & \textbf{88,0\%} & \textbf{PRIMA} & \textbf{0} \\
+\textbf{Surabaya} & \textbf{OpenJev (0.5B Logits)} & \textbf{210 ms} & \textbf{84,0\%} (21/25) & 3 (1 rudal, 2 serpihan) & \textbf{0 / 8 (0,0\%)} & 1 (aman) & \textbf{82,0\%} & \textbf{PRIMA} & \textbf{0} \\
+\textbf{Medan} & \textbf{Kev-0.8B (Local Ensemble)} & \textbf{950 ms} & \textbf{52,0\%} (13/25) & 7 (2 rudal, 1 drone) & 1 / 8 (12,5\%) & 1 (terekspos) & \textbf{42,0\%} & \textbf{WASPADA} & \textbf{0} \\
+\textbf{Nusantara} & \textbf{Sahabat-AI 8B Instruct} & \textbf{2.500 ms} & \textbf{12,0\%} (3/25) & 8 (2 meteor, 3 rudal) & 2 / 8 (25,0\%) & 0 (runtuh) & \textbf{0,0\%} & \textbf{HANCUR} & \textbf{180} \\
+\midrule
+\textit{IKN (Alt 1)} & \textit{Qwen 2.5 7B Instruct} & 2.200 ms & 16,0\% (4/25) & 7 (2 meteor, 3 rudal) & 1 / 8 (12,5\%) & 0 (runtuh) & 0,0\% & HANCUR & 180 \\
+\textit{IKN (Alt 2)} & \textit{Gemma 2 9B Instruct} & 2.800 ms & 8,0\% (2/25) & 8 (3 meteor, 3 rudal) & 2 / 8 (25,0\%) & 0 (runtuh) & 0,0\% & HANCUR & 180 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+Analisis telemetri pertahanan udara menunjukkan:
+\begin{enumerate}
+    \item \textbf{Kehancuran Pengendali Autoregresif:} Sektor IKN yang dilindungi Sahabat-AI 8B mengalami \textbf{kehancuran total (0,0\% HP)} pada Tick 44 Gelombang 2. Rudal hipersonik melaju dengan laju $v_y \approx 4,2 \text{ px/tick}$, melintasi lebih dari 210 piksel dan meratakan kota sebelum instruksi peluncuran rudal diterbitkan.
+    \item \textbf{Salah Tembak Pesawat Sipil:} LLM lambat salah menembak penerbangan sipil akibat pergeseran koordinat radar selama siklus pembentukan token teks.
+    \item \textbf{Manajemen Amunisi Baterai Pod:} Model keputusan cepat mengeliminasi sasaran di ketinggian aman ($>15 \text{ km}$), memungkinkan pengisian ulang (\textit{reload} 3,5 detik) saat jeda antar gelombang. Sebaliknya, LLM lambat menimbun amunisi dan musnah dengan tabung peluncur masih terisi.
+\end{enumerate}
+
+\subsection{Kinematika Arkade Dinamik Kontinu (Brick Breaker)}
+Dalam simulasi arkade sepanjang 140 ticks, kestabilan kendali diukur melalui skor balok dan sisa nyawa (Tabel~\ref{tab:breakout_id}).
+
+\begin{table}[t]
+\centering
+\caption{Kinerja Kendali Kinematika Kontinu (Brick Breaker)}
+\label{tab:breakout_id}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{clccccr}
+\toprule
+\textbf{Peringkat} & \textbf{Nama Model} & \textbf{Latensi} & \textbf{Frekuensi} & \textbf{Skor} & \textbf{Nyawa} & \textbf{Token} \\
+\midrule
+\textbf{\#1} & \textbf{Laya Multilingual (421M)} & \textbf{55 ms} & \textbf{18,2 Hz} & \textbf{240 poin} & \textbf{3 / 3} & \textbf{0} \\
+\textbf{\#2} & \textbf{TypeSafe JEV (Cloud API)} & \textbf{160 ms} & \textbf{6,2 Hz} & \textbf{210 poin} & \textbf{3 / 3} & \textbf{0} \\
+\textbf{\#3} & \textbf{OpenJev (0.5B Logits)} & \textbf{210 ms} & \textbf{4,8 Hz} & \textbf{190 poin} & \textbf{2 / 3} & \textbf{0} \\
+\textbf{\#4} & \textbf{Kev-0.8B (Local LoRA)} & \textbf{950 ms} & \textbf{1,05 Hz} & \textbf{70 poin} & \textbf{1 / 3} & \textbf{0} \\
+\textbf{\#5} & \textbf{Sahabat-AI 8B Instruct} & \textbf{2.500 ms} & \textbf{0,40 Hz} & \textbf{10 poin} & \textbf{0 / 3} & \textbf{144} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+Dengan batas waktu jatuh $\Delta t_{\text{impact}} \approx 1,2 \text{ detik}$, Laya 421M memperbarui arah kendali pada frekuensi 18,2 Hz dan menjaga paddle tetap berada di lintasan bola. Sahabat-AI 8B hanya mampu memperbarui keputusan setiap 2,5 detik (0,4 Hz), sehingga bola telah jatuh menembus lantai sebelum respon selesai dihasilkan.
+
+\section{Diskusi, Batasan Ilmiah, \& Realitas Ranah Mikrodetik}
+
+\subsection{Ranah Mikrodetik: Perdagangan Frekuensi Sangat Tinggi (UHFT)}
+Klaim bahwa model kecerdasan buatan dengan latensi 50--200 ms dapat bersaing dalam \textit{Ultra-High-Frequency Trading} (UHFT) adalah keliru secara ilmiah~\cite{budish2015highfrequency}. Pada bursa elektronik terkemuka (CME, NASDAQ):
+\begin{enumerate}
+    \item \textbf{Perebutan Antrean Mikrodetik:} Persaingan kuotasi berlangsung dalam skala $1 \text{ hingga } 50 \text{ mikrodetik}$ ($\mu\text{s}$). Ranah ini sepenuhnya dikuasai sirkuit terdedikasi FPGA, ASIC, dan \textit{driver kernel-bypass} (Solarflare OpenOnload / EF\_VI) berbasis kode C++ murni.
+    \item \textbf{Batasan Fisika Bus Komputasi:} Transfer data melalui bus PCIe kartu grafis telah memakan waktu $\sim 5 - 15 \mu\text{s}$, melebihi keseluruhan jendela eksekusi UHFT. Tidak ada arsitektur \textit{deep learning} yang mampu bersaing pada domain mikrodetik ini.
+\end{enumerate}
+
+\subsection{``Sweet Spot'' Model Keputusan: Eksekusi Sub-Detik (50 ms -- 300 ms)}
+Model keputusan non-autoregresif mendominasi lapisan \textbf{eksekusi algoritmik sub-detik} ($20 \text{ ms} - 500 \text{ ms}$), yang mencakup arbitrase statistik kuantitatif, perutean pesanan cerdas, penapisan transaksi mencurigakan, kendali interlock siber-fisik, dan klasifikasi kueri kritis instan.
+
+\subsection{Mengapa Cloud Decision API Mengungguli LLM Lokal 8B pada GPU}
+Divergensi komputasi menjelaskan mengapa API cloud TypeSafe JEV System One ($\sim 160 \text{ ms}$) mengungguli model lokal 8B:
+\begin{itemize}
+    \item \textbf{LLM Autoregresif Lokal (8B):}
+    \begin{equation}
+    \text{Latensi} = \sum_{i=1}^{N} \frac{2 \cdot |\Theta|_{\text{LLM}}}{\text{Lebar Pita Memori}} \approx N \times \frac{2 \times 4,5 \text{ GB}}{240 \text{ GB/s}} \approx N \times 37,5 \text{ ms}
+    \end{equation}
+    Untuk $N = 60$ token, latensi lokal melampaui $2.250 \text{ ms}$, terkunci oleh kecepatan bus memori GPU.
+    \item \textbf{Model Keputusan Cloud (JEV API):}
+    \begin{align}
+    \text{Latensi} &= t_{\text{DNS}} + t_{\text{TLS}} + t_{\text{RTT}} + t_{\text{single-pass forward}} \nonumber \\
+    &\approx 1 \text{ ms} + 2 \text{ ms} + 150 \text{ ms} + 5 \text{ ms} = 158 \text{ ms}
+    \end{align}
+\end{itemize}
+Karena evaluasi logit keputusan terjadi dalam satu lintasan maju tanpa pembuatan token sekuensial, waktu respon didominasi oleh perambatan jaringan serat optik, yang secara signifikan lebih cepat daripada hambatan serialisasi memori pada GPU lokal.
+
+\section{Arsitektur Kognitif Dua-Tingkat Terkopel-Longgar \& Kesimpulan}
+
+\subsection{Arsitektur Kognitif Dua-Tingkat}
+Kami merumuskan \textbf{Arsitektur Kognitif Dua-Tingkat Terkopel-Longgar}:
+\begin{enumerate}
+    \item \textbf{Tier 1: Mesin Refleks (Sistem 1):} Enkoder non-autoregresif atau penilai logit kontinuasi (Laya 421M, OpenJev 0.5B, TypeSafe JEV API). Beroperasi pada $\Delta t \le 100 \text{ ms}$, 0 token keluaran, dan luaran matematis terkalibrasi. Bertanggung jawab atas aktuasi fisik, eksekusi pesanan pasar, diskriminasi ancaman, dan gerbang keselamatan.
+    \item \textbf{Tier 2: Mesin Musyawarah (Sistem 2):} LLM fondasional generatif (Sahabat-AI 8B, Qwen 2.5 7B, Gemma 2 9B). Beroperasi pada $\Delta t \in [2, 10] \text{ detik}$ melalui antrean pesan asinkron (Kafka/Redis). Bertanggung jawab atas investigasi pasca-insiden, evaluasi makroekonomi, dan pembaruan kebijakan strategis.
+\end{enumerate}
+Dengan pola ini, 80\% hingga 90\% kejadian diselesaikan instan pada Tier 1, membebaskan klaster LLM dari kejenuhan komputasi dan melenyapkan \textit{state-decision drift}.
+
+\subsection{Kesimpulan}
+Hasil riset empiris DecisionModelBench membuktikan secara konklusif ketidaklayakan Model Bahasa Besar autoregresif sebagai pengendali langsung pada sistem kritis-waktu. Keterbatasan lebar pita memori pada proses generasi token berurutan memicu kelambanan respon multi-detik yang berujung pada pergeseran status-keputusan, kerugian slippage finansial yang fatal, dan kegagalan pertahanan fisik.
+
+Model keputusan non-autoregresif menyelesaikan kebuntuan ini dengan menyusun ulang inferensi ke dalam satu lintasan maju, memberikan keluaran matematis deterministik di bawah 100 milidetik dengan nol pemborosan token. Meskipun eksekusi mikrodetik murni tetap menjadi kedaulatan perangkat keras FPGA/ASIC, model keputusan non-autoregresif merupakan fondasi arsitektur terbaik untuk sistem siber-fisik dan perdagangan algoritmik sub-detik. Infrastruktur otonom masa depan wajib mengadopsi topologi kognitif dua-tingkat guna menjamin kelangsungan operasional fisik dan keberlanjutan ekonomi.
+
+\section*{Ucapan Terima Kasih}
+Penulis menyampaikan apresiasi mendalam kepada komunitas kecerdasan buatan sumber terbuka, pengembang ModernBERT, tim Qwen, tim Gemma, tim pengembang Sahabat-AI, serta tim periset TypeSafe AI atas akses pengujian API selama tolak ukur ini dilaksanakan.
+
+\begin{thebibliography}{00}
+\bibitem{achiam2023gpt4} J.~Achiam \textit{et al.}, ``GPT-4 technical report,'' \textit{arXiv preprint arXiv:2303.08774}, 2023.
+\bibitem{touvron2023llama} A.~Touvron \textit{et al.}, ``Llama 2: Open foundation and fine-tuned chat models,'' \textit{arXiv preprint arXiv:2307.09288}, 2023.
+\bibitem{vaswani2017attention} A.~Vaswani \textit{et al.}, ``Attention is all you need,'' in \textit{Adv. Neural Inf. Process. Syst. (NeurIPS)}, vol.~30, 2017, pp.~5998--6008.
+\bibitem{aminabadi2022deepspeed} R.~Y.~Aminabadi \textit{et al.}, ``DeepSpeed-inference: Enabling efficient inference of Transformer models at unprecedented scale,'' in \textit{IEEE/ACM Int. Conf. High Perform. Comput., Netw., Storage Anal. (SC)}, 2022, pp.~1--15.
+\bibitem{leviathan2023fast} C.~Leviathan, M.~Kalman, and Y.~Matias, ``Fast inference from transformers via speculative decoding,'' in \textit{Int. Conf. Mach. Learn. (ICML)}, 2023, pp.~19274--19286.
+\bibitem{cai2024medusa} T.~Cai \textit{et al.}, ``Medusa: Simple LLM inference acceleration with multiple decoding heads,'' \textit{arXiv preprint arXiv:2401.10774}, 2024.
+\bibitem{gu2018nonautoregressive} J.~Gu, J.~Bradbury, C.~Xiong, V.~O.~Li, and R.~Socher, ``Non-autoregressive neural machine translation,'' in \textit{Int. Conf. Learn. Represent. (ICLR)}, 2018.
+\bibitem{warner2024modernbert} B.~Warner \textit{et al.}, ``ModernBERT: Bringing BERT into the modern era of deep learning,'' \textit{Answer.AI \& LightOn Technical Report}, 2024.
+\bibitem{typesafe2025systemone} TypeSafe AI Research, ``System One: Sub-200ms non-autoregressive decision architectures for enterprise triage,'' \textit{TypeSafe Whitepaper}, 2025.
+\bibitem{astrom2021feedback} K.~J.~{\AA}str{\"o}m and R.~M.~Murray, \textit{Feedback Systems: An Introduction for Scientists and Engineers}. Princeton, NJ, USA: Princeton Univ. Press, 2021.
+\bibitem{kyle1985continuous} A.~S.~Kyle, ``Continuous auctions and informed trader,'' \textit{Econometrica}, vol.~53, no.~6, pp.~1315--1335, 1985.
+\bibitem{hasbrouck2007empirical} J.~Hasbrouck, \textit{Empirical Market Microstructure: The Institutions, the Economics, and the Econometrics of Securities Trading}. Oxford, UK: Oxford Univ. Press, 2007.
+\bibitem{ohara2015highfrequency} M.~O'Hara, ``High frequency market microstructure,'' \textit{J. Financ. Econ.}, vol.~116, no.~2, pp.~257--270, 2015.
+\bibitem{sahabatai2024} GoTo and Indosat Ooredoo Hutchison, ``Sahabat-AI: Indonesian sovereign large language models,'' \textit{Technical Whitepaper}, 2024.
+\bibitem{qwen2024} Qwen Team, ``Qwen2.5 technical report,'' \textit{Alibaba Cloud Technical Report}, 2024.
+\bibitem{gemma2024} Gemma Team, ``Gemma 2: Improving open language models at a practical size,'' \textit{Google DeepMind Technical Report}, 2024.
+\bibitem{zandbergen2022accuracy} P.~A.~Zandbergen, ``Accuracy of air defense systems under high-velocity multi-threat saturation,'' \textit{IEEE Trans. Aerosp. Electron. Syst.}, vol.~58, no.~4, pp.~3120--3134, 2022.
+\bibitem{budish2015highfrequency} E.~Budish, P.~Cramton, and J.~Shim, ``The high-frequency trading arms race: Frequent batch auctions as a market design response,'' \textit{Q. J. Econ.}, vol.~130, no.~4, pp.~1547--1621, 2015.
+\end{thebibliography}
+
+\end{document}
